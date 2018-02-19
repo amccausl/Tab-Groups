@@ -4,6 +4,7 @@
   "description": "A web-extensions port for Tab Groups",
   "scripts": {
     "build": "./build.sh",
+    "build-windows": "build.bat",
     "dev": "./node_modules/.bin/cross-env NODE_ENV=development ./build.sh",
     "test": "node --experimental-modules test/index.mjs",
     "debug": "./node_modules/.bin/web-ext --source-dir dist run --verbose",
