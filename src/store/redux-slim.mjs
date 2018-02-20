@@ -1,12 +1,6 @@
-
-export function pick( obj, fn ) {
-  return Object.keys( obj ).reduce( ( result, key ) => {
-    if( fn( obj[ key ] ) ) {
-      result[ key ] = obj[ key ]
-    }
-    return result
-  }, {})
-}
+import {
+  validateState
+} from './validators.mjs'
 
 export function createStore( reducer, initial_state ) {
   const listeners = []
@@ -42,14 +36,22 @@ export function createStore( reducer, initial_state ) {
 
     try {
       store.is_dispatching = true
-      current_state = reducer( current_state, action )
+      const new_state = reducer( current_state, action )
+      if( validateState( new_state ) ) {
+        current_state = new_state
+      } else {
+        console.error( 'Validator failed on new state' )
+        console.info('current_state',current_state)
+        console.info('action', action)
+        console.info('new_state', new_state)
+      }
     } finally {
       store.is_dispatching = false
     }
 
     for( let listener of listeners.slice() ) {
       if( dispatch_id !== local_dispatch_id ) {
-        console.info('parallel dispatch, early abort')
+        console.warn('parallel dispatch, early abort')
         break
       }
       listener()

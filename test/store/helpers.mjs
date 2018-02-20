@@ -1,5 +1,3 @@
-import Ajv from 'ajv'
-
 import { getTabState } from '../../src/integrations/index.mjs'
 import {
   createWindow,
@@ -84,189 +82,6 @@ export function getMultiWindowInitialState() {
   return initial_state
 }
 
-export const tab_state_schema = {
-  type: 'object',
-  properties: {
-    'id': {
-      type: 'integer'
-    },
-    'title': {
-      type: 'string'
-    },
-    'status': {
-      type: 'string'
-    },
-    'url': {
-      type: 'string'
-    },
-    'icon_url': {
-      type: 'string',
-      format: 'uri'
-    },
-    'context_id': {
-      type: 'string'
-    },
-    'discarded': {
-      type: 'boolean'
-    },
-    'last_accessed': {
-      type: 'integer'
-    },
-    'preview_image': {
-      type: 'object',
-      properties: {
-        'width': {
-          type: 'integer'
-        },
-        'height': {
-          type: 'integer'
-        },
-        'uri': {
-          type: 'string',
-          format: 'uri'
-        }
-      }
-    }
-  },
-  additionalProperties: false,
-  required: [
-    'id',
-    'status',
-  ]
-}
-
-export const tab_group_state_schema = {
-  properties: {
-    'id': {
-      type: 'integer'
-    },
-    'title': {
-      type: 'string'
-    },
-    'active_tab_id': {
-    },
-    'tabs': {
-      type: 'array',
-      items: tab_state_schema
-    },
-    'tabs_count': {
-      type: 'integer'
-    }
-  },
-  additionalProperties: false,
-  required: [
-    'id',
-    'title',
-    'active_tab_id',
-    'tabs',
-    'tabs_count',
-  ]
-}
-
-export const pinned_tab_group_state_schema = {
-  properties: {
-    'id': {
-      enum: [ 0 ]
-    },
-    'pinned': {
-      enum: [ true ]
-    },
-    'active_tab_id': {
-    },
-    'tabs': {
-      type: 'array',
-      items: tab_state_schema
-    },
-    'tabs_count': {
-      type: 'integer',
-      minimum: 0
-    }
-  },
-  additionalProperties: false,
-  required: [
-    'pinned'
-  ]
-}
-
-export const window_state_schema = {
-  type: 'object',
-  properties: {
-    'id': {
-      type: 'integer'
-    },
-    'active_tab_group_id': {
-      type: 'integer',
-      minimum: 1
-    },
-    'tab_groups': {
-      type: 'array',
-      minItems: 2,
-      items: {
-        type: 'object',
-        oneOf: [
-          pinned_tab_group_state_schema,
-          tab_group_state_schema
-        ]
-      }
-    }
-  },
-  additionalProperties: false,
-  required: [
-    'id',
-    'active_tab_group_id',
-    'tab_groups',
-  ]
-}
-
-export const state_schema = {
-  type: 'object',
-  properties: {
-    config: {
-      type: 'object'
-    },
-    contexts: {
-      type: 'object'
-    },
-    orphan_tabs: {
-      type: 'array',
-      items: tab_state_schema
-    },
-    windows: {
-      type: 'array',
-      items: window_state_schema
-    }
-  },
-  additionalProperties: false,
-  required: [
-    'config',
-    'windows',
-  ]
-}
-
-const ajv = new Ajv()
-export const validateTabStateSchema = ajv.compile( tab_state_schema )
-export const validateTabGroupStateSchema = ajv.compile( Object.assign( { type: 'object' }, tab_group_state_schema ) )
-export const validateWindowStateSchema = ajv.compile( window_state_schema )
-export const validateStateSchema = ajv.compile( state_schema )
-
-export function validateTabState( tab_state ) {
-  return validateTabStateSchema( tab_state )
-}
-export function validateTabGroupState( tab_group_state ) {
-  // @todo validate no duplicate tabs
-  // @todo validate active_tab_id is set
-  // @todo validate tab count
-  return validateTabGroupStateSchema( tab_group_state )
-}
-export function validateWindowState( window_state ) {
-  // @todo validate each of the tab groups
-  // @todo validate active_tab_group_id is set
-  return validateWindowStateSchema( window_state )
-}
-export function validateState( state ) {
-  return validateStateSchema( state )
-}
-
 function testFindTab( t ) {
   let state = getInitialState()
   let tab = findTab( state, state.windows[ 0 ].id, state.windows[ 0 ].tab_groups[ 1 ].tabs[ 0 ].id )
@@ -318,12 +133,6 @@ function testGetTabMoveData( t ) {
   t.end()
 }
 
-function testValidate( t ) {
-  let state = getInitialState()
-  t.equal( validateState( state ), true )
-  t.end()
-}
-
 function testPersistence( t ) {
   let state = getInitialState()
   let tab_groups_state = getTabGroupsPersistState( state.windows[ 0 ] )
@@ -344,7 +153,6 @@ function testPersistence( t ) {
 export default function( tap ) {
   tap.test( testFindTab )
   tap.test( testGetTabMoveData )
-  tap.test( testValidate )
   tap.test( testPersistence )
   tap.end()
 }

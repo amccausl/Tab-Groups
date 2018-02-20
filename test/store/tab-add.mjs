@@ -3,10 +3,10 @@ import {
   createTestTab,
   getInitialState,
   getMultiWindowInitialState,
-  validateState,
 } from './helpers.mjs'
 
 import { addTab } from '../../src/store/reducers.mjs'
+import { validateState } from '../../src/store/validators.mjs'
 
 function testSingleWindowAdd( t ) {
   let state = getInitialState()

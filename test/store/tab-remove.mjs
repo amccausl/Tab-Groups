@@ -1,7 +1,6 @@
 import {
   createTestTab,
   getInitialState,
-  validateState,
 } from './helpers.mjs'
 
 import {
@@ -12,6 +11,9 @@ import {
 import {
   removeTab,
 } from '../../src/store/reducers.mjs'
+import {
+  validateState,
+} from '../../src/store/validators.mjs'
 
 function testRemoveFirstTab( t ) {
   let state = getInitialState()

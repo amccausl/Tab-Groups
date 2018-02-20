@@ -21,3 +21,5 @@ This is not ready for public consumption, but if you're curious you can load in 
 4. Load [about:debugging](about:debugging) in Firefox and click "Load Temporary Add-on".  Open `dist/manifest.json`.
 
 Will add a new "Tab Group" sidebar.  It should open when you load.
+
+You can remove the original tab bar by [following these instructions](https://superuser.com/questions/1261660/firefox-quantum-ver-57-how-can-i-hide-the-horizontal-tab-bar-with-treesty/1261661)

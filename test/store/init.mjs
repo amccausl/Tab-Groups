@@ -1,9 +1,9 @@
 import {
   createBrowserTab,
-  validateState,
 } from './helpers.mjs'
 
 import { init } from '../../src/store/reducers.mjs'
+import { validateState } from '../../src/store/validators.mjs'
 
 function testSingleWindowFreshInit( t ) {
   const browser_tabs = [

@@ -1,0 +1,153 @@
+{
+  "definitions": {
+    "tab": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "icon_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "context_id": {
+          "type": "string"
+        },
+        "discarded": {
+          "type": "boolean"
+        },
+        "last_accessed": {
+          "type": "integer"
+        },
+        "preview_image": {
+          "type": "object",
+          "properties": {
+            "width": {
+              "type": "integer"
+            },
+            "height": {
+              "type": "integer"
+            },
+            "uri": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status"
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "config": {
+      "type": "object"
+    },
+    "contexts": {
+      "type": "object"
+    },
+    "orphan_tabs": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/tab" }
+    },
+    "windows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "active_tab_group_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tab_groups": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "oneOf": [
+                {
+                  "properties": {
+                    "id": {
+                      "enum": [ 0 ]
+                    },
+                    "pinned": {
+                      "enum": [ true ]
+                    },
+                    "active_tab_id": {
+                    },
+                    "tabs": {
+                      "type": "array",
+                      "items": { "$ref": "#/definitions/tab" }
+                    },
+                    "tabs_count": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "pinned"
+                  ]
+                },
+                {
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "active_tab_id": {
+                    },
+                    "tabs": {
+                      "type": "array",
+                      "items": { "$ref": "#/definitions/tab" }
+                    },
+                    "tabs_count": {
+                      "type": "integer"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "title",
+                    "active_tab_id",
+                    "tabs",
+                    "tabs_count"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "active_tab_group_id",
+          "tab_groups"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "config",
+    "windows"
+  ]
+}

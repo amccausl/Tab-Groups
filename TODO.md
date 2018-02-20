@@ -1,4 +1,5 @@
-p1
+#### p1
+- styling for pinned
 - testing
   - reproduce all bugs as integration tests
   - add library for web-extension browser mocking
@@ -92,7 +93,6 @@ p1
 - review @todos
 - add docs to hide tab bar
   - https://superuser.com/questions/1261660/firefox-quantum-ver-57-how-can-i-hide-the-horizontal-tab-bar-with-treesty/1261661
-  - https://support.mozilla.org/en-US/questions/957337
 - add sync check
 - add handling for private browsing
 - publish
@@ -100,7 +100,7 @@ p1
   - turn on vuejs production mode
   - fix id
 
-p2
+#### p2
 - bugs
   - tab group page
     - fix rendering when preview images aren't available
@@ -166,7 +166,7 @@ p2
 - context menus
 - add interval to detect state drift
 
-p3
+#### p3
 - common css rules
 - save settings and tabs to sync
   - synced groups
@@ -183,7 +183,7 @@ p3
 - recover with history
 - tour & upgrade features
 
-p4
+#### p4
 - VueJS unit testing
   - https://vuejs.org/v2/guide/unit-testing.html
 - integration tests
@@ -200,12 +200,12 @@ p4
 - investigate placeholder thumbnails on mobile new tab page
 - 3rd party api documentation
 
-p5
+#### p5
 - performance testing
   - virtual scroll
 - interaction with containers
 
-other
+#### other
 - investigate weh
   - https://github.com/mi-g/weh
   - should use standard form spec for preferences
