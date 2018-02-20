@@ -35,15 +35,20 @@ export function createStore( reducer, initial_state ) {
     // }
 
     try {
+      // @todo put profiling behind debug flag
       store.is_dispatching = true
+      console.time( `dispatch ${ action.type }` )
       const new_state = reducer( current_state, action )
+      console.timeEnd( `dispatch ${ action.type }` )
       if( validateState( new_state ) ) {
         current_state = new_state
+        console.info( 'state', current_state )
       } else {
         console.error( 'Validator failed on new state' )
         console.info('current_state',current_state)
         console.info('action', action)
         console.info('new_state', new_state)
+        console.info('errors', validateState.errors)
       }
     } finally {
       store.is_dispatching = false

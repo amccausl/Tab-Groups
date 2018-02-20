@@ -38,7 +38,6 @@ export function onStateChange( fn ) {
 
   // Attach listener to background state changes so we can update the data
   const unsubscribe = window.store.subscribe( () => {
-    console.info('state', window.store.getState())
     fn( window.store.getState() )
   })
   window.addEventListener( 'unload', ( event ) => {

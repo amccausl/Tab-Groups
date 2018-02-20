@@ -6,19 +6,20 @@ This is a work in progress to port some basic functionality from tab groups to w
 - https://addons.mozilla.org/en-US/firefox/addon/tab-center-redux/
 - http://design.firefox.com/photon/welcome.html
 
-# Building
+# Development
 ```
-npm run build
+npm run build && npm run debug
 ```
 
 # Install Instructions
 
-This is not ready for public consumption, but if you're curious you can load in firefox on linux/mac (`build.sh` in the root dir could be ported to windows bat file if you're interested).
+This is not ready for public consumption, but if you're curious you can load in firefox.
 
 1. Install [Node.js](https://nodejs.org/en/) for your platform
 2. `git clone git@github.com:amccausl/Tab-Groups.git` and open directory in terminal
-3. `npm run build`
-4. Load [about:debugging](about:debugging) in Firefox and click "Load Temporary Add-on".  Open `dist/manifest.json`.
+3. `npm install`
+4. `npm run build` on linux/mac or `npm run build-windows` on windows
+5. Load [about:debugging](about:debugging) in Firefox and click "Load Temporary Add-on" and open `dist/manifest.json` or run `npm run debug`
 
 Will add a new "Tab Group" sidebar.  It should open when you load.
 

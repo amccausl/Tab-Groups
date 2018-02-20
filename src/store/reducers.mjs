@@ -156,6 +156,7 @@ export function init( state, { browser_tabs, config, contextual_identities, them
         window_tab_groups.push({
           id: tab_group_state.id,
           title: tab_group_state.title,
+          active_tab_id: null,
           tabs,
           tabs_count: tabs.length
         })

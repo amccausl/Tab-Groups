@@ -62,7 +62,7 @@
     - index based tab dragging
       - style cleanup
       - drop animation looks janky
-      - drag over last item moves to the wrong indexp
+      - drag over last item moves to the wrong index
     - index based group dragging
     - between pinned tabs
     - to new group
@@ -83,16 +83,10 @@
   - fix field tabbing
   - open tools on debug
 - testing for suspend and replace
-- dispatcher
-  - add validator
-    - update to include unique & active linking
-  - add performance markers
 - text overflow gradient
 - clean up console warnings
 - clear out repo
 - review @todos
-- add docs to hide tab bar
-  - https://superuser.com/questions/1261660/firefox-quantum-ver-57-how-can-i-hide-the-horizontal-tab-bar-with-treesty/1261661
 - add sync check
 - add handling for private browsing
 - publish

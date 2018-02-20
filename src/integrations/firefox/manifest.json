@@ -19,6 +19,7 @@
     "theme",
     "unlimitedStorage"
   ],
+  "default_locale": "en",
   "background": {
     "scripts": [ "background.js" ]
   },

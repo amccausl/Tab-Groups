@@ -85,14 +85,15 @@ export function bindBrowserEvents( store ) {
     store.dispatch( activateTabAction( tabId, windowId ) )
 
     // Start background task to get preview image
-    browser.tabs.captureVisibleTab( windowId, TAB_PREVIEW_IMAGE_DETAILS )
-      .then( preview_image_uri => {
-        store.dispatch( updateTabImageAction( tabId, windowId, preview_image_uri ) )
-        const tab = findTab( store.getState(), windowId, tabId )
-        if( tab && tab.preview_image ) {
-          setTabPreviewState( tab.id, tab.preview_image )
-        }
-      })
+    // NOTE: Not needed at the moment, disabled for now
+    // browser.tabs.captureVisibleTab( windowId, TAB_PREVIEW_IMAGE_DETAILS )
+    //   .then( preview_image_uri => {
+    //     store.dispatch( updateTabImageAction( tabId, windowId, preview_image_uri ) )
+    //     const tab = findTab( store.getState(), windowId, tabId )
+    //     if( tab && tab.preview_image ) {
+    //       setTabPreviewState( tab.id, tab.preview_image )
+    //     }
+    //   })
   })
 
   browser.tabs.onCreated.addListener( ( browser_tab ) => {

@@ -18,15 +18,28 @@ export function validateState( state ) {
         // }
       }
 
+      if( tab_group.hasOwnProperty( 'active_tab_id' ) && tab_group.active_tab_id) {
+        if( ! tab_group.tabs.some( tab => tab.id === tab_group.active_tab_id ) ) {
+          // @todo populate error
+          return false
+        }
+      }
+
+      let is_active_tab_valid = false
       for( let tab of tab_group.tabs ) {
         if( tab_ids_map.has( tab.id ) ) {
           // @todo populate error
           return false
         }
+
         tab_ids_map.set( tab.id, { window_id: window.id, tab_group_id: tab_group.id } )
       }
     }
   }
 
-  return validateStateSchema( state )
+  if( ! validateStateSchema( state ) ) {
+    validateState.errors = validateStateSchema.errors
+    return false
+  }
+  return true
 }
