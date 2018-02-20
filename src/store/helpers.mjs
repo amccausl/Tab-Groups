@@ -13,14 +13,10 @@ export function createWindow( window_id, tab_groups ) {
 }
 
 export function createTabGroup( tab_group_id, tabs, active_tab_id ) {
-  if( ! active_tab_id && tabs.length ) {
-    active_tab_id = tabs[ 0 ].id
-  }
-
   return {
     id: tab_group_id,
     title: typeof browser != 'undefined' ? browser.i18n.getMessage( "tab_group_name_placeholder", [ tab_group_id ] ) : `Group ${ tab_group_id }`,
-    active_tab_id,
+    active_tab_id: ! active_tab_id && tabs.length ? tabs[ 0 ].id : null,
     tabs,
     tabs_count: tabs.length
   }

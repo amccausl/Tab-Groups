@@ -70,6 +70,7 @@
       - drag tab to bookmark
       - drag group to bookmarks
   - navigation
+    - scroll to active tab
     - arrow key navigation with selected state
     - add handling for native change tab: none, visible, group-wrap
     - tab wheel scroll

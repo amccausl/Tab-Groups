@@ -16,8 +16,7 @@
           "type": "string"
         },
         "icon_url": {
-          "type": "string",
-          "format": "uri"
+          "type": "string"
         },
         "context_id": {
           "type": "string"

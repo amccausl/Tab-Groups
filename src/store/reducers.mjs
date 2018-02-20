@@ -82,6 +82,13 @@ function _removeTab( state, { tab_id, window_id, index, is_detach } ) {
               tabs_count: tab_group.tabs_count - 1
             })
             orphan_tab = tab_group.tabs.splice( tab_index, 1 )[ 0 ]
+            if( tab_group.active_tab_id === tab_id ) {
+              if( tab_group.tabs_count > 0 ) {
+                tab_group.active_tab_id = tab_group.tabs[ Math.min( tab_index, tab_group.tabs_count - 1 ) ].id
+              } else {
+                tab_group.active_tab_id = null
+              }
+            }
           }
           return tab_group
         })
