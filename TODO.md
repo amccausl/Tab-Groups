@@ -1,10 +1,18 @@
 #### p1
+- add flags to state for feature detection
 - styling for pinned
+- add hide tab support with select active group
+  - https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/show
 - testing
   - reproduce all bugs as integration tests
   - add library for web-extension browser mocking
   - add testing for vue components
+- store failed validations in log, surface on options page
 - bugs
+  - open new tab should be in the current group
+  - native swap for first tabs after pinned has no affect
+  - pinning tab didn't move
+  - 1 drag is off
   - context broken
   - target after start issue
     - could fix with style change
@@ -17,11 +25,14 @@
   - moving to same group should be noop
   - active indicator on pinned tabs
   - sidebar
+    - active tab state falls out of sync
     - bind right click for empty space
     - duplicate tab issue
     - multi-drag
+      - from 1 window to another loses favicon
       - dragging from new doesn't clear the target class
       - styling
+      - styling is weird when dragging to a sticky tab
       - clear selection after move
       - preview placeholder
       - drag below the fold to trigger timer scroll
@@ -37,7 +48,7 @@
       - better handling for broken icons
   - open new tab should open at the end of the current collection
 - watch task with compile / tests
-- sidebar
+- sidebar improvements
   - context menu
   - group header
     - editable group name
@@ -71,6 +82,7 @@
       - drag group to bookmarks
   - navigation
     - scroll to active tab
+    - new group should scroll to group
     - arrow key navigation with selected state
     - add handling for native change tab: none, visible, group-wrap
     - tab wheel scroll

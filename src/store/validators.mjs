@@ -51,7 +51,7 @@ export function validateState( state ) {
     errors.push( ...validateStateSchema.errors )
   }
   if( errors.length ) {
-    validateState.errors = validateStateSchema.errors
+    validateState.errors = errors
     return false
   }
   return true

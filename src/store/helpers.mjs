@@ -164,7 +164,6 @@ export function getTargetTabGroupData( target_window, target_data, ignored_tabs 
  *   window_id
  *   tab_ids
  * @param target_data
- *
  */
 export function getTabMoveData( state, source_data, target_data ) {
   let { windows } = state

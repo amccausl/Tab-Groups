@@ -241,11 +241,13 @@ $dark-header-background: #0c0c0d;
 $dark-header-active-background: #323234;
 $dark-header-hover-background: #252526;
 $dark-awesome-bar-background: #474749;
+$dark-border-color: #e0e0e1;
 
 $light-header-background: #0c0c0d;
 $light-header-active-background: #f5f6f7;
 $light-header-hover-background: #cccdcf;
 $light-awesome-bar-background: #474749; // @todo
+$light-border-color: #e0e0e1;
 
 .sidebar {
   width: 100%;
@@ -427,6 +429,7 @@ $light-awesome-bar-background: #474749; // @todo
 
   .sidebar-header {
     background-color: $light-header-active-background;
+    border-bottom: $light-border-color 1px solid;
   }
 
   .sidebar-header-new_group:hover {
@@ -441,6 +444,10 @@ $light-awesome-bar-background: #474749; // @todo
 
   .sidebar-header-config:hover {
     background-color: $light-header-hover-background;
+  }
+
+  .sidebar-tab-group-tabs-list {
+    border-bottom: $light-border-color 1px solid;
   }
 
   .sidebar-tab-group-tabs-list-item.source .sidebar-tab-view-item {
@@ -465,7 +472,7 @@ $light-awesome-bar-background: #474749; // @todo
 
   .sidebar-tab-group-list-item-header {
     background-color: $photon-white;
-    border-bottom: black 1px solid;
+    border-bottom: $light-border-color 1px solid;
   }
 
   .sidebar-tab-view-item.active {
@@ -497,6 +504,7 @@ $light-awesome-bar-background: #474749; // @todo
 
   .sidebar-header {
     background-color: $dark-header-active-background;
+    border-bottom: $dark-border-color 1px solid;
   }
 
   .sidebar-header-new_group:hover {
@@ -513,6 +521,10 @@ $light-awesome-bar-background: #474749; // @todo
     background-color: $dark-header-hover-background;
   }
 
+  .sidebar-tab-group-tabs-list {
+    border-bottom: $dark-border-color 1px solid;
+  }
+
   .sidebar-tab-group-tabs-list-item.target {
     background-color: $dark-header-active-background;
   }
@@ -527,7 +539,7 @@ $light-awesome-bar-background: #474749; // @todo
 
   .sidebar-tab-group-list-item-header {
     background-color: black;
-    border-bottom: $photon-white 1px solid;
+    border-bottom: $light-border-color 1px solid;
   }
 
   .sidebar-tabs-pinned-list-item.active {

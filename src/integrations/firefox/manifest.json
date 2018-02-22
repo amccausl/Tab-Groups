@@ -16,6 +16,7 @@
     "sessions",
     "storage",
     "tabs",
+    "tabHide",
     "theme",
     "unlimitedStorage"
   ],

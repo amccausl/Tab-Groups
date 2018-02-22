@@ -1,10 +1,17 @@
 import { createTestTab } from './helpers'
-import { createTabGroup, createWindow } from '../../src/store/helpers.mjs'
+import {
+  createPinnedTabGroup,
+  createTabGroup,
+  createWindow,
+  getTabMoveData,
+} from '../../src/store/helpers.mjs'
+import { validateState } from '../../src/store/validators.mjs'
 
 import { moveTabs } from '../../src/store/reducers'
 
 function testSingleWindowMoveOne( t ) {
   const initial_state = {
+    config: {},
     windows: [
       createWindow( 1, [
         createPinnedTabGroup( [] ),
@@ -21,15 +28,21 @@ function testSingleWindowMoveOne( t ) {
     ]
   }
 
-  // Move middle tab of group1 to end of group1
-  let source_tabs_data = {
+  console.info('initial_state', initial_state)
+  t.ok( validateState( initial_state ), "state validates", validateState.errors )
+
+  let source_data = {
     window_id: 1,
     tab_ids: [ 4, 5 ]
   }
   let target_data = {
     window_id: 1
   }
-  const state1 = moveTabs( initial_state, { source_tabs_data, target_data } )
+
+  let tab_move_data = getTabMoveData( initial_state, source_data, target_data )
+
+  const state1 = moveTabs( initial_state, tab_move_data.source_data, tab_move_data.target_data )
+  t.ok( validateState( state1 ), "state validates", validateState.errors )
   t.end()
 }
 
