@@ -371,6 +371,7 @@ export function moveGroup( state, { tab_group_id, window_id, index } ) {
 }
 
 export function activateTab( state, { tab_id, window_id } ) {
+  // @todo activate the group the tab is in
   let tab_group_id
   // @todo optimize to return existing state if tab already active
   return Object.assign( {}, state, {

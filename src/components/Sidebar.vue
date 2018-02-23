@@ -187,7 +187,7 @@ export default {
     openTab( tab ) {
       console.info('openTab', tab)
       this.selected_tab_ids.splice( 0, this.selected_tab_ids.length )
-      window.background.setTabActive( tab.id )
+      window.background.setTabActive( window.store, this.window_id, tab.id )
     },
     closeTab( tab ) {
       console.info('closeTab', tab)

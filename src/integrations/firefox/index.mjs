@@ -170,7 +170,7 @@ export function loadBrowserState() {
     browser.tabs.query( EMPTY ),
     // theme.getCurrent is available in firefox 58+
     browser.theme && browser.theme.getCurrent ? browser.theme.getCurrent() : null,
-    browser.contextualIdentities.query( EMPTY )
+    browser.contextualIdentities.query( EMPTY ).then( null, console.error )
   ]).then(
     ( [ storage, _browser_tabs, _theme, _contextual_identities ] ) => {
       browser_tabs = _browser_tabs
@@ -393,8 +393,46 @@ export function openTabGroupsPage() {
  * @param tab_id
  * @todo should this include the window_id?
  */
-export function setTabActive( tab_id ) {
-  return browser.tabs.update( tab_id, { active: true } )
+export function setTabActive( store, window_id, tab_id ) {
+  const state = store.getState()
+  const updates = []
+
+  updates.push( browser.tabs.update( tab_id, { active: true } ) )
+
+  if( browser.tabs.show && browser.tabs.hide ) {
+    const show_ids = []
+    const hide_ids = []
+
+    for( let window of state.windows ) {
+      if( window.id !== window_id ) {
+        continue
+      }
+      // @todo check for noop
+      for( let tab_group of window.tab_groups ) {
+        if( tab_group.hasOwnProperty( 'pinned' ) ) {
+          if( tab_group.tabs.some( tab => tab.id === tab_id ) ) {
+            break
+          }
+          continue
+        }
+        if( tab_group.tabs.some( tab => tab.id === tab_id ) ) {
+          show_ids.push( ...tab_group.tabs.map( tab => tab.id ) )
+        } else {
+          // @todo pin tab if hide not possible
+          hide_ids.push( ...tab_group.tabs.map( tab => tab.id ) )
+        }
+      }
+      if( hide_ids.length ) {
+        updates.push( browser.tabs.hide( hide_ids ) )
+      }
+      if( show_ids.length ) {
+        updates.push( browser.tabs.show( show_ids ) )
+      }
+      break
+    }
+  }
+
+  return Promise.all( updates )
 }
 
 /**
