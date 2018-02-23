@@ -98,7 +98,7 @@ export function bindBrowserEvents( store ) {
 
   browser.tabs.onCreated.addListener( ( browser_tab ) => {
     console.info('tabs.onCreated', browser_tab)
-    store.dispatch( addTabAction( browser_tab ) )
+    onTabCreated( store, browser_tab )
   })
 
   browser.tabs.onRemoved.addListener( ( tab_id, { windowId, isWindowClosing } ) => {
@@ -441,6 +441,28 @@ export function setTabActive( store, window_id, tab_id ) {
  */
 export function closeTab( tab_id ) {
   return browser.tabs.remove( [ tab_id ] )
+}
+
+export function onTabCreated( store, browser_tab ) {
+  // @todo find active group
+  const state = store.getState()
+
+  for( let window of state.windows ) {
+    if( window.id !== browser_tab.windowId ) {
+      continue
+    }
+    let index_offset = 0
+    for( let tab_group of window.tab_groups ) {
+      index_offset += tab_group.tabs_count
+      if( window.active_tab_group_id === tab_group.id ) {
+        browser_tab.index = index_offset
+        browser.tabs.move( [ browser_tab.id ], { index: browser_tab.index } )
+      }
+    }
+    break
+  }
+
+  store.dispatch( addTabAction( browser_tab ) )
 }
 
 export function onTabMoved( store, source_data, target_data ) {

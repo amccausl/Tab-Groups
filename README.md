@@ -24,3 +24,5 @@ This is not ready for public consumption, but if you're curious you can load in 
 Will add a new "Tab Group" sidebar.  It should open when you load.
 
 You can remove the original tab bar by [following these instructions](https://superuser.com/questions/1261660/firefox-quantum-ver-57-how-can-i-hide-the-horizontal-tab-bar-with-treesty/1261661)
+
+Or, if you're using the latest firefox 59, you can update `extensions.webextensions.tabhide.enabled` property at about:config

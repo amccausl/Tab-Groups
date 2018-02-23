@@ -8,6 +8,7 @@
   - investigate nodejs es6 dependency mocking
 - store failed validations in log, surface on options page
 - bugs
+  - update hide state on tab move
   - open new tab should be in the current group
   - native swap for first tabs after pinned has no affect
   - pinning tab didn't move
