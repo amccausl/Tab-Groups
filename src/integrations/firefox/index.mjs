@@ -555,6 +555,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
   const { tab_ids } = source_data
   const state = store.getState()
 
+  const updates = []
   const move_data = getTabMoveData( state, source_data, target_data )
 
   if( ! move_data ) {
@@ -574,12 +575,20 @@ export function moveTabsToGroup( store, source_data, target_data ) {
   }
   store.dispatch( moveTabsAction( source_data, target_data ) )
 
+  if( browser.tabs.show && browser.tabs.hide ) {
+    const target_window = state.windows.find( window => window.id === target_data.window_id )
+    const tab_ids = source_data.tabs.map( tab => tab.id )
+    if( target_data.tab_group_id === target_window.active_tab_group_id ) {
+      updates.push( browser.tabs.show( tab_ids ) )
+    } else {
+      updates.push( browser.tabs.hide( tab_ids ) )
+    }
+  }
+
   console.info('browser.tabs.move', tab_ids, move_properties)
-  return browser.tabs.move( tab_ids, move_properties )
-    .then( browser_tabs => {
-      // window.setTimeout( () => {
-      // }, 0)
-    })
+  updates.push( browser.tabs.move( tab_ids, move_properties ) )
+
+  return Promise.all( updates )
 }
 
 /**

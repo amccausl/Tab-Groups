@@ -9,7 +9,7 @@
         {{ __MSG_tab_group_new__ }}
       </div>
       <!-- @todo create icon -->
-      <input class="sidebar-header-search" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/>
+      <!-- <input class="sidebar-header-search" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/> -->
       <div class="sidebar-header-config" @click="openOptionsPage()">
         <!-- @todo hi-res, context colours -->
         <img class="icon" src="/icons/options.png"/>
@@ -51,7 +51,6 @@
               draggable="true" @dragstart="onTabDragStart( $event, tab )" @dragend="onTabDragEnd( $event )" @drop="onTabDrop( $event, tab )"
               @dragover="onTabDragOver( $event, tab_group, tab )"
           >
-              <!-- @drag="onTabDrag" @dragenter="onTabDragEnter( tab_group, tab, $event )" @dragleave="onTabDragLeave( tab_group, tab, $event )" @dragexit="onTabDragExit" -->
             <div class="sidebar-tab-view-item" :class="{ active: tab_group.active_tab_id === tab.id }">
               <div class="sidebar-tab-view-item-icon">
                 <div></div>

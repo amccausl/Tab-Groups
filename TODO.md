@@ -6,25 +6,39 @@
   - add library for web-extension browser mocking
   - add testing for vue components
   - investigate nodejs es6 dependency mocking
+  - investigate typescript for tests
+  - VScode integration (running, linking errors & debugging)
+  - file based execution
+  - watch
+  - coverage
 - store failed validations in log, surface on options page
 - bugs
-  - update hide state on tab move
+  - hide/show
+    - if removing last in group, move to other group or open new tab
+    - use openerId for new tabs to link if possible
+    - pin if can't hide
+    - closing all tabs in group and new tab
+    - reopen closed tab should activate the group that contains it
+    - add process to suspend tabs
+    - middle click open in tab ordering is off in nav bar
   - open new tab should be in the current group
   - native swap for first tabs after pinned has no affect
   - pinning tab didn't move
   - 1 drag is off
   - context broken
+    - testing on main browser
+    - use https://developer.mozilla.org/en-US/docs/Web/CSS/attr for styles
   - target after start issue
     - could fix with style change
   - drag from new window to existing
   - fix move when there are pinned tabs
-  - search text weirdness
   - pinned tab drag
   - when transitioning from discarded, if update clears favicon, keep open one
   - "new group" should open new tab in group, group should open
   - moving to same group should be noop
   - active indicator on pinned tabs
   - sidebar
+    - active group should always be open in sidebar
     - bind right click for empty space
     - multi-drag
       - from 1 window to another loses favicon
@@ -58,12 +72,13 @@
   - tab item
     - visual style for suspend
     - loading indicator
-    - status indication
+    - status indication and bubbling
       - audio playing, muted
       - pinned
       - loading
       - notifications?
     - ensure new tab is visible (scroll, open group)
+      - sometimes not clear there are more items under stick header
   - create new group [icon]
   - favicon scan for context styles
   - drag and drop
@@ -94,7 +109,7 @@
   - open tools on debug
 - testing for suspend and replace
 - text overflow gradient
-- clean up console warnings
+- clean up console messaging
 - clear out repo
 - review @todos
 - add sync check
@@ -106,14 +121,7 @@
 
 #### p2
 - bugs
-  - tab group page
-    - fix rendering when preview images aren't available
-    - fix title text truncation sizing
-    - tab group name edit
-      - right side artifact
-      - enter should exit
-      - select text on focus
-      - visual indication for edit
+  - search text weirdness
   - action
     - fix icon theming
     - groups should be selectable
@@ -123,6 +131,45 @@
   - refactor includes from components as methods on background window
 - revisit tab design
   - with mobile and new tab page layouts
+- action
+  - update icons for dynamic colours
+  - 2nd screen for open tabs
+  - 2nd screen for config
+  - scrollable
+  - dark theme
+- replace tab navigation hotkeys for more consistent group handling
+- investigate mobile version
+- sync
+- load/save backup
+- update tests for new state schema
+- drag and drop
+  - groups in sidebar
+  - between windows
+  - handle external url list drop
+- sidebar
+  - detect if favicons require background
+  - bubbling audio indicator
+  - tab search clear
+  - tab close button
+  - fade for overflow
+  - ui style for suspended tabs
+  - toggle styles
+    - big vs little icons
+- open main tab groups page with hotkey
+- context menus
+- add interval to detect state drift
+
+#### p3
+- common css rules
+- bugs
+  - tab group page
+    - fix rendering when preview images aren't available
+    - fix title text truncation sizing
+    - tab group name edit
+      - right side artifact
+      - enter should exit
+      - select text on focus
+      - visual indication for edit
 - tab groups page - 1st layout
   - visual indicator for editable text
     - enter should finish edit
@@ -141,37 +188,8 @@
     - placeholder icon
     - if dragging, don't set active tag
   - shouldn't be included as tab in tab group
-- preview image
-  - add debounce task after transition to complete if active
-- action
-  - update icons for dynamic colours
-  - 2nd screen for open tabs
-  - 2nd screen for config
-  - scrollable
-  - dark theme
-- replace tab navigation hotkeys for more consistent group handling
-- investigate mobile version
-- sync
-- load/save backup
-- update tests for new state schema
-- drag and drop
-  - groups in sidebar
-  - between windows
-  - handle external url list drop
-- sidebar
-  - bubbling audio indicator
-  - tab search clear
-  - tab close button
-  - fade for overflow
-  - ui style for suspended tabs
-  - toggle styles
-    - big vs little icons
-- open main tab groups page with hotkey
-- context menus
-- add interval to detect state drift
-
-#### p3
-- common css rules
+  - preview image
+    - add debounce task after transition to complete if active
 - save settings and tabs to sync
   - synced groups
   - options
