@@ -34,11 +34,10 @@
             v-on:click="toggleTabGroupOpen( tab_group )"
             @dragenter="onTabGroupDragEnter( $event, tab_group )" @dragover="onTabGroupDragOver( $event, tab_group )" @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
         >
-          <span class="text">
-            <!-- @todo icons -->
-            <span>{{ tab_group.open ? '–' : '+' }}</span>
-            {{ tab_group.title }}
-          </span>
+          <svg class="carat-icon" :class="{ open: tab_group.open }" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
+            <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
+          </svg>
+          <span class="text" contenteditable="true" spellcheck="false" @blur="onTabGroupNameUpdate( $event, tab_group )" @keyup.enter="onTabGroupNamePressEnter">{{ tab_group.title }}</span>
 
           <span class="sidebar-tab-group-list-item-header-tab-count">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
         </div>
@@ -73,6 +72,7 @@
 <script>
 import {
   createGroupAction,
+  updateGroupAction,
 } from '../store/actions.mjs'
 import {
   cloneTabGroup,
@@ -202,6 +202,17 @@ export default {
     onTabGroupDragEnter,
     onTabGroupDragOver,
     onTabGroupDrop,
+    onTabGroupNamePressEnter( event ) {
+      console.info('onTabGroupNamePressEnter', event)
+      event.preventDefault()
+      event.target.textContent = event.target.textContent.replace( /\n/g, '' )
+      event.currentTarget.blur()
+      window.getSelection().removeAllRanges()
+    },
+    onTabGroupNameUpdate( event, tab_group ) {
+      console.info('onTabGroupNameUpdate', event, event.target.textContent)
+      window.store.dispatch( updateGroupAction( tab_group.id, this.window_id, { title: event.target.textContent } ) )
+    },
     onUpdateSearchText: debounce( function( search_text ) {
       console.info('runSearch', search_text)
       window.background.runTabSearch( window.store, this.window_id, search_text )
@@ -418,6 +429,19 @@ $light-border-color: #e0e0e1;
   height: 16px;
   width: 16px;
   margin-right: 4px;
+}
+
+.carat-icon {
+  width: 6px;
+  margin-right: 4px;
+  margin-bottom: 1px;
+  transition-property: transform;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(.07,.95,0,1);
+}
+
+.carat-icon.open {
+  transform: rotate(90deg);
 }
 
 .light {

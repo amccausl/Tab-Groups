@@ -21,9 +21,11 @@
     - reopen closed tab should activate the group that contains it
     - add process to suspend tabs
     - middle click open in tab ordering is off in nav bar
+  - pinned
+    - reopen closed pinned tab, not added to pinned
+    - native move to 0 index pins tab
   - open new tab should be in the current group
   - native swap for first tabs after pinned has no affect
-  - pinning tab didn't move
   - 1 drag is off
   - context broken
     - testing on main browser
@@ -31,7 +33,6 @@
   - target after start issue
     - could fix with style change
   - drag from new window to existing
-  - fix move when there are pinned tabs
   - pinned tab drag
   - when transitioning from discarded, if update clears favicon, keep open one
   - "new group" should open new tab in group, group should open
@@ -66,6 +67,7 @@
     - delete group
     - group header shouldn't wrap
     - active group indicator
+    - opening new group should focus the name for edit
   - pinned tabs
     - icon sizing should match native for consistency
     - update styling to match tab bar
