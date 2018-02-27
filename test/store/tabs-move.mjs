@@ -40,7 +40,7 @@ function testSingleWindowMoveOne( t ) {
 
   let tab_move_data = getTabMoveData( initial_state, source_data, target_data )
 
-  const state1 = moveTabs( initial_state, tab_move_data.source_data, tab_move_data.target_data )
+  const state1 = moveTabs( initial_state, tab_move_data )
   t.ok( validateState( state1 ), "state validates", validateState.errors )
   t.end()
 }
@@ -81,7 +81,7 @@ function testMoveActiveTab( t ) {
 
   let tab_move_data = getTabMoveData( initial_state, source_data, target_data )
 
-  const state1 = moveTabs( initial_state, tab_move_data.source_data, tab_move_data.target_data )
+  const state1 = moveTabs( initial_state, tab_move_data )
   t.ok( validateState( state1 ), "state validates", validateState.errors )
   t.equal( state1.windows[ 0 ].active_tab_group_id, inactive_tab_group.id, 'activate new group on move of active tab' )
   t.end()

@@ -61,9 +61,13 @@
   - open new tab should open at the end of the current collection
 - watch task with compile / tests
 - sidebar improvements
-  - context menu
+  - tab group context menu
+    - pull from window
+    - open as window
+    - archive
+  - tab context menu
+    - move to group
   - group header
-    - editable group name
     - delete group
     - group header shouldn't wrap
     - active group indicator

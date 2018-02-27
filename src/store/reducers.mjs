@@ -413,7 +413,7 @@ export function addTab( state, { browser_tab } ) {
   }
 
   // Otherwise, use the move helper
-  const { source_data, target_data } = getTabMoveData(
+  const move_data = getTabMoveData(
     state,
     { tabs: [ getTabState( browser_tab ) ] },
     {
@@ -422,7 +422,7 @@ export function addTab( state, { browser_tab } ) {
     }
   )
 
-  return moveTabs( state, source_data, target_data )
+  return moveTabs( state, move_data )
 }
 
 export function removeTab( state, { tab_id, window_id } ) {
@@ -434,7 +434,7 @@ export function updateTab( state, { browser_tab, change_info } ) {
     const window_id = browser_tab.windowId
     const target_window = state.windows.find( window => window.id === window_id )
     const tab_group_id = change_info.pinned ? 0 : target_window.active_tab_group_id
-    const { source_data, target_data } = getTabMoveData(
+    const move_data = getTabMoveData(
       state,
       {
         window_id,
@@ -447,7 +447,7 @@ export function updateTab( state, { browser_tab, change_info } ) {
       }
     )
 
-    return moveTabs( state, source_data, target_data )
+    return moveTabs( state, move_data )
   }
   // @todo change use the nature of change_info to ignore changes
   return Object.assign( {}, state, {
@@ -518,7 +518,7 @@ export function updateTabImage( state, { tab_id, window_id, preview_image_uri } 
  *   { window_id, tab_group_id, tab_group_index }
 //  *   { window_id, pinned }
  */
-export function moveTabs( state, source_data, target_data ) {
+export function moveTabs( state, { source_data, target_data } ) {
   let { windows, orphan_tabs } = state
 
   // @todo check orphan tabs
@@ -530,53 +530,56 @@ export function moveTabs( state, source_data, target_data ) {
         return window
       }
 
-      window = Object.assign( {}, window, {
-        tab_groups: window.tab_groups.map( tab_group => {
-          let { tabs, active_tab_id } = tab_group
+      let active_tab_group_id = window.active_tab_group_id
+      let tab_groups = window.tab_groups.map( tab_group => {
+        let { tabs, active_tab_id } = tab_group
 
-          if( tabs.some( tab => source_data.tabs.includes( tab ) ) ) {
-            const filtered_tabs = []
+        if( tabs.some( tab => source_data.tabs.includes( tab ) ) ) {
+          const filtered_tabs = []
 
-            for( let tab of tabs ) {
-              if( ! source_data.tabs.includes( tab ) ) {
-                filtered_tabs.push( tab )
-                if( active_tab_id == null ) {
-                  active_tab_id = tab.id
-                }
-              } else if( tab.id === active_tab_id && tab_group.id !== target_data.tab_group_id ) {
-                active_tab_id = null
+          for( let tab of tabs ) {
+            if( ! source_data.tabs.includes( tab ) ) {
+              filtered_tabs.push( tab )
+              if( active_tab_id == null ) {
+                active_tab_id = tab.id
+              }
+            } else if( tab.id === active_tab_id && tab_group.id !== target_data.tab_group_id ) {
+              active_tab_id = null
+              // If the active tab in the active group is moving, activate new group
+              if( active_tab_group_id === tab_group.id ) {
+                active_tab_group_id = target_data.tab_group_id
               }
             }
-
-            if( active_tab_id == null && filtered_tabs.length ) {
-              active_tab_id = filtered_tabs[ filtered_tabs.length - 1 ].id
-            }
-
-            tabs = filtered_tabs
           }
 
-          if( target_data.tab_group_id === tab_group.id ) {
-            tabs = [ ...tabs ]
-            if( target_data.tab_group_index == null ) {
-              tabs.push( ...source_data.tabs )
-            } else {
-              tabs.splice( target_data.tab_group_index, 0, ...source_data.tabs )
-            }
+          if( active_tab_id == null && filtered_tabs.length ) {
+            active_tab_id = filtered_tabs[ filtered_tabs.length - 1 ].id
           }
 
-          if( tabs !== tab_group.tabs ) {
-            tab_group = Object.assign( {}, tab_group, {
-              active_tab_id,
-              tabs,
-              tabs_count: tabs.length
-            })
-          }
+          tabs = filtered_tabs
+        }
 
-          return tab_group
-        })
+        if( target_data.tab_group_id === tab_group.id ) {
+          tabs = [ ...tabs ]
+          if( target_data.tab_group_index == null ) {
+            tabs.push( ...source_data.tabs )
+          } else {
+            tabs.splice( target_data.tab_group_index, 0, ...source_data.tabs )
+          }
+        }
+
+        if( tabs !== tab_group.tabs ) {
+          tab_group = Object.assign( {}, tab_group, {
+            active_tab_id,
+            tabs,
+            tabs_count: tabs.length
+          })
+        }
+
+        return tab_group
       })
 
-      return window
+      return Object.assign( {}, window, { tab_groups, active_tab_group_id } )
     })
   })
 }
@@ -611,7 +614,7 @@ export function moveTab( state, { tab_id, window_id, index } ) {
     getTargetTabGroupData( target_window, target_data, source_data.tabs )
   )
 
-  return moveTabs( state, source_data, target_data )
+  return moveTabs( state, { source_data, target_data } )
 }
 
 export function attachTab( state, { tab_id, window_id, index } ) {
@@ -624,9 +627,9 @@ export function attachTab( state, { tab_id, window_id, index } ) {
       return state
     }
 
-    const { source_data, target_data } = getTabMoveData( state, { window_id: tab_window_id, tab_ids: [ tab_id ] }, { window_id, index } )
+    const move_data = getTabMoveData( state, { window_id: tab_window_id, tab_ids: [ tab_id ] }, { window_id, index } )
 
-    return moveTabs( state, source_data, target_data )
+    return moveTabs( state, move_data )
   }
 
   const orphan_tabs = [ ...state.orphan_tabs ]
@@ -707,7 +710,7 @@ export default function App( state = initial_state, action ) {
     case GROUP_MOVE:
       return moveGroup( state, action )
     case TABS_MOVE:
-      return moveTabs( state, action.source_data, action.target_data )
+      return moveTabs( state, action )
     case TAB_ACTIVATE:
       return activateTab( state, action )
     case TAB_ADD:
