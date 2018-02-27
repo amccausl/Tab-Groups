@@ -517,6 +517,10 @@ $light-border-color: #e0e0e1;
   .sidebar-tab-view-item-url {
     color: $photon-grey-50;
   }
+
+  .carat-icon {
+    fill: black;
+  }
 }
 
 .dark {
@@ -599,6 +603,10 @@ $light-border-color: #e0e0e1;
 
   .sidebar-tab-view-item-url {
     color: $photon-grey-50;
+  }
+
+  .carat-icon {
+    fill: $photon-white;
   }
 }
 </style>

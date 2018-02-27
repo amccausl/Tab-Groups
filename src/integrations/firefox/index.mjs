@@ -553,7 +553,7 @@ export function onTabMoved( store, source_data, target_data ) {
 export function moveTabsToGroup( store, source_data, target_data ) {
   console.info('moveTabsToGroup', source_data, target_data)
   const { tab_ids } = source_data
-  const state = store.getState()
+  let state = store.getState()
 
   const updates = []
   const move_data = getTabMoveData( state, source_data, target_data )
@@ -574,6 +574,9 @@ export function moveTabsToGroup( store, source_data, target_data ) {
     move_properties.windowId = target_data.window_id
   }
   store.dispatch( moveTabsAction( source_data, target_data ) )
+
+  // Reload the state
+  state = store.getState()
 
   if( browser.tabs.show && browser.tabs.hide ) {
     const target_window = state.windows.find( window => window.id === target_data.window_id )

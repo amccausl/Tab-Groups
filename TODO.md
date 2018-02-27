@@ -1,6 +1,11 @@
 #### p1
 - add flags to state for feature detection
 - styling for pinned
+  - background
+  - active indicator on pinned tabs
+  - sizing, spacing & separator
+  - contexts
+  - notifications & audio
 - testing
   - reproduce all bugs as integration tests
   - add library for web-extension browser mocking
@@ -11,46 +16,41 @@
   - file based execution
   - watch
   - coverage
-- store failed validations in log, surface on options page
+  - suspend and replace
 - bugs
   - hide/show
-    - if removing last in group, move to other group or open new tab
     - use openerId for new tabs to link if possible
     - pin if can't hide
     - closing all tabs in group and new tab
     - reopen closed tab should activate the group that contains it
-    - add process to suspend tabs
     - middle click open in tab ordering is off in nav bar
   - pinned
     - reopen closed pinned tab, not added to pinned
     - native move to 0 index pins tab
-  - open new tab should be in the current group
-  - native swap for first tabs after pinned has no affect
-  - 1 drag is off
   - context broken
     - testing on main browser
     - use https://developer.mozilla.org/en-US/docs/Web/CSS/attr for styles
   - target after start issue
     - could fix with style change
-  - drag from new window to existing
-  - pinned tab drag
   - when transitioning from discarded, if update clears favicon, keep open one
   - "new group" should open new tab in group, group should open
   - moving to same group should be noop
-  - active indicator on pinned tabs
+  - drag and drop
+    - pinned tab drag
+    - 1 drag is off
+    - from 1 window to another loses favicon
+    - dragging from new doesn't clear the target class
+    - styling is weird when dragging to a sticky tab
+    - preview placeholder
+    - drag below the fold to trigger timer scroll
+    - drag over collapsed group should open after 1s
+    - drag image
+      - experiment with svg content
+  - native drag
+    - swap for first tabs after pinned has no affect
+    - drag from new window to existing
   - sidebar
-    - active group should always be open in sidebar
     - bind right click for empty space
-    - multi-drag
-      - from 1 window to another loses favicon
-      - dragging from new doesn't clear the target class
-      - styling is weird when dragging to a sticky tab
-      - clear selection after move
-      - preview placeholder
-      - drag below the fold to trigger timer scroll
-      - drag over collapsed group should open after 1s
-      - drag image
-        - experiment with svg content
     - out of window drop target makes new window?
     - group toggle is odd if group moves above the fold, should scroll container so both headers visible
     - active style should only be displayed if group also active
@@ -61,20 +61,26 @@
   - open new tab should open at the end of the current collection
 - watch task with compile / tests
 - sidebar improvements
+  - add process to suspend tabs
   - tab group context menu
     - pull from window
     - open as window
     - archive
   - tab context menu
     - move to group
+  - door hanger
   - group header
     - delete group
     - group header shouldn't wrap
     - active group indicator
+  - rename
     - opening new group should focus the name for edit
+    - should select text on focus
+    - should not toggle open on focus
   - pinned tabs
     - icon sizing should match native for consistency
     - update styling to match tab bar
+    - open new tab from pinned tab while in long group scrolls to beginning and adds to end in native bar
   - tab item
     - visual style for suspend
     - loading indicator
@@ -85,6 +91,9 @@
       - notifications?
     - ensure new tab is visible (scroll, open group)
       - sometimes not clear there are more items under stick header
+    - update url rendering for usefulness
+    - text overflow gradient
+    - copy tab bar active style with blue bar
   - create new group [icon]
   - favicon scan for context styles
   - drag and drop
@@ -95,6 +104,10 @@
     - index based group dragging
     - between pinned tabs
     - to new group
+  - native drag
+    - drag from native tab to sidebar
+    - drag from bookmarks to sidebar
+    - drag from link to sidebar
     - [Recommended drag types](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types)
       - drag tab to bookmark
       - drag group to bookmarks
@@ -105,6 +118,7 @@
     - add handling for native change tab: none, visible, group-wrap
     - tab wheel scroll
     - command to toggle group sidebar
+    - j+k hotkeys to change group selection
 - options
   - base styling
   - toggles
@@ -113,14 +127,14 @@
       - sync
   - fix field tabbing
   - open tools on debug
-- testing for suspend and replace
-- text overflow gradient
-- clean up console messaging
-- clear out repo
-- review @todos
-- add sync check
-- add handling for private browsing
+- validation
+  - add sync check after validation failure
+  - store failed validations in log, surface on options page
+- private browsing
 - publish
+  - clean up console messaging
+  - clear out repo
+  - review @todos
   - determine min version
   - turn on vuejs production mode
   - fix id
@@ -132,6 +146,7 @@
     - fix icon theming
     - groups should be selectable
     - pinned tab rendering
+- archived groups
 - test with typescript
   - pull in types for redux, web-extensions
   - refactor includes from components as methods on background window
@@ -232,6 +247,7 @@
 - performance testing
   - virtual scroll
 - interaction with containers
+- audio actions (play, pause)
 
 #### other
 - investigate weh
