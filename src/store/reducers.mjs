@@ -529,7 +529,8 @@ export function moveTabs( state, source_data, target_data ) {
       if( window.id !== source_data.window_id && window.id !== target_data.window_id ) {
         return window
       }
-      return Object.assign( {}, window, {
+
+      window = Object.assign( {}, window, {
         tab_groups: window.tab_groups.map( tab_group => {
           let { tabs, active_tab_id } = tab_group
 
@@ -574,6 +575,8 @@ export function moveTabs( state, source_data, target_data ) {
           return tab_group
         })
       })
+
+      return window
     })
   })
 }
