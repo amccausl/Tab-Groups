@@ -25,7 +25,7 @@
     "scripts": [ "background.js" ]
   },
   "sidebar_action": {
-    "default_icon": "icons/sidebar.png",
+    "default_icon": "icons/tab-groups.svg",
     "default_title" : "__MSG_extension_name__",
     "default_panel": "sidebar.html"
   },

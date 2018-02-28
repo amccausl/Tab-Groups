@@ -30,6 +30,40 @@ export function getCountMessage( key, count ) {
 }
 
 /**
+ * Helper to get a more user-friendly url
+ * @param uri_string
+ */
+export function getFriendlyUrlText( uri_string ) {
+  try {
+    const url = new URL( uri_string )
+    let url_text = ''
+
+    // Return full path for about pages
+    if( url.protocol === 'about:' ) {
+      return url.href
+    }
+
+    // Ignore common protocols
+    if( ! [ 'https:', 'http:' ].includes( url.protocol ) ) {
+      url_text += url.protocol + '//'
+    }
+
+    // Strip leading www. (not really helpful)
+    url_text += url.host.startsWith( 'www.' ) ? url.host.substr( 4 ) : url.host
+
+    // @todo add as much of url and args as makes sense
+    if( url.pathname !== '/' ) {
+      url_text += '/…'
+    }
+    return url_text
+  } catch( ex ) {
+    // @todo error handling
+    console.error( 'getFriendlyUrlText exception', ex )
+    return null
+  }
+}
+
+/**
  * Subscribe to changes from the store and add cleanup on window
  * @param fn
  */

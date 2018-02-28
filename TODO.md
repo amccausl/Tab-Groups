@@ -1,4 +1,8 @@
 #### p1
+- use openerId to prevent new tabs from being at end of tab bar
+  - store ancestor list to tab state
+- new group
+  - make drag target (target as new group)
 - add flags to state for feature detection
 - styling for pinned
   - background
@@ -17,6 +21,7 @@
   - watch
   - coverage
   - suspend and replace
+  - url serialization
 - bugs
   - hide/show
     - use openerId for new tabs to link if possible
@@ -24,6 +29,7 @@
     - closing all tabs in group and new tab
     - reopen closed tab should activate the group that contains it
     - middle click open in tab ordering is off in nav bar
+    - should toggle states on launch
   - pinned
     - reopen closed pinned tab, not added to pinned
     - native move to 0 index pins tab
@@ -76,7 +82,6 @@
   - rename
     - opening new group should focus the name for edit
     - should select text on focus
-    - should not toggle open on focus
   - pinned tabs
     - icon sizing should match native for consistency
     - update styling to match tab bar
@@ -94,7 +99,6 @@
     - update url rendering for usefulness
     - text overflow gradient
     - copy tab bar active style with blue bar
-  - create new group [icon]
   - favicon scan for context styles
   - drag and drop
     - index based tab dragging
@@ -173,14 +177,12 @@
   - tab search clear
   - tab close button
   - fade for overflow
-  - ui style for suspended tabs
-  - toggle styles
-    - big vs little icons
 - open main tab groups page with hotkey
 - context menus
 - add interval to detect state drift
 
 #### p3
+- add wiki with screenshots
 - common css rules
 - bugs
   - tab group page
