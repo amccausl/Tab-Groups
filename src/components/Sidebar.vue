@@ -44,7 +44,7 @@
           <span class="text" contenteditable="true" spellcheck="false" @click.stop @blur="onTabGroupNameUpdate( $event, tab_group )" @keyup.enter="onTabGroupNamePressEnter">{{ tab_group.title }}</span>
 
           <span class="sidebar-tab-group-list-item-header-tab-count">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
-          <button class="browser-style more" @click.stop="openTabGroupMore( $event, tab_group )">
+          <button class="more" @click.stop="openTabGroupMore( $event, tab_group )">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <path :fill="context_fill" d="M2 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"></path>
             </svg>
@@ -74,6 +74,18 @@
           </div>
         </div>
       </div>
+    </div>
+    <div v-if="tab_group_context_menu.open" class="tab-group-context-menu-ctx" @click="closeTabGroupMore" @click.right="closeTabGroupMore"></div>
+    <div v-if="tab_group_context_menu.open" class="tab-group-context-menu" :style="{ top: tab_group_context_menu.y + 'px', right: tab_group_context_menu.x + 'px' }">
+      <!-- @todo localize -->
+      <!-- @todo icons -->
+      <!-- <div class="tab-group-context-menu-item"><span>R</span>eload Tabs</div> -->
+      <!-- <div class="tab-group-context-menu-item"><span>M</span>ute Tabs</div> -->
+      <!-- @todo separator -->
+      <!-- <div class="tab-group-context-menu-item">Re<span>n</span>ame</div> -->
+      <!-- <div class="tab-group-context-menu-item">Move to New <span>W</span>indow</div> -->
+      <!-- <div class="tab-group-context-menu-item" @click="archiveTabGroup( tab_group_context_menu.tab_group_id )"><span>A</span>rchive</div> -->
+      <div class="tab-group-context-menu-item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span>C</span>lose</div>
     </div>
   </body>
 </template>
@@ -116,6 +128,12 @@ export default {
   },
   data() {
     return {
+      tab_group_context_menu: {
+        open: false,
+        x: 0,
+        y: 0,
+        tab_group_id: null
+      },
       window_id: window.current_window_id,
       active_tab_group_id: null,
       context_styles: {},
@@ -211,6 +229,16 @@ export default {
     },
     openTabGroupMore( event, tab_group ) {
       console.info('openTabGroupMore', event, tab_group )
+      this.tab_group_context_menu.open = true
+      const box = event.target.getBoundingClientRect()
+      this.tab_group_context_menu.x = document.body.clientWidth - box.right - 2
+      this.tab_group_context_menu.y = box.bottom + 8
+      this.tab_group_context_menu.tab_group_id = tab_group.id
+    },
+    closeTabGroupMore( event ) {
+      console.info('closeTabGroupMore', event )
+      this.tab_group_context_menu.open = false
+      this.tab_group_context_menu.tab_group_id = null
     },
     openTab( tab ) {
       console.info('openTab', tab)
@@ -220,6 +248,14 @@ export default {
     closeTab( tab ) {
       console.info('closeTab', tab)
       window.background.closeTab( tab.id )
+    },
+    archiveTabGroup( tab_group_id ) {
+      console.info('archiveTabGroup', tab_group_id)
+    },
+    closeTabGroup( tab_group_id ) {
+      console.info('closeTabGroup', tab_group_id)
+      window.background.closeTabGroup( window.store, this.window_id, tab_group_id )
+      this.tab_group_context_menu.open = false
     },
     isSelected( tab ) {
       return this.selected_tab_ids.includes( tab.id )
@@ -300,12 +336,15 @@ $light-border-color: #e0e0e1;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  height: 32px;
 }
 
 .sidebar-header-new_group {
   flex: 1;
   display: flex;
-  padding: 4px 8px;
+  align-items: center;
+  padding: 0 8px;
+  height: 32px;
   cursor: pointer;
 }
 
@@ -322,10 +361,9 @@ $light-border-color: #e0e0e1;
 }
 
 .sidebar-header-config {
-  width: 24px;
-  height: 24px;
-  padding: 4px;
-  margin-right: 4px;
+  width: 32px;
+  height: 32px;
+  padding: 8px;
   cursor: pointer;
 }
 
@@ -376,9 +414,61 @@ $light-border-color: #e0e0e1;
   }
 }
 
-button.browser-style.more {
+button.more {
   display: flex;
   margin: 0 0 0 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.tab-group-context-menu-ctx {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.tab-group-context-menu {
+  z-index: 2;
+  position: absolute;
+  padding: 2px 0;
+  background-color: $white-100;
+  border: solid 1px $grey-90-a20;
+  border-radius: 2px;
+  box-shadow: 0 4px 16px rgba(12,12,13,.1);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  color: $grey-90;
+}
+
+.tab-group-context-menu:before {
+  position: absolute;
+  top: -7px;
+  right: 11px;
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg);
+  clip-path: polygon(0% 0, 100% 0, 0 100%);
+  box-shadow: 0 4px 16px rgba(12,12,13,.1);
+  background-color: $white-100;
+  border: solid 1px $grey-90-a20;
+  content: "";
+}
+
+.tab-group-context-menu-item {
+  padding: 4px 8px;
+
+  &:hover {
+    background-color: $grey-20;
+    cursor: pointer;
+  }
+
+  > span {
+    text-decoration: underline;
+  }
 }
 
 .sidebar-tab-group-list-item-header > span {
@@ -582,7 +672,6 @@ button.browser-style.more {
 
   .sidebar-header {
     background-color: $dark-header-active-background;
-    border-bottom: $dark-border-color 1px solid;
   }
 
   .sidebar-header-new_group:hover {

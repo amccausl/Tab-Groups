@@ -1,4 +1,3 @@
-// @todo think through handling for 3rd party drag sources
 
 export function setTabTransferData( data_transfer, window_id, tab_ids ) {
   const event_data = { window_id, tab_ids }

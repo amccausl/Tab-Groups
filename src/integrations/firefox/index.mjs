@@ -10,6 +10,7 @@ import {
   moveTabsAction,
   attachTabAction,
   detachTabAction,
+  removeGroupAction,
   startSearchAction,
   finishSearchAction,
   resetSearchAction,
@@ -441,6 +442,24 @@ export function setTabActive( store, window_id, tab_id ) {
  */
 export function closeTab( tab_id ) {
   return browser.tabs.remove( [ tab_id ] )
+}
+
+export function closeTabGroup( store, window_id, tab_group_id ) {
+  const state = store.getState()
+  for( let window of state.windows ) {
+    if( window.id !== window_id ) {
+      continue
+    }
+    const tab_group = window.tab_groups.find( tab_group => tab_group.id === tab_group_id )
+    if( tab_group ) {
+      const tab_ids = tab_group.tabs.map( tab => tab.id )
+      return browser.tabs.remove( tab_ids )
+        .then( () => {
+          store.dispatch( removeGroupAction( tab_group_id, window.id ) )
+        })
+    }
+  }
+  // @todo return empty promise
 }
 
 export function onTabCreated( store, browser_tab ) {

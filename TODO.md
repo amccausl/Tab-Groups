@@ -3,6 +3,7 @@
   - store ancestor list to tab state
 - new group
   - make drag target (target as new group)
+- shim around native drags
 - add flags to state for feature detection
 - styling for pinned
   - background
@@ -30,6 +31,9 @@
     - reopen closed tab should activate the group that contains it
     - middle click open in tab ordering is off in nav bar
     - should toggle states on launch
+    - open config when config is already open in another group will add to current (same for other "open tab")
+      tab bar, but activate the other group
+    - application drag from another window to inactive group adds to tab strip
   - pinned
     - reopen closed pinned tab, not added to pinned
     - native move to 0 index pins tab
@@ -52,6 +56,7 @@
     - drag over collapsed group should open after 1s
     - drag image
       - experiment with svg content
+    - from app to native tab bar
   - native drag
     - swap for first tabs after pinned has no affect
     - drag from new window to existing
@@ -68,10 +73,6 @@
 - watch task with compile / tests
 - sidebar improvements
   - add process to suspend tabs
-  - tab group context menu
-    - pull from window
-    - open as window
-    - archive
   - tab context menu
     - move to group
   - door hanger
@@ -178,7 +179,6 @@
   - tab close button
   - fade for overflow
 - open main tab groups page with hotkey
-- context menus
 - add interval to detect state drift
 
 #### p3
@@ -229,6 +229,7 @@
 - tour & upgrade features
 
 #### p4
+- save group to pocket?
 - VueJS unit testing
   - https://vuejs.org/v2/guide/unit-testing.html
 - integration tests

@@ -342,7 +342,16 @@ export function createGroup( state, { window_id } ) {
 }
 
 export function removeGroup( state, { tab_group_id, window_id } ) {
-  return state
+  return Object.assign( {}, state, {
+    windows: state.windows.map( window => {
+      if( window.id !== window_id ) {
+        return window
+      }
+      return Object.assign( {}, window, {
+        tab_groups: window.tab_groups.filter( tab_group => tab_group.id !== tab_group_id )
+      })
+    })
+  })
 }
 
 export function updateGroup( state, { tab_group_id, window_id, change_info } ) {
