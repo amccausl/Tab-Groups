@@ -9,6 +9,8 @@ import {
   GROUP_REMOVE,
   GROUP_UPDATE,
   GROUP_MOVE,
+  GROUP_MUTE,
+  GROUP_UNMUTE,
   TABS_MOVE,
   TAB_ACTIVATE,
   TAB_ADD,
@@ -327,6 +329,24 @@ export function resetWindowSearch( state, { window_id } ) {
   })
 }
 
+function mapTabGroup( state, window_id, tab_group_id, fn ) {
+  return Object.assign( {}, state, {
+    windows: state.windows.map( window => {
+      if( window.id !== window_id ) {
+        return window
+      }
+      return Object.assign( {}, window, {
+        tab_groups: window.tab_groups.map( tab_group => {
+          if( tab_group.id !== tab_group_id ) {
+            return tab_group
+          }
+          return fn( tab_group )
+        })
+      })
+    })
+  })
+}
+
 export function createGroup( state, { window_id } ) {
   const new_tab_group = createTabGroup( getNewTabGroupId( state ), [] )
   return Object.assign( {}, state, {
@@ -355,28 +375,32 @@ export function removeGroup( state, { tab_group_id, window_id } ) {
 }
 
 export function updateGroup( state, { tab_group_id, window_id, change_info } ) {
-  return Object.assign( {}, state, {
-    windows: state.windows.map( window => {
-      if( window.id !== window_id ) {
-        return window
+  return mapTabGroup( state, window_id, tab_group_id,
+    tab_group => {
+      if( change_info.title && change_info.title !== tab_group.title ) {
+        // @todo validation
       }
-      return Object.assign( {}, window, {
-        tab_groups: window.tab_groups.map( tab_group => {
-          if( tab_group.id === tab_group_id ) {
-            if( change_info.title && change_info.title !== tab_group.title ) {
-              // @todo validation
-            }
-            tab_group = Object.assign( {}, tab_group, change_info )
-          }
-          return tab_group
-        })
-      })
-    })
-  })
+      return Object.assign( {}, tab_group, change_info )
+    }
+  )
 }
 
 export function moveGroup( state, { tab_group_id, window_id, index } ) {
   return state
+}
+
+// @todo consider merging these with updateGroup
+
+export function muteGroup( state, { tab_group_id, window_id } ) {
+  return mapTabGroup( state, window_id, tab_group_id,
+    tab_group => Object.assign( {}, tab_group, { muted: true } )
+  )
+}
+
+export function unmuteGroup( state, { tab_group_id, window_id } ) {
+  return mapTabGroup( state, window_id, tab_group_id,
+    tab_group => omit( tab_group, 'muted')
+  )
 }
 
 export function activateTab( state, { tab_id, window_id } ) {
@@ -472,6 +496,14 @@ export function updateTab( state, { browser_tab, change_info } ) {
               tabs: [ ...tab_group.tabs ]
             })
             tab_group.tabs[ tab_index ] = getTabState( browser_tab )
+
+            if( change_info.hasOwnProperty( 'audible' ) ) {
+              if( change_info.audible && ! tab_group.audible ) {
+                tab_group.audible = true
+              } else if( ! change_info.audible && ! tab_group.tabs.some( _tab => _tab.audible ) ) {
+                tab_group = omit( tab_group, 'audible' )
+              }
+            }
           }
           return tab_group
         })
@@ -718,6 +750,10 @@ export default function App( state = initial_state, action ) {
       return updateGroup( state, action )
     case GROUP_MOVE:
       return moveGroup( state, action )
+    case GROUP_MUTE:
+      return muteGroup( state, action )
+    case GROUP_UNMUTE:
+      return unmuteGroup( state, action )
     case TABS_MOVE:
       return moveTabs( state, action )
     case TAB_ACTIVATE:

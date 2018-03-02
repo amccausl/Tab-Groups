@@ -7,6 +7,8 @@ import {
   bindBrowserEvents,
   closeTab,
   closeTabGroup,
+  muteTabGroup,
+  unmuteTabGroup,
   getMessage,
   loadBrowserState,
   moveTabsToGroup,
@@ -65,6 +67,8 @@ window.getStore = function() {
 window.moveTabsToGroup = moveTabsToGroup
 window.closeTab = closeTab
 window.closeTabGroup = closeTabGroup
+window.muteTabGroup = muteTabGroup
+window.unmuteTabGroup = unmuteTabGroup
 window.getMessage = getMessage
 window.openOptionsPage = openOptionsPage
 window.runTabSearch = runTabSearch

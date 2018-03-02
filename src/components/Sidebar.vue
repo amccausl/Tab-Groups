@@ -43,6 +43,19 @@
           </svg>
           <span class="text" contenteditable="true" spellcheck="false" @click.stop @blur="onTabGroupNameUpdate( $event, tab_group )" @keyup.enter="onTabGroupNamePressEnter">{{ tab_group.title }}</span>
 
+          <svg v-if="tab_group.muted" class="audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <g :fill="context_fill">
+              <path d="M13 8a2.813 2.813 0 0 0-.465-1.535l-.744.744A1.785 1.785 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
+              <path d="M13.273 5.727A3.934 3.934 0 0 1 14 8a3.984 3.984 0 0 1-2.742 3.775.5.5 0 0 0 .316.949A4.985 4.985 0 0 0 15 8a4.93 4.93 0 0 0-1.012-2.988zm-4.603 7.99a.2.2 0 0 0 .33-.152V10l-2.154 2.154zm6.037-12.424a1 1 0 0 0-1.414 0L9 5.586V2.544a.25.25 0 0 0-.413-.19L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618a2.186 2.186 0 0 0 1.659 2.118l-2.366 2.366a1 1 0 1 0 1.414 1.414l12-12a1 1 0 0 0 0-1.414z"></path>
+            </g>
+          </svg>
+          <svg v-else-if="tab_group.audible" class="audio-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <g :fill="context_fill">
+              <path d="M8.587 2.354L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618A2.191 2.191 0 0 0 4.191 11H5.5l3.17 2.717a.2.2 0 0 0 .33-.152V2.544a.25.25 0 0 0-.413-.19zm2.988.921a.5.5 0 0 0-.316.949 3.97 3.97 0 0 1 0 7.551.5.5 0 0 0 .316.949 4.971 4.971 0 0 0 0-9.449z"></path>
+              <path d="M13 8a3 3 0 0 0-2.056-2.787.5.5 0 1 0-.343.939A2.008 2.008 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
+            </g>
+          </svg>
+
           <span class="sidebar-tab-group-list-item-header-tab-count">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
           <button class="more" @click.stop="openTabGroupMore( $event, tab_group )">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -80,7 +93,8 @@
       <!-- @todo localize -->
       <!-- @todo icons -->
       <!-- <div class="tab-group-context-menu-item"><span>R</span>eload Tabs</div> -->
-      <!-- <div class="tab-group-context-menu-item"><span>M</span>ute Tabs</div> -->
+      <div class="tab-group-context-menu-item" v-if="!isGroupMuted( tab_group_context_menu.tab_group_id )" @click="muteTabGroup( tab_group_context_menu.tab_group_id )"><span>M</span>ute Tabs</div>
+      <div class="tab-group-context-menu-item" v-else @click="unmuteTabGroup( tab_group_context_menu.tab_group_id )">Un<span>m</span>ute Tabs</div>
       <!-- @todo separator -->
       <!-- <div class="tab-group-context-menu-item">Re<span>n</span>ame</div> -->
       <!-- <div class="tab-group-context-menu-item">Move to New <span>W</span>indow</div> -->
@@ -257,8 +271,20 @@ export default {
       window.background.closeTabGroup( window.store, this.window_id, tab_group_id )
       this.tab_group_context_menu.open = false
     },
+    muteTabGroup( tab_group_id ) {
+      window.background.muteTabGroup( window.store, this.window_id, tab_group_id )
+      this.tab_group_context_menu.open = false
+    },
+    unmuteTabGroup( tab_group_id ) {
+      window.background.unmuteTabGroup( window.store, this.window_id, tab_group_id )
+      this.tab_group_context_menu.open = false
+    },
     isSelected( tab ) {
       return this.selected_tab_ids.includes( tab.id )
+    },
+    isGroupMuted( tab_group_id ) {
+      const tab_group = this.tab_groups.find( tab_group => tab_group.id === tab_group_id )
+      return tab_group.muted
     },
     onTabDragStart,
     onTabDragOver,
@@ -345,6 +371,9 @@ $light-border-color: #e0e0e1;
   align-items: center;
   padding: 0 8px;
   height: 32px;
+  transition-property: background-color;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(.07,.95,0,1);
   cursor: pointer;
 }
 
@@ -364,6 +393,9 @@ $light-border-color: #e0e0e1;
   width: 32px;
   height: 32px;
   padding: 8px;
+  transition-property: background-color;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(.07,.95,0,1);
   cursor: pointer;
 }
 
@@ -418,6 +450,7 @@ button.more {
   display: flex;
   margin: 0 0 0 4px;
   border: none;
+  background-color: transparent;
   cursor: pointer;
 }
 
@@ -460,6 +493,9 @@ button.more {
 
 .tab-group-context-menu-item {
   padding: 4px 8px;
+  transition-property: background-color;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(.07,.95,0,1);
 
   &:hover {
     background-color: $grey-20;
@@ -477,6 +513,9 @@ button.more {
 
 .sidebar-tab-group-list-item-header > .sidebar-tab-group-list-item-header-tab-count {
   text-align: right;
+  flex-grow: 0;
+  margin-left: 8px;
+  white-space: nowrap;
 }
 
 .sidebar-tab-group-tabs-list {
@@ -635,8 +674,8 @@ button.more {
     }
   }
 
-  button.more {
-    // @todo
+  button.more:hover {
+    background-color: $light-header-hover-background;
   }
 
   .sidebar-tab-view-item.active {
@@ -713,9 +752,8 @@ button.more {
     }
   }
 
-  button.more {
-    // @todo
-    background-color: black;
+  button.more:hover {
+    background-color: $dark-header-hover-background;
   }
 
   .sidebar-tabs-pinned-list-item.active {

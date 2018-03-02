@@ -27,6 +27,12 @@
         "last_accessed": {
           "type": "integer"
         },
+        "audible": {
+          "type": "boolean"
+        },
+        "muted": {
+          "type": "boolean"
+        },
         "preview_image": {
           "type": "object",
           "properties": {
@@ -107,12 +113,19 @@
                 {
                   "properties": {
                     "id": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": 1
                     },
                     "title": {
                       "type": "string"
                     },
                     "active_tab_id": {
+                    },
+                    "audible": {
+                      "type": "boolean"
+                    },
+                    "muted": {
+                      "type": "boolean"
                     },
                     "tabs": {
                       "type": "array",

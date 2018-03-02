@@ -11,6 +11,8 @@ import {
   GROUP_REMOVE,
   GROUP_UPDATE,
   GROUP_MOVE,
+  GROUP_MUTE,
+  GROUP_UNMUTE,
   TABS_MOVE,
   TAB_ACTIVATE,
   TAB_ADD,
@@ -82,6 +84,22 @@ export function moveGroupAction( tab_group_id, window_id, index ) {
     tab_group_id,
     window_id,
     index
+  }
+}
+
+export function muteGroupAction( tab_group_id, window_id ) {
+  return {
+    type: GROUP_MUTE,
+    tab_group_id,
+    window_id
+  }
+}
+
+export function unmuteGroupAction( tab_group_id, window_id ) {
+  return {
+    type: GROUP_UNMUTE,
+    tab_group_id,
+    window_id
   }
 }
 

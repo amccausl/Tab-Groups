@@ -78,6 +78,19 @@ export function findTab( state, window_id, tab_id ) {
   return null
 }
 
+export function findTabGroup( state, window_id, tab_group_id ) {
+  for( let window of state.windows ) {
+    if( window.id !== window_id ) {
+      continue
+    }
+    for( let tab_group of window.tab_groups ) {
+      if( tab_group.id === tab_group_id ) {
+        return tab_group
+      }
+    }
+  }
+}
+
 /**
  * Scan the state for the next available tab_group_id
  */

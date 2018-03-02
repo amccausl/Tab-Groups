@@ -11,6 +11,8 @@ import {
   attachTabAction,
   detachTabAction,
   removeGroupAction,
+  muteGroupAction,
+  unmuteGroupAction,
   startSearchAction,
   finishSearchAction,
   resetSearchAction,
@@ -19,6 +21,7 @@ import {
 import {
   default_config,
   findTab,
+  findTabGroup,
   getSourceTabGroupData,
   getTabMoveData,
 } from '../../store/helpers.mjs'
@@ -141,6 +144,25 @@ export function bindBrowserEvents( store ) {
 
   browser.tabs.onUpdated.addListener( ( tab_id, change_info, browser_tab ) => {
     console.info('tabs.onUpdated', tab_id, change_info, browser_tab)
+    const state = store.getState()
+    // If change_info.audible && tab_group.muted, mute tab
+    if( change_info.hasOwnProperty( 'audible' ) ) {
+      for( let window of state.windows ) {
+        if( window.id !== browser_tab.windowId ) {
+          continue
+        }
+        for( let tab_group of window.tab_groups ) {
+          if( ! tab_group.tabs.some( tab => tab.id === tab_id ) ) {
+            continue
+          }
+          if( change_info.audible && tab_group.muted ) {
+            browser.tabs.update( tab_id, { muted: true } )
+          }
+          break
+        }
+        break
+      }
+    }
     store.dispatch( updateTabAction( browser_tab, change_info ) )
   })
 
@@ -229,6 +251,14 @@ export function getTabState( browser_tab ) {
     // @todo openerTabId?
     // @todo highlighted?
     // @todo sessionId
+  }
+
+  if( browser_tab.hasOwnProperty( 'audible' ) && browser_tab.audible ) {
+    tab.audible = true
+  }
+
+  if( browser_tab.mutedInfo.muted ) {
+    tab.muted = true
   }
 
   if( browser_tab.cookieStoreId ) {
@@ -425,9 +455,11 @@ export function setTabActive( store, window_id, tab_id ) {
       }
       if( hide_ids.length ) {
         updates.push( browser.tabs.hide( hide_ids ) )
+        updates.push( ...hide_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: true } ) ) )
       }
       if( show_ids.length ) {
         updates.push( browser.tabs.show( show_ids ) )
+        updates.push( ...show_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: false } ) ) )
       }
       break
     }
@@ -460,6 +492,38 @@ export function closeTabGroup( store, window_id, tab_group_id ) {
     }
   }
   // @todo return empty promise
+}
+
+export function muteTabGroup( store, window_id, tab_group_id ) {
+  const state = store.getState()
+  const tab_group = findTabGroup( state, window_id, tab_group_id )
+  if( ! tab_group ) {
+    // @todo error
+    return
+  }
+  return Promise.all(
+    tab_group.tabs
+      .filter( tab => tab.audible && ! tab.muted )
+      .map( tab => browser.tabs.update( tab.id, { muted: true } ) )
+  ).then( () => {
+    store.dispatch( muteGroupAction( tab_group_id, window_id ) )
+  })
+}
+
+export function unmuteTabGroup( store, window_id, tab_group_id ) {
+  const state = store.getState()
+  const tab_group = findTabGroup( state, window_id, tab_group_id )
+  if( ! tab_group ) {
+    // @todo error
+    return
+  }
+  return Promise.all(
+    tab_group.tabs
+      .filter( tab => tab.hasOwnProperty( 'muted' ) )
+      .map( tab => browser.tabs.update( tab.id, { muted: false } ) )
+  ).then( () => {
+    store.dispatch( unmuteGroupAction( tab_group_id, window_id ) )
+  })
 }
 
 export function onTabCreated( store, browser_tab ) {
