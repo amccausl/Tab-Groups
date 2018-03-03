@@ -9,7 +9,6 @@ import {
   moveTabAction,
   moveTabsAction,
   attachTabAction,
-  detachTabAction,
   removeGroupAction,
   muteGroupAction,
   unmuteGroupAction,
@@ -134,7 +133,6 @@ export function bindBrowserEvents( store ) {
 
   browser.tabs.onDetached.addListener( ( tab_id, { oldWindowId, oldPosition } ) => {
     console.info('tabs.onDetached', tab_id, oldWindowId, oldPosition)
-    store.dispatch( detachTabAction( tab_id, oldWindowId, oldPosition ) )
   })
 
   browser.tabs.onReplaced.addListener( ( added_tab_id, removed_tab_id ) => {
@@ -361,10 +359,6 @@ function resetTabState( tab ) {
  */
 export function resetBrowserState( store ) {
   const state = store.getState()
-
-  if( state.orphan_tabs ) {
-    state.orphan_tabs.forEach( resetTabState )
-  }
 
   state.windows.forEach( window => {
     resetWindowState( window )

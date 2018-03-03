@@ -1,6 +1,4 @@
 #### p1
-- use openerId to prevent new tabs from being at end of tab bar
-  - store ancestor list to tab state
 - new group
   - make drag target (target as new group)
 - shim around native drags
@@ -25,11 +23,9 @@
   - url serialization
 - bugs
   - hide/show
-    - use openerId for new tabs to link if possible
     - pin if can't hide
     - closing all tabs in group and new tab
     - reopen closed tab should activate the group that contains it
-    - middle click open in tab ordering is off in nav bar
     - should toggle states on launch
     - open config when config is already open in another group will add to current (same for other "open tab")
       tab bar, but activate the other group
@@ -37,7 +33,6 @@
   - pinned
     - reopen closed pinned tab, not added to pinned
     - native move to 0 index pins tab
-    - drag out to new window initializes as tabbed
   - audio
     - on close tab playing, group still audible
   - context broken
@@ -79,7 +74,6 @@
   - add process to suspend tabs
   - tab context menu
     - move to group
-  - door hanger
   - group header
     - delete group
     - group header shouldn't wrap
@@ -151,6 +145,7 @@
 
 #### p2
 - investigate vuejs change detection alternatives
+- store ancestor list to tab state
 - context menu improvements
   - fade in
   - add more items

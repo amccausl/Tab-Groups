@@ -19,7 +19,6 @@ import {
   TAB_UPDATE_IMAGE,
   TAB_MOVE,
   TAB_ATTACH,
-  TAB_DETACH,
   CONFIG_UPDATE,
 } from './action-types.mjs'
 
@@ -44,7 +43,6 @@ import {
 const initial_state = {
   config: default_config,
   contexts: {},
-  orphan_tabs: [],
   windows: []
 }
 
@@ -68,9 +66,8 @@ function findWindowIndex( windows, window_id ) {
   return windows.findIndex( window => window.id === window_id )
 }
 
-function _removeTab( state, { tab_id, window_id, index, is_detach } ) {
+function _removeTab( state, { tab_id, window_id, index } ) {
   // @todo use index to optimize the lookup process if set
-  let orphan_tab = null
   // @todo update active_tab_id if required
 
   const windows = state.windows.map( window => {
@@ -83,7 +80,7 @@ function _removeTab( state, { tab_id, window_id, index, is_detach } ) {
               tabs: [ ...tab_group.tabs ],
               tabs_count: tab_group.tabs_count - 1
             })
-            orphan_tab = tab_group.tabs.splice( tab_index, 1 )[ 0 ]
+            tab_group.tabs.splice( tab_index, 1 )[ 0 ]
             if( tab_group.active_tab_id === tab_id ) {
               if( tab_group.tabs_count > 0 ) {
                 tab_group.active_tab_id = tab_group.tabs[ Math.min( tab_index, tab_group.tabs_count - 1 ) ].id
@@ -102,10 +99,6 @@ function _removeTab( state, { tab_id, window_id, index, is_detach } ) {
   const new_state = Object.assign( {}, state, {
     windows
   })
-
-  if( is_detach && orphan_tab ) {
-    new_state.orphan_tabs = [ ...new_state.orphan_tabs, orphan_tab ]
-  }
 
   return new_state
 }
@@ -186,7 +179,6 @@ export function init( state, { browser_tabs, config, contextual_identities, them
   const init_state = {
     config: config || initial_state.config,
     contexts,
-    orphan_tabs: initial_state.orphan_tabs,
     windows
       /*
       id,
@@ -208,23 +200,17 @@ export function init( state, { browser_tabs, config, contextual_identities, them
 }
 
 export function addWindow( state, { browser_window } ) {
-  // Check if there are any orphan_tabs that belong to this window
-  let tabs = []
-  let orphan_tabs = state.orphan_tabs
-  if( orphan_tabs.length > 0 ) {
-    // @todo map to state
-    // @todo is it possible to have pinned orphan tabs?
-    tabs = state.orphan_tabs.filter( browser_tab => browser_tab.windowId === browser_window.id )
-    orphan_tabs = orphan_tabs.filter( browser_tab => browser_tab.windowId !== browser_window.id )
+  // Only add if not already exists
+  if( state.windows.some( window => window.id === browser_window.id ) ) {
+    return state
   }
 
   return Object.assign( {}, state, {
-    orphan_tabs,
     windows: [
       ...state.windows,
       createWindow( browser_window.id, [
         createPinnedTabGroup( [] ),
-        createTabGroup( getNewTabGroupId( state ), tabs )
+        createTabGroup( getNewTabGroupId( state ), [] )
       ])
     ]
   })
@@ -547,7 +533,7 @@ export function updateTabImage( state, { tab_id, window_id, preview_image_uri } 
 //  *   { window_id, pinned }
  */
 export function moveTabs( state, { source_data, target_data } ) {
-  let { windows, orphan_tabs } = state
+  let { windows } = state
 
   // Target is new window
   if( target_data.window ) {
@@ -557,7 +543,6 @@ export function moveTabs( state, { source_data, target_data } ) {
   // @todo check orphan tabs
   // @todo If source is same as target, noop
   return Object.assign( {}, state, {
-    orphan_tabs,
     windows: windows.map( window => {
       if( window.id !== source_data.window_id && window.id !== target_data.window_id ) {
         return window
@@ -651,35 +636,14 @@ export function moveTab( state, { tab_id, window_id, index } ) {
 }
 
 export function attachTab( state, { tab_id, window_id, index } ) {
-  let tab_index = state.orphan_tabs.findIndex( browser_tab => browser_tab.id === tab_id )
-  if( tab_index === -1 ) {
-    // If the tab that is being detached is the last in the window, the attach event is fired before the detach, scan for tab in windows
-    const tab_window_id = findTabWindowId( state.windows, tab_id )
-    if( tab_window_id == null ) {
-      // @todo error
-      return state
-    }
-
-    const move_data = getTabMoveData( state, { window_id: tab_window_id, tab_ids: [ tab_id ] }, { window_id, index } )
-
-    return moveTabs( state, move_data )
+  const tab_window_id = findTabWindowId( state.windows, tab_id )
+  if( tab_window_id == null ) {
+    // @todo error
+    return state
   }
 
-  const orphan_tabs = [ ...state.orphan_tabs ]
-  const browser_tab = Object.assign( {}, orphan_tabs.splice( tab_index, 1 )[ 0 ], {
-    windowId: window_id,
-    index,
-    pinned: false
-  })
-
-  return Object.assign( addTab( state, { browser_tab } ), {
-    orphan_tabs
-  })
-}
-
-export function detachTab( state, { tab_id, window_id, index } ) {
-  console.info('detachTab', { tab_id, window_id, index })
-  return _removeTab( state, { tab_id, window_id, index, is_detach: true } )
+  const move_data = getTabMoveData( state, { window_id: tab_window_id, tab_ids: [ tab_id ] }, { window_id, index, pinned: false } )
+  return moveTabs( state, move_data )
 }
 
 export function updateConfig( state, { config } ) {
@@ -762,8 +726,6 @@ export default function App( state = initial_state, action ) {
       return moveTab( state, action )
     case TAB_ATTACH:
       return attachTab( state, action )
-    case TAB_DETACH:
-      return detachTab( state, action )
     default:
       console.warn('unknown action type', action.type)
       return state

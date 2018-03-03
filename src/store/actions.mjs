@@ -21,7 +21,6 @@ import {
   TAB_UPDATE_IMAGE,
   TAB_MOVE,
   TAB_ATTACH,
-  TAB_DETACH,
 } from './action-types.mjs'
 
 export function initAction({ browser_tabs, window_tab_groups_map }) {
@@ -173,15 +172,6 @@ export function moveTabToGroupAction( tab_id, window_id, tab_group_id ) {
 export function attachTabAction( tab_id, window_id, index ) {
   return {
     type: TAB_ATTACH,
-    tab_id,
-    window_id,
-    index
-  }
-}
-
-export function detachTabAction( tab_id, window_id, index ) {
-  return {
-    type: TAB_DETACH,
     tab_id,
     window_id,
     index

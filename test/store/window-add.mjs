@@ -7,7 +7,6 @@ import { addWindow } from '../../src/store/reducers.mjs'
 
 function testSingleWindowAdd( t ) {
   let state = {
-    orphan_tabs: [],
     windows: []
   }
 

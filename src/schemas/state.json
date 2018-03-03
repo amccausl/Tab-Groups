@@ -67,10 +67,6 @@
     "contexts": {
       "type": "object"
     },
-    "orphan_tabs": {
-      "type": "array",
-      "items": { "$ref": "#/definitions/tab" }
-    },
     "windows": {
       "type": "array",
       "items": {
