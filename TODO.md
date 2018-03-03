@@ -37,6 +37,9 @@
   - pinned
     - reopen closed pinned tab, not added to pinned
     - native move to 0 index pins tab
+    - drag out to new window initializes as tabbed
+  - audio
+    - on close tab playing, group still audible
   - context broken
     - testing on main browser
     - use https://developer.mozilla.org/en-US/docs/Web/CSS/attr for styles
@@ -57,6 +60,7 @@
     - drag image
       - experiment with svg content
     - from app to native tab bar
+    - dragging many tabs to a later group sometimes misses target
   - native drag
     - swap for first tabs after pinned has no affect
     - drag from new window to existing
@@ -137,6 +141,7 @@
   - store failed validations in log, surface on options page
 - private browsing
 - publish
+  - setup self-hosted with unique id on github
   - clean up console messaging
   - clear out repo
   - review @todos
@@ -145,6 +150,14 @@
   - fix id
 
 #### p2
+- investigate vuejs change detection alternatives
+- context menu improvements
+  - fade in
+  - add more items
+  - button hover effect
+  - mute based on state
+  - keyboard navigation (arrows, hotkeys & enter)
+- integration with time tracker API
 - bugs
   - search text weirdness
   - action

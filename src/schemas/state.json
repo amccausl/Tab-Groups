@@ -21,6 +21,9 @@
         "context_id": {
           "type": "string"
         },
+        "opener_tab_id": {
+          "type": "integer"
+        },
         "discarded": {
           "type": "boolean"
         },

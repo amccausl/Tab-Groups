@@ -247,8 +247,6 @@ export function getTabState( browser_tab ) {
     },
     // @todo last_accessed
     // @todo discarded
-    // @todo audio info?
-    // @todo openerTabId?
     // @todo highlighted?
     // @todo sessionId
   }
@@ -259,6 +257,11 @@ export function getTabState( browser_tab ) {
 
   if( browser_tab.mutedInfo.muted ) {
     tab.muted = true
+  }
+
+  // @todo store ancestry?
+  if( browser_tab.openerTabId ) {
+    tab.opener_tab_id = browser_tab.openerTabId
   }
 
   if( browser_tab.cookieStoreId ) {
@@ -410,6 +413,7 @@ export function openTabGroupsPage() {
 
   const url = browser.extension.getURL( "tab-groups.html" )
 
+  console.info('browser.tabs.create', { url })
   browser.tabs.create({ url })
     .then( () => {
       // We don't want to sync this URL ever nor clutter the users history
@@ -455,11 +459,11 @@ export function setTabActive( store, window_id, tab_id ) {
       }
       if( hide_ids.length ) {
         updates.push( browser.tabs.hide( hide_ids ) )
-        updates.push( ...hide_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: true } ) ) )
+        // updates.push( ...hide_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: true } ) ) )
       }
       if( show_ids.length ) {
         updates.push( browser.tabs.show( show_ids ) )
-        updates.push( ...show_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: false } ) ) )
+        // updates.push( ...show_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: false } ) ) )
       }
       break
     }
@@ -473,6 +477,7 @@ export function setTabActive( store, window_id, tab_id ) {
  * @param tab_id
  */
 export function closeTab( tab_id ) {
+  console.info('browser.tabs.remove', [ tab_id ])
   return browser.tabs.remove( [ tab_id ] )
 }
 
@@ -501,10 +506,12 @@ export function muteTabGroup( store, window_id, tab_group_id ) {
     // @todo error
     return
   }
+  const change_info = { muted: true }
+  console.info('browser.tabs.update', change_info)
   return Promise.all(
     tab_group.tabs
       .filter( tab => tab.audible && ! tab.muted )
-      .map( tab => browser.tabs.update( tab.id, { muted: true } ) )
+      .map( tab => browser.tabs.update( tab.id, change_info ) )
   ).then( () => {
     store.dispatch( muteGroupAction( tab_group_id, window_id ) )
   })
@@ -517,10 +524,12 @@ export function unmuteTabGroup( store, window_id, tab_group_id ) {
     // @todo error
     return
   }
+  const change_info = { muted: false }
+  console.info('browser.tabs.update', change_info)
   return Promise.all(
     tab_group.tabs
       .filter( tab => tab.hasOwnProperty( 'muted' ) )
-      .map( tab => browser.tabs.update( tab.id, { muted: false } ) )
+      .map( tab => browser.tabs.update( tab.id, change_info ) )
   ).then( () => {
     store.dispatch( unmuteGroupAction( tab_group_id, window_id ) )
   })
@@ -530,19 +539,25 @@ export function onTabCreated( store, browser_tab ) {
   // @todo find active group
   const state = store.getState()
 
-  for( let window of state.windows ) {
-    if( window.id !== browser_tab.windowId ) {
-      continue
-    }
-    let index_offset = 0
-    for( let tab_group of window.tab_groups ) {
-      index_offset += tab_group.tabs_count
-      if( window.active_tab_group_id === tab_group.id ) {
-        browser_tab.index = index_offset
-        browser.tabs.move( [ browser_tab.id ], { index: browser_tab.index } )
+  if( ! browser_tab.openerTabId ) {
+    for( let window of state.windows ) {
+      if( window.id !== browser_tab.windowId ) {
+        continue
       }
+      let index_offset = 0
+      for( let tab_group of window.tab_groups ) {
+        index_offset += tab_group.tabs_count
+        if( window.active_tab_group_id === tab_group.id ) {
+          if( browser_tab.index !== index_offset ) {
+            browser_tab.index = index_offset
+            console.info('tabs.move', [ browser_tab.id ], { index: browser_tab.index })
+            browser.tabs.move( [ browser_tab.id ], { index: browser_tab.index } )
+          }
+          break
+        }
+      }
+      break
     }
-    break
   }
 
   store.dispatch( addTabAction( browser_tab ) )
@@ -665,8 +680,10 @@ export function moveTabsToGroup( store, source_data, target_data ) {
     const target_window = state.windows.find( window => window.id === target_data.window_id )
     const tab_ids = source_data.tabs.map( tab => tab.id )
     if( target_data.tab_group_id === target_window.active_tab_group_id ) {
+      console.info('browser.tabs.show', tab_ids)
       updates.push( browser.tabs.show( tab_ids ) )
     } else {
+      console.info('browser.tabs.hide', tab_ids)
       updates.push( browser.tabs.hide( tab_ids ) )
     }
   }
