@@ -46,8 +46,26 @@ function testMultiWindowAdd( t ) {
   t.end()
 }
 
+function testAddToNewWindow( t ) {
+  let state = getInitialState()
+
+  let browser_tab = createBrowserTab({
+    id: 5,
+    index: 0,
+    windowId: 100
+  })
+
+  state = addTab( state, { browser_tab } )
+  t.ok( validateState( state ), "state validates", validateState.errors )
+
+  t.equal( state.windows.length, 2 )
+  t.equal( state.windows[ 1 ].tab_groups[ 1 ].tabs[ 0 ].id, 5 )
+  t.end()
+}
+
 export default function( tap ) {
   tap.test( testSingleWindowAdd )
   tap.test( testMultiWindowAdd )
+  tap.test( testAddToNewWindow )
   tap.end()
 }

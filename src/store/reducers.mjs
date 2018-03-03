@@ -433,19 +433,6 @@ export function activateTab( state, { tab_id, window_id } ) {
 }
 
 export function addTab( state, { browser_tab } ) {
-  // If the window for the new tab doesn't exist yet, add to orphaned
-  if( state.windows.includes( window => window.id === browser_tab.windowId ) ) {
-    let orphan_tabs = [
-      ...state.orphan_tabs,
-      browser_tab
-    ]
-
-    return Object.assign( {}, state, {
-      orphan_tabs
-    })
-  }
-
-  // Otherwise, use the move helper
   const move_data = getTabMoveData(
     state,
     { tabs: [ getTabState( browser_tab ) ] },
@@ -561,6 +548,11 @@ export function updateTabImage( state, { tab_id, window_id, preview_image_uri } 
  */
 export function moveTabs( state, { source_data, target_data } ) {
   let { windows, orphan_tabs } = state
+
+  // Target is new window
+  if( target_data.window ) {
+    windows = [ ...windows, target_data.window ]
+  }
 
   // @todo check orphan tabs
   // @todo If source is same as target, noop

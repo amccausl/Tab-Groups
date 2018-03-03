@@ -226,10 +226,17 @@ export function getTabMoveData( state, source_data, target_data ) {
     tabs: source_tabs
   })
 
-  // @todo scan to get the target index and group index
-  const target_window = state.windows.find( window => window.id === target_data.window_id )
+  let target_window = state.windows.find( window => window.id === target_data.window_id )
   if( ! target_window ) {
-    return null
+    // This can trigger on window creation (the tab create is called before window create)
+    // Create a new window as a placeholder
+    target_data.tab_group_id = getNewTabGroupId( state )
+    target_data.tab_group_index = target_data.index
+    target_window = createWindow( target_data.window_id, [
+      createPinnedTabGroup( [] ),
+      createTabGroup( target_data.tab_group_id, [] )
+    ])
+    target_data.window = target_window
   }
   // Load the global index for the target
   if( target_data.index == null && target_data.tab_group_id != null ) {
