@@ -106,7 +106,7 @@ export function bindBrowserEvents( store ) {
 
   browser.tabs.onRemoved.addListener( ( tab_id, { windowId, isWindowClosing } ) => {
     console.info('tabs.onRemoved', tab_id, windowId)
-    store.dispatch( removeTabAction( tab_id, windowId ) )
+    onTabRemoved( store, tab_id, windowId )
   })
 
   browser.tabs.onMoved.addListener( ( tab_id, { windowId, fromIndex, toIndex } ) => {
@@ -470,7 +470,7 @@ export function setTabActive( store, window_id, tab_id ) {
  * Close the given tab
  * @param tab_id
  */
-export function closeTab( tab_id ) {
+export function closeTab( store, tab_id ) {
   console.info('browser.tabs.remove', [ tab_id ])
   return browser.tabs.remove( [ tab_id ] )
 }
@@ -555,6 +555,11 @@ export function onTabCreated( store, browser_tab ) {
   }
 
   store.dispatch( addTabAction( browser_tab ) )
+}
+
+export function onTabRemoved( store, tab_id, window_id ) {
+  // @todo if this was the last tab in the group, activate the next group
+  store.dispatch( removeTabAction( tab_id, window_id ) )
 }
 
 export function onTabMoved( store, source_data, target_data ) {

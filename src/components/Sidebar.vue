@@ -261,7 +261,7 @@ export default {
     },
     closeTab( tab ) {
       console.info('closeTab', tab)
-      window.background.closeTab( tab.id )
+      window.background.closeTab( window.store, tab.id )
     },
     archiveTabGroup( tab_group_id ) {
       console.info('archiveTabGroup', tab_group_id)

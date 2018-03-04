@@ -132,6 +132,51 @@ function testGetTabMoveData( t ) {
   t.end()
 }
 
+function testGetTabMoveDataMiddle( t ) {
+  const initial_state = {
+    windows: [
+      createWindow( 1, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( 2, [
+          createTestTab({ id: 5 }),
+          createTestTab({ id: 6 }),
+          createTestTab({ id: 7 })
+        ]),
+        createTabGroup( 3, [
+          createTestTab({ id: 8 })
+        ]),
+        createTabGroup( 4, [
+          createTestTab({ id: 9 })
+        ])
+      ])
+    ]
+  }
+
+  let source_data = {
+    window_id: 1,
+    tab_ids: [ 5 ]
+  }
+  let target_data = {
+    window_id: 1,
+    tab_group_id: 3
+  }
+
+  let tab_move_data = getTabMoveData( initial_state, source_data, target_data )
+
+  t.equal( tab_move_data.source_data.window_id, 1 )
+  t.equal( tab_move_data.source_data.tabs.filter( tab => tab ).length, 1, "no missing tabs" )
+  t.same( tab_move_data.source_data.tabs.map( tab => tab.id ), [ 5 ], "tabs match ids and order" )
+  t.equal( tab_move_data.source_data.tabs[ 0 ], initial_state.windows[ 0 ].tab_groups[ 1 ].tabs[ 0 ], "copy tab 5 by reference" )
+  t.same( tab_move_data.target_data, {
+    window_id: 1,
+    index: 3,
+    tab_group_id: 3,
+    tab_group_index: 1
+  })
+
+  t.end()
+}
+
 function testPersistence( t ) {
   let state = getInitialState()
   let tab_groups_state = getTabGroupsPersistState( state.windows[ 0 ] )
@@ -152,6 +197,7 @@ function testPersistence( t ) {
 export default function( tap ) {
   tap.test( testFindTab )
   tap.test( testGetTabMoveData )
+  tap.test( testGetTabMoveDataMiddle )
   tap.test( testPersistence )
   tap.end()
 }

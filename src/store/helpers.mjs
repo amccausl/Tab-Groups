@@ -107,19 +107,29 @@ export function getNewTabGroupId( state ) {
 }
 
 export function getTargetIndex( target_window, target_data, ignored_tabs ) {
+  function isIncluded( tab ) {
+    return ! ignored_tabs.includes( tab )
+  }
   let index_offset = 0
   for( let tab_group of target_window.tab_groups ) {
     if( target_data.tab_group_id === tab_group.id ) {
-      if( target_data.tab_group_index != null ) {
-        return {
-          index: index_offset + target_data.tab_group_index
+      let tab_group_index = 0
+      for( let tab of tab_group.tabs ) {
+        if( isIncluded( tab ) ) {
+          tab_group_index++
+          if( target_data.tab_group_index === tab_group_index ) {
+            return {
+              index: index_offset + target_data.tab_group_index
+            }
+          }
         }
       }
       return {
-        index: index_offset + tab_group.tabs_count
+        index: index_offset + tab_group_index,
+        tab_group_index
       }
     }
-    index_offset += tab_group.tabs_count
+    index_offset += tab_group.tabs.filter( isIncluded ).length
   }
   // @todo should this add to the last group?
   return null
