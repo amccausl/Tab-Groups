@@ -9,18 +9,6 @@
   - sizing, spacing & separator
   - contexts
   - notifications & audio
-- testing
-  - reproduce all bugs as integration tests
-  - add library for web-extension browser mocking
-  - add testing for vue components
-  - investigate nodejs es6 dependency mocking
-  - investigate typescript for tests
-  - VScode integration (running, linking errors & debugging)
-  - file based execution
-  - watch
-  - coverage
-  - suspend and replace
-  - url serialization
 - bugs
   - hide/show
     - pin if can't hide
@@ -32,7 +20,6 @@
     - application drag from another window to inactive group adds to tab strip
   - pinned
     - reopen closed pinned tab, not added to pinned
-    - native move to 0 index pins tab
   - audio
     - on close tab playing, group still audible
   - context broken
@@ -144,6 +131,18 @@
   - fix id
 
 #### p2
+- testing
+  - reproduce all bugs as integration tests
+  - add library for web-extension browser mocking
+  - add testing for vue components
+  - investigate nodejs es6 dependency mocking
+  - investigate typescript for tests
+  - VScode integration (running, linking errors & debugging)
+  - file based execution
+  - watch
+  - coverage
+  - suspend and replace
+  - url serialization
 - investigate vuejs change detection alternatives
 - store ancestor list to tab state
 - context menu improvements
