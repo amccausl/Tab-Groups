@@ -16,7 +16,7 @@ export function createTabGroup( tab_group_id, tabs, active_tab_id ) {
   return {
     id: tab_group_id,
     title: typeof browser != 'undefined' ? browser.i18n.getMessage( "tab_group_name_placeholder", [ tab_group_id ] ) : `Group ${ tab_group_id }`,
-    active_tab_id: ! active_tab_id && tabs.length ? tabs[ 0 ].id : null,
+    active_tab_id: active_tab_id || ( tabs.length ? tabs[ 0 ].id : null ),
     tabs,
     tabs_count: tabs.length
   }
@@ -115,13 +115,13 @@ export function getTargetIndex( target_window, target_data, ignored_tabs ) {
     if( target_data.tab_group_id === tab_group.id ) {
       let tab_group_index = 0
       for( let tab of tab_group.tabs ) {
+        if( target_data.tab_group_index === tab_group_index ) {
+          return {
+            index: index_offset + target_data.tab_group_index
+          }
+        }
         if( isIncluded( tab ) ) {
           tab_group_index++
-          if( target_data.tab_group_index === tab_group_index ) {
-            return {
-              index: index_offset + target_data.tab_group_index
-            }
-          }
         }
       }
       return {
@@ -250,18 +250,26 @@ export function getTabMoveData( state, source_data, target_data ) {
     ])
     target_data.window = target_window
   }
-  // Load the global index for the target
-  if( target_data.index == null && target_data.tab_group_id != null ) {
-    target_data = Object.assign( {}, target_data,
-      getTargetIndex( target_window, target_data, source_tabs )
-    )
-    // @todo check result
-  }
 
-  if( target_data.tab_group_id == null ) {
-    target_data = Object.assign( {}, target_data,
-      getTargetTabGroupData( target_window, target_data )
-    )
+  if( target_data.index == null && target_data.tab_group_id == null ) {
+    // @todo create new group, load data
+    target_data = Object.assign( {}, target_data, {
+      tab_group: createTabGroup( getNewTabGroupId( state ), source_data.tabs, source_data.tabs[ 0 ].id )
+    })
+  } else {
+    // Load the global index for the target
+    if( target_data.index == null && target_data.tab_group_id != null ) {
+      target_data = Object.assign( {}, target_data,
+        getTargetIndex( target_window, target_data, source_tabs )
+      )
+      // @todo check result
+    }
+
+    if( target_data.tab_group_id == null ) {
+      target_data = Object.assign( {}, target_data,
+        getTargetTabGroupData( target_window, target_data )
+      )
+    }
   }
 
   return {

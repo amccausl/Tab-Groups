@@ -1,6 +1,4 @@
 #### p1
-- new group
-  - make drag target (target as new group)
 - shim around native drags
 - add flags to state for feature detection
 - styling for pinned
@@ -32,7 +30,6 @@
   - moving to same group should be noop
   - drag and drop
     - pinned tab drag
-    - 1 drag is off
     - from 1 window to another loses favicon
     - dragging from new doesn't clear the target class
     - styling is weird when dragging to a sticky tab
@@ -48,23 +45,19 @@
     - drag from new window to existing
   - sidebar
     - bind right click for empty space
-    - out of window drop target makes new window?
     - group toggle is odd if group moves above the fold, should scroll container so both headers visible
     - active style should only be displayed if group also active
     - drag preview image issue
     - context display is broken
     - icons
       - better handling for broken icons
-  - open new tab should open at the end of the current collection
 - watch task with compile / tests
 - sidebar improvements
   - add process to suspend tabs
   - tab context menu
     - move to group
   - group header
-    - delete group
     - group header shouldn't wrap
-    - active group indicator
   - rename
     - opening new group should focus the name for edit
     - should select text on focus
@@ -82,7 +75,6 @@
       - notifications?
     - ensure new tab is visible (scroll, open group)
       - sometimes not clear there are more items under stick header
-    - update url rendering for usefulness
     - text overflow gradient
     - copy tab bar active style with blue bar
   - favicon scan for context styles
@@ -93,7 +85,6 @@
       - drag over last item moves to the wrong index
     - index based group dragging
     - between pinned tabs
-    - to new group
   - native drag
     - drag from native tab to sidebar
     - drag from bookmarks to sidebar
@@ -120,6 +111,7 @@
 - validation
   - add sync check after validation failure
   - store failed validations in log, surface on options page
+  - validate audible flag
 - private browsing
 - publish
   - setup self-hosted with unique id on github
@@ -185,6 +177,7 @@
   - tab search clear
   - tab close button
   - fade for overflow
+  - out of window drop target makes new window?
 - open main tab groups page with hotkey
 - add interval to detect state drift
 

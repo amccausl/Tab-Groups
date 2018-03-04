@@ -99,7 +99,7 @@ export function onTabGroupDrop( event, tab_group ) {
     console.info('detected tab drop', source_data)
     const target_data = {
       window_id: this.window_id,
-      tab_group_id: tab_group.id
+      tab_group_id: tab_group ? tab_group.id : null
     }
     window.background.moveTabsToGroup( window.store, source_data, target_data )
     this.resetDragState()
