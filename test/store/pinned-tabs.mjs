@@ -1,6 +1,10 @@
-import { createBrowserTab } from './helpers.mjs'
+import {
+  createBrowserTab,
+  getInitialState,
+} from './helpers.mjs'
 
 import { init, updateTab } from '../../src/store/reducers.mjs'
+import { validateState } from '../../src/store/validators.mjs'
 
 function testSingleWindowFreshInit( t ) {
   const browser_tabs = [
@@ -89,8 +93,6 @@ function testPinnedTabs( t ) {
   })
   state = updateTab( state, { browser_tab, change_info: { pinned: true } } )
 
-  // console.info( 'state', state.windows[ 0 ].tab_groups[ 0 ] )
-
   // Ensure added to pinned
   t.equal( state.windows[ 0 ].tab_groups[ 0 ].tabs.length, 2 )
   t.equal( state.windows[ 0 ].tab_groups[ 0 ].tabs[ 1 ].id, browser_tab.id )
@@ -101,8 +103,22 @@ function testPinnedTabs( t ) {
   // browser_tab = Object.assign( {}, state.windows[ 0 ].pinned_tabs[ 0 ], { index: 1, pinned: false } )
   state = updateTab( state, { browser_tab, change_info: { pinned: false } } )
 
-  // console.info( 'state', state.windows[ 0 ].tab_groups[ 0 ] )
   t.equal( state.windows[ 0 ].tab_groups[ 0 ].tabs.length, 1 )
+
+  t.end()
+}
+
+function testPinActiveTab( t ) {
+  const state0 = getInitialState()
+
+  let browser_tab = createBrowserTab({
+    id: state0.windows[ 0 ].tab_groups[ 1 ].active_tab_id,
+    index: 1,
+    windowId: state0.windows[ 0 ].id
+  })
+  const state1 = updateTab( state0, { browser_tab, change_info: { pinned: true } } )
+
+  t.ok( validateState( state1 ), "state validates", validateState.errors )
 
   t.end()
 }
@@ -114,5 +130,6 @@ export default function( tap ) {
   // @todo run update to unpin a tab
   tap.test( testSingleWindowFreshInit )
   tap.test( testPinnedTabs )
+  tap.test( testPinActiveTab )
   tap.end()
 }

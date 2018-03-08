@@ -564,7 +564,7 @@ export function moveTabs( state, { source_data, target_data } ) {
             } else if( tab.id === active_tab_id && tab_group.id !== target_data.tab_group_id ) {
               active_tab_id = null
               // If the active tab in the active group is moving, activate new group
-              if( active_tab_group_id === tab_group.id ) {
+              if( active_tab_group_id === tab_group.id && target_data.tab_group_id !== 0 ) {
                 active_tab_group_id = target_data.tab_group_id
               }
             }
