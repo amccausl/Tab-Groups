@@ -424,7 +424,8 @@ export function addTab( state, { browser_tab } ) {
     { tabs: [ getTabState( browser_tab ) ] },
     {
       window_id: browser_tab.windowId,
-      index: browser_tab.index
+      index: browser_tab.index,
+      pinned: browser_tab.pinned
     }
   )
 

@@ -153,6 +153,7 @@ ClientBin/
 *.publishsettings
 
 node_modules/
+web-ext-artifacts/
 
 # RIA/Silverlight projects
 Generated_Code/
