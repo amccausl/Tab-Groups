@@ -17,16 +17,22 @@
         </svg>
       </div>
     </div>
-    <div class="sidebar-tabs-pinned-list" @click.right.prevent>
-      <div class="sidebar-tabs-pinned-list-item"
-          v-for="tab in pinned_tabs" :key="tab.id"
-          :class="{ active: tab.active, selected: isSelected( tab ) }" :title="tab.title"
+    <div class="pinned-tab-list" @click.right.prevent>
+      <div v-for="tab in pinned_tabs" :key="tab.id"
+          class="pinned-tab-list__item"
+          :class="{ 'pinned-tab-list__item--active': tab.active, selected: isSelected( tab ) }" :title="tab.title"
           @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab )" @click.middle="closeTab( tab )"
       >
-        <!-- @todo fade styling for pinned tabs if search -->
-        <img class="sidebar-tabs-pinned-list-item-icon" :src="tab.icon_url"/>
-        <!-- @todo context bar -->
-        <!-- https://design.firefox.com/favicon.ico -->
+        <span class="pinned-tab-list__ink"></span>
+        <div class="pinned-tab-list__tab"
+            :class="{ 'pinned-tab-list__tab--active': tab.active, 'pinned-tab-list__tab--selected': isSelected( tab ) }"
+        >
+          <tab-icon :theme="theme" :tab="tab"></tab-icon>
+          <!-- @todo fade styling for pinned tabs if search -->
+          <!-- @todo context bar -->
+          <!-- https://design.firefox.com/favicon.ico -->
+        </div>
+        <span class="pinned-tab-list__ink"></span>
       </div>
     </div>
     <div class="sidebar-tab-group-list" @click.right.prevent>
@@ -136,9 +142,12 @@ import {
   INK_90,
 } from './photon-colors'
 
+import TabIcon from './TabIcon.vue'
+
 export default {
   name: 'sidebar',
   components: {
+    TabIcon,
   },
   data() {
     return {
@@ -188,8 +197,6 @@ export default {
         // Need to deep clone the objects because Vue extends prototypes when state added to the vm
         let tab_groups = state_window.tab_groups.map( cloneTabGroup )
         // Use the extended splice to trigger change detection
-        Object.getPrototypeOf( this.pinned_tabs ).splice.apply( this.pinned_tabs, [ 0, this.pinned_tabs.length, ...tab_groups[ 0 ].tabs ] )
-        tab_groups = tab_groups.filter( tab_group => tab_group.id )
         tab_groups.forEach( tab_group => {
           // Copy the `open` flag from original data
           const orig_tab_group = this.tab_groups.find( _tab_group => _tab_group.id === tab_group.id )
@@ -203,11 +210,15 @@ export default {
             if( this.selected_tab_ids.includes( tab.id ) ) {
               new_selected_tab_ids.push( tab.id )
             }
+            if( tab.id === tab_group.active_tab_id ) {
+              tab.active = true
+            }
           })
         })
-        Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...new_selected_tab_ids ] )
         // Use the extended splice to trigger change detection
-        Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length, ...tab_groups ] )
+        Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...new_selected_tab_ids ] )
+        Object.getPrototypeOf( this.pinned_tabs ).splice.apply( this.pinned_tabs, [ 0, this.pinned_tabs.length, ...tab_groups[ 0 ].tabs ] )
+        Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length, ...tab_groups.slice( 1 ) ] )
       } else {
         // @todo error
       }
@@ -399,21 +410,65 @@ $light-border-color: #e0e0e1;
   cursor: pointer;
 }
 
-.sidebar-tabs-pinned-list {
+// @todo use photon colors
+$pinned-tab-list__ink--color: #545455 !default;
+$pinned-tab-list__ink--hover--color: #252526 !default;
+$pinned-tab-list__ink--active--color: $blue-50 !default;
+
+// @todo may be tab-list--pinned or plural tabs
+// @todo fix active state
+
+.pinned-tab-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 28px);
+  grid-template-columns: repeat(auto-fill, 40px);
   grid-auto-columns: min-content;
   grid-auto-rows: max-content;
-  cursor: pointer;
-}
 
-.sidebar-tabs-pinned-list-item {
-  padding: 2px;
-}
+  &__item {
+    padding-top: 1px;
+    margin-left: -1px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-.sidebar-tabs-pinned-list-item-icon {
-  width: 24px;
-  height: 24px;
+    &:hover {
+      border-right: solid 1px $pinned-tab-list__ink--color;
+      border-left: solid 1px $pinned-tab-list__ink--color;
+      margin-left: -1px;
+      background-color: $pinned-tab-list__ink--hover--color;
+    }
+  }
+
+  &__ink {
+    width: 1px;
+    height: 24px;
+    background-color: $pinned-tab-list__ink--color;
+  }
+
+  &__tab {
+    // padding: 6px 12px 7px 11px;
+    padding: 6px 12px;
+    border-top: solid 2px transparent;
+    cursor: pointer;
+
+    &:hover {
+      border-top-color: $pinned-tab-list__ink--color;
+      // border-right: solid 1px $pinned-tab-list__ink--color;
+      // border-left: solid 1px $pinned-tab-list__ink--color;
+      // margin-left: -1px;
+      // margin-right: -1px;
+      z-index:10;
+    }
+
+    &--active {
+      border-top-color: $pinned-tab-list__ink--active--color;
+      background-color: $pinned-tab-list__ink--color;
+    }
+
+    &--dark {
+      border-top-color: white;
+    }
+  }
 }
 
 .sidebar-tab-group-list {
@@ -430,7 +485,7 @@ $light-border-color: #e0e0e1;
 }
 
 .sidebar-tab-group-list-item-header {
-  padding: 10px;
+  padding: 10px 0 10px 10px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -653,15 +708,15 @@ button.more {
     background-color: $white-100;
   }
 
-  .sidebar-tabs-pinned-list-item.active {
+  .pinned-tab-list-item.active {
     background-color: $light-header-active-background;
   }
 
-  .sidebar-tabs-pinned-list-item:hover {
+  .pinned-tab-list-item:hover {
     background-color: $light-header-hover-background;
   }
 
-  .sidebar-tabs-pinned-list-item.active:hover {
+  .pinned-tab-list-item.active:hover {
     background-color: $light-header-active-background;
   }
 
@@ -756,15 +811,15 @@ button.more {
     background-color: $dark-header-hover-background;
   }
 
-  .sidebar-tabs-pinned-list-item.active {
+  .pinned-tab-list-item.active {
     background-color: $dark-header-active-background;
   }
 
-  .sidebar-tabs-pinned-list-item:hover {
+  .pinned-tab-list-item:hover {
     background-color: $dark-header-hover-background;
   }
 
-  .sidebar-tabs-pinned-list-item.active:hover {
+  .pinned-tab-list-item.active:hover {
     background-color: $dark-header-active-background;
   }
 

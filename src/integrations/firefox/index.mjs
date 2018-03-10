@@ -475,6 +475,18 @@ export function closeTab( store, tab_id ) {
   return browser.tabs.remove( [ tab_id ] )
 }
 
+export function muteTab( store, window_id, tab_id ) {
+  const change_info = { muted: true }
+  console.info('browser.tabs.update', tab_id, change_info)
+  return browser.tabs.update( tab_id, change_info )
+}
+
+export function unmuteTab( store, window_id, tab_id ) {
+  const change_info = { muted: false }
+  console.info('browser.tabs.update', tab_id, change_info)
+  return browser.tabs.update( tab_id, change_info )
+}
+
 export function closeTabGroup( store, window_id, tab_group_id ) {
   const state = store.getState()
   for( let window of state.windows ) {

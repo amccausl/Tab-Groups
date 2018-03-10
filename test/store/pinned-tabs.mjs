@@ -144,6 +144,36 @@ function testOpenerPinnedTab( t ) {
   t.end()
 }
 
+function testReopenPinnedTab( t ) {
+  const state0 = {
+    config: {},
+    windows: [
+      createWindow( 1, [
+        createPinnedTabGroup([
+          createTestTab({ id: 1 }),
+        ]),
+        createTabGroup( 1, [
+          createTestTab({ id: 2 })
+        ])
+      ])
+    ]
+  }
+
+  const browser_tab = createBrowserTab({
+    id: 3,
+    index: 1,
+    windowId: 1,
+    pinned: true
+  })
+
+  const state1 = addTab( state0, { browser_tab } )
+
+  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.equal( state1.windows[ 0 ].tab_groups[ 0 ].tabs_count, 2 )
+  t.equal( state1.windows[ 0 ].tab_groups[ 0 ].tabs[ 1 ].id, 3 )
+  t.end()
+}
+
 function testPinActiveTab( t ) {
   const state0 = getInitialState()
 
@@ -160,13 +190,11 @@ function testPinActiveTab( t ) {
 }
 
 export default function( tap ) {
-  // @todo run init on window with pinned tabs
-  // @todo run update to pin a tab
   // @todo move pinned tabs
-  // @todo run update to unpin a tab
   tap.test( testSingleWindowFreshInit )
   tap.test( testPinnedTabs )
   tap.test( testOpenerPinnedTab )
+  tap.test( testReopenPinnedTab )
   tap.test( testPinActiveTab )
   tap.end()
 }

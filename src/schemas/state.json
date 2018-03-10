@@ -95,6 +95,9 @@
                     },
                     "active_tab_id": {
                     },
+                    "audible": {
+                      "enum": [ true ]
+                    },
                     "tabs": {
                       "type": "array",
                       "items": { "$ref": "#/definitions/tab" }
@@ -121,7 +124,7 @@
                     "active_tab_id": {
                     },
                     "audible": {
-                      "type": "boolean"
+                      "enum": [ true ]
                     },
                     "muted": {
                       "type": "boolean"

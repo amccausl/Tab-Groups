@@ -6,6 +6,8 @@ import { getTabGroupsPersistState } from './store/helpers.mjs'
 import {
   bindBrowserEvents,
   closeTab,
+  muteTab,
+  unmuteTab,
   closeTabGroup,
   muteTabGroup,
   unmuteTabGroup,
@@ -66,6 +68,8 @@ window.getStore = function() {
 // Proxy public methods from integrations to reduce duplication in app js
 window.moveTabsToGroup = moveTabsToGroup
 window.closeTab = closeTab
+window.muteTab = muteTab
+window.unmuteTab = unmuteTab
 window.closeTabGroup = closeTabGroup
 window.muteTabGroup = muteTabGroup
 window.unmuteTabGroup = unmuteTabGroup
