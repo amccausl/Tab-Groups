@@ -17,7 +17,7 @@
         </svg>
       </div>
     </div>
-    <div class="pinned-tab-list" @click.right.prevent>
+    <div v-if="show_pinned_tabs" class="pinned-tab-list" @click.right.prevent>
       <div v-for="tab in pinned_tabs" :key="tab.id"
           class="pinned-tab-list__item"
           :class="{ 'pinned-tab-list__item--active': tab.active, selected: isSelected( tab ) }" :title="tab.title"
@@ -165,6 +165,7 @@ export default {
       search_text: '',
       search_resolved: true,
       selected_tab_ids: [],
+      show_pinned_tabs: true,
       pinned_tabs: [],
       tab_groups: [],
       target_tab_group_id: null,
@@ -176,6 +177,7 @@ export default {
   created() {
     onStateChange( state => {
       this.theme = state.config.theme
+      this.show_pinned_tabs = state.config.show_pinned_tabs
 
       for( let context_id in state.contexts || {} ) {
         this.context_styles[ context_id ] = {
@@ -411,6 +413,8 @@ $light-border-color: #e0e0e1;
 }
 
 // @todo use photon colors
+$pinned-tab-list__item--background-color: #0c0c0d !default;
+$pinned-tab-list__item--active--background-color: #323234 !default;
 $pinned-tab-list__ink--color: #545455 !default;
 $pinned-tab-list__ink--hover--color: #252526 !default;
 $pinned-tab-list__ink--active--color: $blue-50 !default;
@@ -437,6 +441,16 @@ $pinned-tab-list__ink--active--color: $blue-50 !default;
       margin-left: -1px;
       background-color: $pinned-tab-list__ink--hover--color;
     }
+
+    &--active {
+      border-left: solid 1px $pinned-tab-list__item--background-color;
+      background-color: $pinned-tab-list__item--active--background-color;
+
+      &:hover {
+        border-left: solid 1px $pinned-tab-list__item--background-color;
+        background-color: $pinned-tab-list__item--active--background-color;
+      }
+    }
   }
 
   &__ink {
@@ -446,23 +460,24 @@ $pinned-tab-list__ink--active--color: $blue-50 !default;
   }
 
   &__tab {
-    // padding: 6px 12px 7px 11px;
     padding: 6px 12px;
     border-top: solid 2px transparent;
     cursor: pointer;
 
     &:hover {
       border-top-color: $pinned-tab-list__ink--color;
-      // border-right: solid 1px $pinned-tab-list__ink--color;
-      // border-left: solid 1px $pinned-tab-list__ink--color;
-      // margin-left: -1px;
-      // margin-right: -1px;
-      z-index:10;
+      z-index: 10;
     }
 
     &--active {
       border-top-color: $pinned-tab-list__ink--active--color;
-      background-color: $pinned-tab-list__ink--color;
+      border-right: solid 1px $pinned-tab-list__item--background-color;
+      cursor: none;
+      z-index: 5;
+
+      &:hover {
+        border-top-color: $pinned-tab-list__ink--active--color;
+      }
     }
 
     &--dark {

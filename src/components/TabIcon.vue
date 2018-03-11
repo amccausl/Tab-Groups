@@ -1,6 +1,6 @@
 <template>
   <div class="tab-icon">
-    <img class="tab-icon__img" :src="tab.icon_url"/>
+    <img class="tab-icon__img" :src="tab.icon_url" @error="onIconLoadError"/>
     <svg v-if="tab.muted" class="tab-icon__state audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
         @click.prevent="unmuteTab( $event, tab.id )"
     >
@@ -32,7 +32,6 @@ export default {
   data() {
     return {
       window_id: window.current_window_id,
-      theme: null,
     }
   },
   computed: {
@@ -57,6 +56,9 @@ export default {
       console.info('unmuteTab', this.tab.id)
       event.stopPropagation()
       window.background.unmuteTab( window.store, this.window_id, this.tab.id )
+    },
+    onIconLoadError( event ) {
+      console.info('onIconLoadError', event, this.tab.id, this.tab.icon_url)
     }
   }
 }

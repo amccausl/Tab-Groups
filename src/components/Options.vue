@@ -17,15 +17,21 @@
     <article class="main">
       <section v-if="selected_section === 'preferences'">
         <form @submit.prevent>
-          Theme:
-          <div class="browser-style">
-            <input type="radio" id="theme_light" value="light" v-model="preferences.theme" @input="selectTheme( 'light' )">
-            <label for="theme_light">Light</label>
-          </div>
-          <div class="browser-style">
-            <input type="radio" id="theme_dark" value="dark" v-model="preferences.theme" @input="selectTheme( 'dark' )">
-            <label for="theme_dark">Dark</label>
-          </div>
+          <fieldset>
+            Theme:
+            <div class="browser-style">
+              <input type="radio" id="theme_light" value="light" v-model="preferences.theme" @input="selectTheme( 'light' )">
+              <label for="theme_light">Light</label>
+            </div>
+            <div class="browser-style">
+              <input type="radio" id="theme_dark" value="dark" v-model="preferences.theme" @input="selectTheme( 'dark' )">
+              <label for="theme_dark">Dark</label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <label for="show_pinned_tabs">Show pinned tabs</label>
+            <input type="checkbox" id="show_pinned_tabs" v-model="show_pinned_tabs">
+          </fieldset>
         </form>
       </section>
       <section v-if="selected_section === 'data'">
@@ -47,7 +53,7 @@
 import {
   resetBrowserState,
   openSidebarPage,
-  setTheme,
+  setConfig,
 } from '../integrations/index.mjs'
 import {
   onStateChange,
@@ -58,10 +64,21 @@ export default {
   data() {
     return {
       preferences: {
-        theme: null
+        theme: null,
+        show_pinned_tabs: null
       },
       selected_section: 'preferences',
       window_ids: []
+    }
+  },
+  computed: {
+    show_pinned_tabs: {
+      get() {
+        return this.preferences.show_pinned_tabs
+      },
+      set( value ) {
+        setConfig( 'show_pinned_tabs', value )
+      }
     }
   },
   created() {
@@ -73,6 +90,7 @@ export default {
       Object.getPrototypeOf( this.window_ids ).splice.apply( this.window_ids, [ 0, this.window_ids.length, ...window_ids ] )
 
       this.preferences.theme = state.config.theme
+      this.preferences.show_pinned_tabs = state.config.show_pinned_tabs
     })
   },
   methods: {
@@ -87,7 +105,7 @@ export default {
       this.selected_section = section_id
     },
     selectTheme( theme_id ) {
-      setTheme( theme_id )
+      setConfig( 'theme', theme_id )
     }
   }
 }
