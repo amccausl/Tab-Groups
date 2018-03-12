@@ -62,7 +62,15 @@
   "type": "object",
   "properties": {
     "config": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "theme": {
+          "enum": [ "light", "dark" ]
+        },
+        "show_pinned_tabs": {
+          "type": "boolean"
+        }
+      }
     },
     "contexts": {
       "type": "object"
@@ -76,6 +84,10 @@
             "type": "integer"
           },
           "active_tab_group_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "active_tab_id": {
             "type": "integer",
             "minimum": 1
           },
@@ -154,6 +166,7 @@
         "required": [
           "id",
           "active_tab_group_id",
+          "active_tab_id",
           "tab_groups"
         ]
       }

@@ -8,6 +8,7 @@ export function createWindow( window_id, tab_groups ) {
   return {
     id: window_id,
     active_tab_group_id: tab_groups[ 1 ].id,
+    active_tab_id: tab_groups[ 1 ].active_tab_id,
     tab_groups: tab_groups
   }
 }

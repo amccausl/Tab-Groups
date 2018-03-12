@@ -73,12 +73,12 @@
           <div class="sidebar-tab-group-tabs-list-item"
               v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
               v-if="! search_text || ! search_resolved || tab.matched" :title="tab.title"
-              :class="{ active: tab_group.active_tab_id === tab.id, selected: isSelected( tab ), source: isSelected( tab ) && is_dragging, target: target_tab_id === tab.id && ! isSelected( tab ) }"
+              :class="{ active: tab.active, selected: isSelected( tab ), source: isSelected( tab ) && is_dragging, target: target_tab_id === tab.id && ! isSelected( tab ) }"
               @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab )" @click.middle="closeTab( tab )"
               draggable="true" @dragstart="onTabDragStart( $event, tab )" @dragend="onTabDragEnd( $event )" @drop="onTabDrop( $event, tab )"
               @dragover="onTabDragOver( $event, tab_group, tab )"
           >
-            <div class="sidebar-tab-view-item" :class="{ active: tab_group.active_tab_id === tab.id }">
+            <div class="sidebar-tab-view-item" :class="{ active: tab.active }">
               <div class="sidebar-tab-view-item-icon">
                 <div></div>
                 <img :src="tab.icon_url"/>
@@ -212,7 +212,7 @@ export default {
             if( this.selected_tab_ids.includes( tab.id ) ) {
               new_selected_tab_ids.push( tab.id )
             }
-            if( tab.id === tab_group.active_tab_id ) {
+            if( tab.id === state_window.active_tab_id ) {
               tab.active = true
             }
           })

@@ -136,6 +136,13 @@ export function init( state, { browser_tabs, config, contextual_identities, them
     // @todo ensure tabs are in index sorted order, with the pinned tabs first
     // @todo this should be based on config setting
 
+    let active_tab_id = null
+    for( let browser_tab of window_tabs ) {
+      if( browser_tab.active ) {
+        active_tab_id = browser_tab.id
+      }
+    }
+
     let pinned_tabs
 
     // Find the first non-pinned tab
@@ -172,6 +179,7 @@ export function init( state, { browser_tabs, config, contextual_identities, them
     windows.push({
       id: window_id,
       active_tab_group_id: window_tab_groups[ 1 ].id, // @todo
+      active_tab_id,
       tab_groups: window_tab_groups
     })
   }
@@ -180,18 +188,6 @@ export function init( state, { browser_tabs, config, contextual_identities, them
     config: config || initial_state.config,
     contexts,
     windows
-      /*
-      id,
-      active_tab_group_id,
-      tab_groups: [
-        {
-          id,
-          title,
-          active_tab_id,
-          tabs,
-        }
-      ]
-      */
   }
 
   // @todo compare with state to return optimized diff
@@ -391,26 +387,32 @@ export function unmuteGroup( state, { tab_group_id, window_id } ) {
 
 export function activateTab( state, { tab_id, window_id } ) {
   // @todo activate the group the tab is in
-  let tab_group_id
   // @todo optimize to return existing state if tab already active
   return Object.assign( {}, state, {
     windows: state.windows.map( window => {
       if( window.id === window_id ) {
-        window = Object.assign( {}, window, {
-          tab_groups: window.tab_groups.map( tab_group => {
-            // If tab_group contains the tab_id, return a copy with active toggled
-            if( tab_group.tabs.some( tab => tab.id === tab_id ) ) {
-              tab_group_id = tab_group.id
-              tab_group = Object.assign( {}, tab_group, {
-                active_tab_id: tab_id
-              })
+        let { active_tab_group_id } = window
+        let active_tab_id = null
+        const tab_groups = window.tab_groups.map( tab_group => {
+          // If tab_group contains the tab_id, return a copy with active toggled
+          if( tab_group.tabs.some( tab => tab.id === tab_id ) ) {
+            if( tab_group.id ) {
+              active_tab_group_id = tab_group.id
             }
-            return tab_group
-          })
+            active_tab_id = tab_id
+            tab_group = Object.assign( {}, tab_group, {
+              active_tab_id
+            })
+          }
+          return tab_group
         })
 
-        if( tab_group_id ) {
-          window.active_tab_group_id = tab_group_id
+        if( active_tab_id ) {
+          window = Object.assign( {}, window, {
+            active_tab_group_id,
+            active_tab_id,
+            tab_groups
+          })
         }
       }
       return window
