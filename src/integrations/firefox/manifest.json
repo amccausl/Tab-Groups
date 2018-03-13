@@ -12,6 +12,7 @@
   "permissions": [
     "<all_urls>",
     "contextualIdentities",
+    "cookies",
     "find",
     "sessions",
     "storage",

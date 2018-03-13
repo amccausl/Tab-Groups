@@ -18,18 +18,19 @@
       </div>
     </div>
     <div v-if="show_pinned_tabs" :class="[ `pinned-tab-list`, `pinned-tab-list--${ theme }` ]" @click.right.prevent>
-      <div v-for="tab in pinned_tabs" :key="tab.id"
-          :class="[ `pinned-tab-list__item`, `pinned-tab--${ theme }-list__item`, { 'pinned-tab-list__item--active': tab.active, selected: isSelected( tab ) } ]"
-          :title="tab.title"
-          @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab )" @click.middle="closeTab( tab )"
+      <div v-for="pinned_tab in pinned_tabs" :key="pinned_tab.id"
+          :class="[ `pinned-tab-list__item`, `pinned-tab-list--${ theme }__item`, { 'pinned-tab-list__item--active': pinned_tab.active, selected: isSelected( pinned_tab ) } ]"
+          :title="pinned_tab.title"
+          @click.ctrl="toggleTabSelection( pinned_tab )" @click.exact="openTab( pinned_tab )" @click.middle="closeTab( pinned_tab )"
       >
         <span :class="[ `pinned-tab-list__ink`, `pinned-tab-list--${ theme }__ink` ]"></span>
-        <div :class="[ `pinned-tab-list__tab`, `pinned-tab-list--${ theme }__tab`, tab.active ? `pinned-tab-list--${ theme }__tab--active` : `` ]">
-          <tab-icon :theme="theme" :tab="tab"></tab-icon>
+        <div :class="[ `pinned-tab-list__tab`, `pinned-tab-list--${ theme }__tab`, pinned_tab.active ? `pinned-tab-list--${ theme }__tab--active` : `` ]">
+          <tab-icon :theme="theme" :tab="pinned_tab"></tab-icon>
           <!-- @todo fade styling for pinned tabs if search -->
-          <!-- @todo context bar -->
           <!-- https://design.firefox.com/favicon.ico -->
+          <div v-if="pinned_tab.context_id" class="pinned-tab-list__tab-context" :style="context_styles[ pinned_tab.context_id ]"></div>
         </div>
+        <span :class="[ `pinned-tab-list__ink` ]"></span>
       </div>
     </div>
     <div class="sidebar-tab-group-list" @click.right.prevent>
@@ -367,6 +368,10 @@ $light-border-color: #e0e0e1;
   align-items: stretch;
 }
 
+// =============================================================================
+// Action Strip
+// =============================================================================
+
 $action-strip--light__button--background-color: #f5f6f7 !default;
 $action-strip--light__button--hover--background-color: #d0d0d0 !default;
 $action-strip--light__text--color: $grey-90-a80 !default;
@@ -444,6 +449,7 @@ $action-strip--dark__separator--color: $grey-90-a80 !default;
   }
 }
 
+/*
 .sidebar-header-search {
   flex: 0;
   padding: 4px 8px;
@@ -451,6 +457,11 @@ $action-strip--dark__separator--color: $grey-90-a80 !default;
   border-radius: $photon-border-radius;
   max-width: 50%;
 }
+*/
+
+// =============================================================================
+// Pinned Tab List
+// =============================================================================
 
 // @todo use photon colors
 $pinned-tab-list--light__item--background-color: #e3e4e6 !default;
@@ -476,16 +487,12 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
 
   &__item {
     padding-top: 1px;
-    margin-left: -1px;
+    margin-left: -3px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-right: solid 1px transparent;
     border-left: solid 1px transparent;
-
-    &:hover {
-      margin-left: -1px;
-    }
   }
 
   &__ink {
@@ -494,8 +501,9 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
   }
 
   &__tab {
-    padding: 6px 8px;
+    padding: 6px 8px 6px 7px;
     border-top: solid 2px transparent;
+    border-right: solid 1px transparent;
     cursor: pointer;
 
     &:hover {
@@ -505,7 +513,6 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
     &--active {
       z-index: 5;
       cursor: none;
-      border-right: solid 1px transparent;
     }
   }
 
@@ -616,9 +623,10 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
   z-index: 1;
 
   > .active-bar {
-    height: 46px;
+    height: 37px;
     width: 4px;
     margin: -11px 10px -11px -10px;
+    background-color: $blue-50;
   }
 }
 
@@ -629,6 +637,10 @@ button.more {
   background-color: transparent;
   cursor: pointer;
 }
+
+// =============================================================================
+// Context Menu
+// =============================================================================
 
 .tab-group-context-menu-ctx {
   z-index: 1;
@@ -734,7 +746,6 @@ button.more {
   display: flex;
   align-items: center;
   width: 100%;
-  overflow: hidden;
   white-space: nowrap;
   text-overflow: clip;
   cursor: pointer;
@@ -763,7 +774,8 @@ button.more {
 .sidebar-tab-view-item-text {
   flex: 1;
   padding-top: 10px;
-  padding-bottom: 10px
+  padding-bottom: 10px;
+  overflow: hidden;
 }
 
 .sidebar-tab-view-item-context {
@@ -831,10 +843,6 @@ button.more {
   .sidebar-tab-group-list-item-header {
     background-color: $white-100;
     border-bottom: $light-border-color 1px solid;
-
-    > .active-bar {
-      background-color: blue;
-    }
   }
 
   button.more:hover {
@@ -897,10 +905,6 @@ button.more {
   .sidebar-tab-group-list-item-header {
     background-color: black;
     border-bottom: $light-border-color 1px solid;
-
-    > .active-bar {
-      background-color: blue;
-    }
   }
 
   button.more:hover {

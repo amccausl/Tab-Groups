@@ -246,7 +246,6 @@ export function getTabState( browser_tab ) {
     // @todo last_accessed
     // @todo discarded
     // @todo highlighted?
-    // @todo sessionId
   }
 
   if( browser_tab.hasOwnProperty( 'audible' ) && browser_tab.audible ) {
