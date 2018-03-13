@@ -1,38 +1,35 @@
 <template>
   <body class="sidebar" :class="theme">
-    <div class="sidebar-header">
-      <div class="sidebar-header-new_group"
+    <div :class="[ `action-strip`, `action-strip--${ theme }` ]">
+      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button` ]"
           @click.left="createTabGroup()" @click.right.prevent
           @dragenter="onTabGroupDragEnter( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-          <path :fill="context_fill" d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
+        <svg :class="[ `action-strip__icon`, `action-strip--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+          <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
         </svg>
-        <span class="sidebar-header-new_group-text">{{ __MSG_tab_group_new__ }}</span>
+        <span :class="[ `action-strip__button-text`, `action-strip--${ theme }__button-text` ]">{{ __MSG_tab_group_new__ }}</span>
       </div>
       <!-- <input class="sidebar-header-search" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/> -->
-      <div class="sidebar-header-config" @click="openOptionsPage()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-          <path :fill="context_fill" d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
+      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button`, `action-strip__button--no-grow` ]" @click="openOptionsPage()">
+        <svg :class="[ `action-strip__icon`, `action-strip--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+          <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
         </svg>
       </div>
     </div>
-    <div v-if="show_pinned_tabs" class="pinned-tab-list" @click.right.prevent>
+    <div v-if="show_pinned_tabs" :class="[ `pinned-tab-list`, `pinned-tab-list--${ theme }` ]" @click.right.prevent>
       <div v-for="tab in pinned_tabs" :key="tab.id"
-          class="pinned-tab-list__item"
-          :class="{ 'pinned-tab-list__item--active': tab.active, selected: isSelected( tab ) }" :title="tab.title"
+          :class="[ `pinned-tab-list__item`, `pinned-tab--${ theme }-list__item`, { 'pinned-tab-list__item--active': tab.active, selected: isSelected( tab ) } ]"
+          :title="tab.title"
           @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab )" @click.middle="closeTab( tab )"
       >
-        <span class="pinned-tab-list__ink"></span>
-        <div class="pinned-tab-list__tab"
-            :class="{ 'pinned-tab-list__tab--active': tab.active, 'pinned-tab-list__tab--selected': isSelected( tab ) }"
-        >
+        <span :class="[ `pinned-tab-list__ink`, `pinned-tab-list--${ theme }__ink` ]"></span>
+        <div :class="[ `pinned-tab-list__tab`, `pinned-tab-list--${ theme }__tab`, tab.active ? `pinned-tab-list--${ theme }__tab--active` : `` ]">
           <tab-icon :theme="theme" :tab="tab"></tab-icon>
           <!-- @todo fade styling for pinned tabs if search -->
           <!-- @todo context bar -->
           <!-- https://design.firefox.com/favicon.ico -->
         </div>
-        <span class="pinned-tab-list__ink"></span>
       </div>
     </div>
     <div class="sidebar-tab-group-list" @click.right.prevent>
@@ -370,28 +367,81 @@ $light-border-color: #e0e0e1;
   align-items: stretch;
 }
 
-.sidebar-header {
+$action-strip--light__button--background-color: #f5f6f7 !default;
+$action-strip--light__button--hover--background-color: #d0d0d0 !default;
+$action-strip--light__text--color: $grey-90-a80 !default;
+$action-strip--light__separator--color: #cccccc !default;
+
+$action-strip--dark__button--background-color: #323234 !default;
+$action-strip--dark__button--hover--background-color: #5b5b5d !default;
+$action-strip--dark__text--color: #d0d0d0 !default;
+$action-strip--dark__separator--color: $grey-90-a80 !default;
+
+.action-strip {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
   height: 32px;
-}
+  border-bottom: solid 1px transparent;
 
-.sidebar-header-new_group {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  padding: 0 8px;
-  height: 32px;
-  transition-property: background-color;
-  transition-duration: 250ms;
-  transition-timing-function: cubic-bezier(.07,.95,0,1);
-  cursor: pointer;
-}
+  &__button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    height: 32px;
+    transition-property: background-color;
+    transition-duration: 250ms;
+    transition-timing-function: cubic-bezier(.07,.95,0,1);
+    cursor: pointer;
+  }
 
-.sidebar-header-new_group-text {
-  padding-left: 4px;
+  &__button--no-grow {
+    flex: 0;
+  }
+
+  &__button-text {
+    padding-left: 4px;
+  }
+
+  &--light {
+    &__button {
+      background-color: $action-strip--light__button--background-color;
+      border-bottom: solid 1px $action-strip--light__separator--color;
+    }
+
+    &__button:hover {
+      background-color: $action-strip--light__button--hover--background-color;
+    }
+
+    &__button-text {
+      color: $action-strip--light__text--color;
+    }
+
+    &__icon {
+      fill: $action-strip--light__text--color;
+    }
+  }
+
+  &--dark {
+    &__button {
+      background-color: $action-strip--dark__button--background-color;
+      border-bottom: solid 1px $action-strip--dark__separator--color;
+    }
+
+    &__button:hover {
+      background-color: $action-strip--dark__button--hover--background-color;
+    }
+
+    &__button-text {
+      color: $action-strip--dark__text--color;
+    }
+
+    &__icon {
+      fill: $action-strip--dark__text--color;
+    }
+  }
 }
 
 .sidebar-header-search {
@@ -402,22 +452,18 @@ $light-border-color: #e0e0e1;
   max-width: 50%;
 }
 
-.sidebar-header-config {
-  width: 32px;
-  height: 32px;
-  padding: 8px;
-  transition-property: background-color;
-  transition-duration: 250ms;
-  transition-timing-function: cubic-bezier(.07,.95,0,1);
-  cursor: pointer;
-}
-
 // @todo use photon colors
-$pinned-tab-list__item--background-color: #0c0c0d !default;
-$pinned-tab-list__item--active--background-color: #323234 !default;
-$pinned-tab-list__ink--color: #545455 !default;
-$pinned-tab-list__ink--hover--color: #252526 !default;
-$pinned-tab-list__ink--active--color: $blue-50 !default;
+$pinned-tab-list--light__item--background-color: #e3e4e6 !default;
+$pinned-tab-list--light__item--active--background-color: #f5f6f7 !default;
+$pinned-tab-list--light__ink--color: $grey-90-a80 !default;
+$pinned-tab-list--light__ink--hover--color: #252526 !default;
+$pinned-tab-list--light__ink--active--color: $blue-50 !default;
+
+$pinned-tab-list--dark__item--background-color: #0c0c0d !default;
+$pinned-tab-list--dark__item--active--background-color: #323234 !default;
+$pinned-tab-list--dark__ink--color: #545455 !default;
+$pinned-tab-list--dark__ink--hover--color: #252526 !default;
+$pinned-tab-list--dark__ink--active--color: $blue-50 !default;
 
 // @todo may be tab-list--pinned or plural tabs
 // @todo fix active state
@@ -434,54 +480,114 @@ $pinned-tab-list__ink--active--color: $blue-50 !default;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-right: solid 1px transparent;
+    border-left: solid 1px transparent;
 
     &:hover {
-      border-right: solid 1px $pinned-tab-list__ink--color;
-      border-left: solid 1px $pinned-tab-list__ink--color;
       margin-left: -1px;
-      background-color: $pinned-tab-list__ink--hover--color;
-    }
-
-    &--active {
-      border-left: solid 1px $pinned-tab-list__item--background-color;
-      background-color: $pinned-tab-list__item--active--background-color;
-
-      &:hover {
-        border-left: solid 1px $pinned-tab-list__item--background-color;
-        background-color: $pinned-tab-list__item--active--background-color;
-      }
     }
   }
 
   &__ink {
-    width: 1px;
+    min-width: 1px;
     height: 24px;
-    background-color: $pinned-tab-list__ink--color;
   }
 
   &__tab {
-    padding: 6px 12px;
+    padding: 6px 8px;
     border-top: solid 2px transparent;
     cursor: pointer;
 
     &:hover {
-      border-top-color: $pinned-tab-list__ink--color;
       z-index: 10;
     }
 
     &--active {
-      border-top-color: $pinned-tab-list__ink--active--color;
-      border-right: solid 1px $pinned-tab-list__item--background-color;
-      cursor: none;
       z-index: 5;
+      cursor: none;
+      border-right: solid 1px transparent;
+    }
+  }
 
+  &--light {
+    &__item {
       &:hover {
-        border-top-color: $pinned-tab-list__ink--active--color;
+        border-right-color: $pinned-tab-list--light__ink--color;
+        border-left-color: $pinned-tab-list--light__ink--color;
+        background-color: $pinned-tab-list--light__ink--hover--color;
+      }
+
+      &--active {
+        border-left-color: $pinned-tab-list--light__item--background-color;
+        background-color: $pinned-tab-list--light__item--active--background-color;
+
+        &:hover {
+          border-left-color: $pinned-tab-list--light__item--background-color;
+          background-color: $pinned-tab-list--light__item--active--background-color;
+        }
       }
     }
 
-    &--dark {
-      border-top-color: white;
+    &__ink {
+      background-color: $pinned-tab-list--light__ink--color;
+    }
+
+    &__tab {
+      border-top-color: $pinned-tab-list--light__item--background-color;
+
+      &:hover {
+        border-top-color: $pinned-tab-list--light__ink--color;
+      }
+
+      &--active {
+        border-top-color: $pinned-tab-list--light__ink--active--color;
+        border-right-color: $pinned-tab-list--light__item--background-color;
+
+        &:hover {
+          border-top-color: $pinned-tab-list--light__ink--active--color;
+        }
+      }
+    }
+  }
+
+  &--dark {
+    &__item {
+      &:hover {
+        border-right: solid 1px $pinned-tab-list--dark__ink--color;
+        border-left: solid 1px $pinned-tab-list--dark__ink--color;
+        background-color: $pinned-tab-list--dark__ink--hover--color;
+      }
+
+      &--active {
+        border-left: solid 1px $pinned-tab-list--dark__item--background-color;
+        background-color: $pinned-tab-list--dark__item--active--background-color;
+
+        &:hover {
+          border-left: solid 1px $pinned-tab-list--dark__item--background-color;
+          background-color: $pinned-tab-list--dark__item--active--background-color;
+        }
+      }
+    }
+
+    &__ink {
+      background-color: $pinned-tab-list--dark__ink--color;
+    }
+
+    &__tab {
+      border-top-color: $pinned-tab-list--dark__item--background-color;
+
+      &:hover {
+        border-top-color: $pinned-tab-list--dark__ink--color;
+      }
+
+      &--active {
+        border-top-color: $pinned-tab-list--dark__ink--active--color;
+        border-right: solid 1px $pinned-tab-list--dark__item--background-color;
+
+        &:hover {
+          border-top-color: $pinned-tab-list--dark__ink--active--color;
+        }
+      }
     }
   }
 }
@@ -692,23 +798,10 @@ button.more {
     background-color: $white-100;
   }
 
-  .sidebar-header {
-    background-color: $light-header-active-background;
-    border-bottom: $light-border-color 1px solid;
-  }
-
-  .sidebar-header-new_group:hover {
-    background-color: $light-header-hover-background;
-  }
-
   .sidebar-header-search {
     background-color: $white-100;
     color: $ink-90;
     border: 1px solid #ccc;
-  }
-
-  .sidebar-header-config:hover {
-    background-color: $light-header-hover-background;
   }
 
   .sidebar-tab-group-tabs-list {
@@ -779,22 +872,10 @@ button.more {
     background-color: $dark-header-background;
   }
 
-  .sidebar-header {
-    background-color: $dark-header-active-background;
-  }
-
-  .sidebar-header-new_group:hover {
-    background-color: $dark-header-hover-background;
-  }
-
   .sidebar-header-search {
     background-color: $dark-awesome-bar-background;
     color: $white-100;
     border: none;
-  }
-
-  .sidebar-header-config:hover {
-    background-color: $dark-header-hover-background;
   }
 
   .sidebar-tab-group-tabs-list {
