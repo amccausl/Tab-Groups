@@ -36,18 +36,24 @@
               <option value="none">None</option>
             </select>
           </fieldset>
-          <fieldset v-if="sidebar_tab_display !== 'none'">
-            <label for="show_pinned_tabs">Show pinned tabs</label>
-            <input type="checkbox" id="show_pinned_tabs" v-model="show_pinned_tabs">
-          </fieldset>
-          <fieldset v-if="sidebar_tab_display !== 'none'">
-            <label for="show_tab_context">Show tab context</label>
-            <input type="checkbox" id="show_tab_context" v-model="show_tab_context">
-          </fieldset>
-          <fieldset v-if="preferences.theme === 'dark' && sidebar_tab_display !== 'none'">
-            <label for="show_tab_icon_background">Show tab icon background</label>
-            <input type="checkbox" id="show_tab_icon_background" v-model="show_tab_icon_background">
-          </fieldset>
+
+          <label v-if="sidebar_tab_display !== 'none'" class="checkbox">
+            <input class="checkbox__input" type="checkbox" v-model="show_pinned_tabs">
+            <span class="checkbox__icon"></span>
+            <span class="checkbox__label">Show pinned tabs</span>
+          </label>
+
+          <label v-if="preferences.theme === 'dark' && sidebar_tab_display !== 'none'" class="checkbox">
+            <input class="checkbox__input" type="checkbox" v-model="show_tab_context">
+            <span class="checkbox__icon"></span>
+            <span class="checkbox__label">Show tab context</span>
+          </label>
+
+          <label v-if="sidebar_tab_display !== 'none'" class="checkbox">
+            <input class="checkbox__input" type="checkbox" v-model="show_tab_icon_background">
+            <span class="checkbox__icon"></span>
+            <span class="checkbox__label">Show tab icon background</span>
+          </label>
         </form>
       </section>
       <section v-if="selected_section === 'data'">
@@ -157,7 +163,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss">
+@import 'photon-colors';
+
 .options {
   display: flex;
   align-items: flex-start;
@@ -179,14 +187,16 @@ export default {
 .sidenav a {
   display: block;
   padding: 16px;
-  font-size: 22px; font-weight: 300; /* Title 30 */
-  color: #0c0c0d; /* Photon Primary Text */
+  /* Title 30 */
+  font-size: 22px;
+  font-weight: 300;
+  color: $grey-90;
   text-decoration: none;
 }
 
 .sidenav a:hover,
 .sidenav a:focus {
-  background-color: #d7d7db; /* Photon Grey 30 */
+  background-color: $grey-30;
 }
 
 .sidenav a:focus {
@@ -194,11 +204,50 @@ export default {
 }
 
 .sidenav li.active a {
-  color: #0a84ff; /* Photon Blue 50 */
+  color: $blue-50;
 }
 
 .main {
   flex: 1;
   padding: 16px;
 }
+
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  padding: 3px;
+
+  &__input {
+    // @todo need to determine how this is still selectable
+    display: none;
+  }
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    background-color: $grey-90-a10;
+    border: 1px solid $grey-90-a30;
+    margin-right: 4px;
+  }
+
+  &__icon:hover {
+    background-color: $grey-90-a20;
+  }
+
+  &__input:checked + &__icon {
+    border: none;
+    background-color: $blue-60;
+    background-image: url("/icons/checkbox-check-16.svg");
+  }
+
+  &:hover &__icon {
+    background-color: $grey-90-a20;
+  }
+
+  &:hover &__input:checked + &__icon {
+    background-color: $blue-70;
+  }
+}
+
 </style>

@@ -485,14 +485,6 @@ export function updateTab( state, { browser_tab, change_info } ) {
               tabs: [ ...tab_group.tabs ]
             })
             tab_group.tabs[ tab_index ] = getTabState( browser_tab )
-
-            if( change_info.hasOwnProperty( 'audible' ) ) {
-              if( change_info.audible && ! tab_group.audible ) {
-                tab_group.audible = true
-              } else if( ! change_info.audible && ! tab_group.tabs.some( _tab => _tab.audible ) ) {
-                tab_group = omit( tab_group, 'audible' )
-              }
-            }
           }
           return tab_group
         })
