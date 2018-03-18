@@ -421,17 +421,30 @@ export function activateTab( state, { tab_id, window_id } ) {
 }
 
 export function addTab( state, { browser_tab } ) {
-  const move_data = getTabMoveData(
-    state,
-    { tabs: [ getTabState( browser_tab ) ] },
-    {
-      window_id: browser_tab.windowId,
-      index: browser_tab.index,
-      pinned: browser_tab.pinned
-    }
-  )
+  const target_window = state.windows.find( window => window.id === browser_tab.windowId )
 
-  return moveTabs( state, move_data )
+  const tab = getTabState( browser_tab )
+
+  if( target_window ) {
+    const move_data = getTabMoveData(
+      state,
+      { tabs: [ tab ] },
+      {
+        window_id: browser_tab.windowId,
+        index: browser_tab.index,
+        pinned: browser_tab.pinned
+      }
+    )
+
+    return moveTabs( state, move_data )
+  } else {
+    return Object.assign( {}, state, {
+      windows: [ ...state.windows, createWindow( browser_tab.windowId, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( getNewTabGroupId( state ), [ tab ] )
+      ] ) ]
+    })
+  }
 }
 
 export function removeTab( state, { tab_id, window_id } ) {

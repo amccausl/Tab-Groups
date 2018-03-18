@@ -65,10 +65,27 @@
       "type": "object",
       "properties": {
         "theme": {
-          "enum": [ "light", "dark" ]
+          "enum": [ "light", "dark" ],
+          "default": "light"
         },
         "show_pinned_tabs": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
+        },
+        "sidebar_tab_display": {
+          "enum": [ "large", "small", "none" ]
+        },
+        "show_tabs": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_tab_icon_background": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_tab_context": {
+          "type": "boolean",
+          "default": true
         }
       }
     },
@@ -107,9 +124,6 @@
                     },
                     "active_tab_id": {
                     },
-                    "audible": {
-                      "enum": [ true ]
-                    },
                     "tabs": {
                       "type": "array",
                       "items": { "$ref": "#/definitions/tab" }
@@ -131,12 +145,10 @@
                       "minimum": 1
                     },
                     "title": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 1
                     },
                     "active_tab_id": {
-                    },
-                    "audible": {
-                      "enum": [ true ]
                     },
                     "muted": {
                       "type": "boolean"

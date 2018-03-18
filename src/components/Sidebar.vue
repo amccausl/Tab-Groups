@@ -38,11 +38,11 @@
           v-for="tab_group in tab_groups" :key="tab_group.id"
       >
         <div class="sidebar-tab-group-list-item-header"
-            v-on:click="toggleTabGroupOpen( tab_group )"
+            v-on:click="onTabGroupClick( tab_group )"
             @dragenter="onTabGroupDragEnter( $event, tab_group )" @dragover="onTabGroupDragOver( $event, tab_group )" @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
         >
           <div v-if="! tab_group.open && active_tab_group_id === tab_group.id" class="active-bar"></div>
-          <svg class="carat-icon" :class="{ open: tab_group.open }" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
+          <svg v-if="sidebar_tab_display !== 'none'" class="carat-icon" :class="{ open: tab_group.open }" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
             <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
           </svg>
           <span class="text" contenteditable="true" spellcheck="false" @click.stop @blur="onTabGroupNameUpdate( $event, tab_group )" @keyup.enter="onTabGroupNamePressEnter">{{ tab_group.title }}</span>
@@ -67,7 +67,7 @@
             </svg>
           </button>
         </div>
-        <div v-if="tab_group.open" class="sidebar-tab-group-tabs-list">
+        <div v-if="tab_group.open && sidebar_tab_display !== 'none'" class="sidebar-tab-group-tabs-list">
           <div class="sidebar-tab-group-tabs-list-item"
               v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
               v-if="! search_text || ! search_resolved || tab.matched" :title="tab.title"
@@ -86,7 +86,7 @@
                 <br>
                 <span class="sidebar-tab-view-item-url">{{ tab.url | url }}</span>
               </div>
-              <div v-if="tab.context_id" class="sidebar-tab-view-item-context" :style="context_styles[ tab.context_id ]"></div>
+              <div v-if="show_tab_context && tab.context_id" class="sidebar-tab-view-item-context" :style="context_styles[ tab.context_id ]"></div>
             </div>
           </div>
         </div>
@@ -163,7 +163,11 @@ export default {
       search_text: '',
       search_resolved: true,
       selected_tab_ids: [],
+      sidebar_tab_display: 'none',
+      show_tabs: true,
       show_pinned_tabs: true,
+      show_tab_context: true,
+      show_tab_icon_background: true,
       pinned_tabs: [],
       tab_groups: [],
       target_tab_group_id: null,
@@ -175,7 +179,10 @@ export default {
   created() {
     onStateChange( state => {
       this.theme = state.config.theme
+      this.sidebar_tab_display = state.config.sidebar_tab_display || 'none'
       this.show_pinned_tabs = state.config.show_pinned_tabs
+      this.show_tab_context = state.config.show_tab_context
+      this.show_tab_icon_background = state.config.show_tab_icon_background
 
       for( let context_id in state.contexts || {} ) {
         this.context_styles[ context_id ] = {
@@ -206,6 +213,7 @@ export default {
             tab_group.open = ( tab_group.id === state_window.active_tab_group_id )
           }
 
+          let is_group_audible = false
           tab_group.tabs.forEach( tab => {
             if( this.selected_tab_ids.includes( tab.id ) ) {
               new_selected_tab_ids.push( tab.id )
@@ -213,7 +221,14 @@ export default {
             if( tab.id === state_window.active_tab_id ) {
               tab.active = true
             }
+            if( tab.audible && ! tab.muted ) {
+              is_group_audible = true
+            }
           })
+
+          if( is_group_audible ) {
+            tab_group.audible = true
+          }
         })
         // Use the extended splice to trigger change detection
         Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...new_selected_tab_ids ] )
@@ -256,7 +271,7 @@ export default {
       console.info('openTabGroupMore', event, tab_group )
       this.tab_group_context_menu.open = true
       const box = event.target.getBoundingClientRect()
-      this.tab_group_context_menu.x = document.body.clientWidth - box.right - 2
+      this.tab_group_context_menu.x = document.body.clientWidth - box.right + 3
       this.tab_group_context_menu.y = box.bottom + 8
       this.tab_group_context_menu.tab_group_id = tab_group.id
     },
@@ -301,6 +316,13 @@ export default {
     onTabDragOver,
     onTabDragEnd,
     onTabDrop,
+    onTabGroupClick( tab_group ) {
+      if( sidebar_tab_display === 'none' ) {
+        // @todo activate tab group
+      } else {
+        tab_group.open = ! tab_group.open
+      }
+    },
     onTabGroupDragEnter,
     onTabGroupDragOver,
     onTabGroupDrop,
@@ -323,9 +345,6 @@ export default {
       window.background.openOptionsPage()
     },
     resetDragState,
-    toggleTabGroupOpen( tab_group ) {
-      tab_group.open = ! tab_group.open
-    },
     toggleTabSelection( tab ) {
       console.info('toggleTabSelection', tab)
       const tab_index = this.selected_tab_ids.indexOf( tab.id )
@@ -668,7 +687,7 @@ button.more {
 .tab-group-context-menu:before {
   position: absolute;
   top: -7px;
-  right: 11px;
+  right: 4px;
   width: 12px;
   height: 12px;
   transform: rotate(45deg);
@@ -697,6 +716,8 @@ button.more {
 
 .sidebar-tab-group-list-item-header > span {
   flex: 1;
+  white-space: nowrap;
+  text-overflow: clip;
 }
 
 .sidebar-tab-group-list-item-header > .sidebar-tab-group-list-item-header-tab-count {

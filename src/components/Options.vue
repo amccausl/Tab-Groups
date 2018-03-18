@@ -29,8 +29,24 @@
             </div>
           </fieldset>
           <fieldset>
+            <label for="sidebar_tab_display">Sidebar Tab Display</label>
+            <select id="sidebar_tab_display" v-model="sidebar_tab_display">
+              <option value="large">Large</option>
+              <option value="small">Small</option>
+              <option value="none">None</option>
+            </select>
+          </fieldset>
+          <fieldset v-if="sidebar_tab_display !== 'none'">
             <label for="show_pinned_tabs">Show pinned tabs</label>
             <input type="checkbox" id="show_pinned_tabs" v-model="show_pinned_tabs">
+          </fieldset>
+          <fieldset v-if="sidebar_tab_display !== 'none'">
+            <label for="show_tab_context">Show tab context</label>
+            <input type="checkbox" id="show_tab_context" v-model="show_tab_context">
+          </fieldset>
+          <fieldset v-if="preferences.theme === 'dark' && sidebar_tab_display !== 'none'">
+            <label for="show_tab_icon_background">Show tab icon background</label>
+            <input type="checkbox" id="show_tab_icon_background" v-model="show_tab_icon_background">
           </fieldset>
         </form>
       </section>
@@ -65,19 +81,46 @@ export default {
     return {
       preferences: {
         theme: null,
-        show_pinned_tabs: null
+        sidebar_tab_display: 'none',
+        show_pinned_tabs: null,
+        show_tab_context: null,
+        show_tab_icon_background: null
       },
       selected_section: 'preferences',
       window_ids: []
     }
   },
   computed: {
+    sidebar_tab_display: {
+      get() {
+        return this.preferences.sidebar_tab_display
+      },
+      set( value ) {
+        setConfig( 'sidebar_tab_display', value )
+      }
+    },
     show_pinned_tabs: {
       get() {
         return this.preferences.show_pinned_tabs
       },
       set( value ) {
         setConfig( 'show_pinned_tabs', value )
+      }
+    },
+    show_tab_context: {
+      get() {
+        return this.preferences.show_tab_context
+      },
+      set( value ) {
+        setConfig( 'show_tab_context', value )
+      }
+    },
+    show_tab_icon_background: {
+      get() {
+        return this.preferences.show_tab_icon_background
+      },
+      set( value ) {
+        setConfig( 'show_tab_icon_background', value )
       }
     }
   },
@@ -90,7 +133,10 @@ export default {
       Object.getPrototypeOf( this.window_ids ).splice.apply( this.window_ids, [ 0, this.window_ids.length, ...window_ids ] )
 
       this.preferences.theme = state.config.theme
+      this.preferences.sidebar_tab_display = state.config.sidebar_tab_display
       this.preferences.show_pinned_tabs = state.config.show_pinned_tabs
+      this.preferences.show_tab_context = state.config.show_tab_context
+      this.preferences.show_tab_icon_background = state.config.show_tab_icon_background
     })
   },
   methods: {
