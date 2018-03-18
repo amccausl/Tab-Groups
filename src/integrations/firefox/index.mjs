@@ -274,7 +274,7 @@ function getIconUrl( browser_tab ) {
       case 'chrome://mozapps/skin/extensions/extensionGeneric-16.svg':
         return '/icons/extensionGeneric.svg'
       case 'chrome://branding/content/icon32.png':
-        return '/icons/icon32.png'
+        return '/icons/firefox-logo-glyph.svg'
       default:
         return browser_tab.favIconUrl
     }

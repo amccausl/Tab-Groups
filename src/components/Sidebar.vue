@@ -733,12 +733,15 @@ button.more {
   flex-direction: column;
   justify-content: flex-start;
   align-items: stretch;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .sidebar-tab-group-tabs-list-item {
   width: 100%;
   flex: 0;
   overflow-x: hidden;
+  min-height: 54px;
 
   &.selected {
     /* @todo themed */
