@@ -1,22 +1,5 @@
 <template>
   <body class="sidebar" :class="theme">
-    <div :class="[ `action-strip`, `action-strip--${ theme }` ]">
-      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button` ]"
-          @click.left="createTabGroup()" @click.right.prevent
-          @dragenter="onTabGroupDragEnter( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
-      >
-        <svg :class="[ `action-strip__icon`, `action-strip--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-          <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
-        </svg>
-        <span :class="[ `action-strip__button-text`, `action-strip--${ theme }__button-text` ]">{{ __MSG_tab_group_new__ }}</span>
-      </div>
-      <!-- <input class="sidebar-header-search" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/> -->
-      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button`, `action-strip__button--no-grow` ]" @click="openOptionsPage()">
-        <svg :class="[ `action-strip__icon`, `action-strip--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-          <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
-        </svg>
-      </div>
-    </div>
     <div v-if="show_pinned_tabs" :class="[ `pinned-tab-list`, `pinned-tab-list--${ theme }` ]" @click.right.prevent>
       <div v-for="pinned_tab in pinned_tabs" :key="pinned_tab.id"
           :class="[ `pinned-tab-list__item`, `pinned-tab-list--${ theme }__item`, { 'pinned-tab-list__item--active': pinned_tab.active, selected: isSelected( pinned_tab ) } ]"
@@ -104,6 +87,23 @@
       <!-- <div class="tab-group-context-menu-item">Move to New <span>W</span>indow</div> -->
       <!-- <div class="tab-group-context-menu-item" @click="archiveTabGroup( tab_group_context_menu.tab_group_id )"><span>A</span>rchive</div> -->
       <div class="tab-group-context-menu-item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span>C</span>lose</div>
+    </div>
+    <div :class="[ `action-strip`, `action-strip--${ theme }` ]">
+      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button` ]"
+          @click.left="createTabGroup()" @click.right.prevent
+          @dragenter="onTabGroupDragEnter( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
+      >
+        <svg :class="[ `action-strip__icon`, `action-strip--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+          <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
+        </svg>
+        <span :class="[ `action-strip__button-text`, `action-strip--${ theme }__button-text` ]">{{ __MSG_tab_group_new__ }}</span>
+      </div>
+      <!-- <input class="sidebar-header-search" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/> -->
+      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button`, `action-strip__button--no-grow` ]" @click="openOptionsPage()">
+        <svg :class="[ `action-strip__icon`, `action-strip--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+          <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
+        </svg>
+      </div>
     </div>
   </body>
 </template>
@@ -317,7 +317,7 @@ export default {
     onTabDragEnd,
     onTabDrop,
     onTabGroupClick( tab_group ) {
-      if( sidebar_tab_display === 'none' ) {
+      if( this.sidebar_tab_display === 'none' ) {
         // @todo activate tab group
       } else {
         tab_group.open = ! tab_group.open
@@ -625,10 +625,11 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
   justify-content: flex-start;
   align-items: stretch;
   overflow-y: auto;
+  flex: 1;
 }
 
 .sidebar-tab-group-list-item {
-  flex: 1;
+  flex: 0;
 }
 
 .sidebar-tab-group-list-item-header {
