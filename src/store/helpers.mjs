@@ -225,6 +225,21 @@ export function getTabMoveData( state, source_data, target_data ) {
       }
       break
     }
+  } else if( source_data.type === 'moz-tab' ) {
+    source_tabs = [ null ]
+    for( let window of windows ) {
+      for( let tab_group of window.tab_groups ) {
+        for( let tab of tab_group.tabs ) {
+          if( tab.id === window.active_tab_id && tab.url === source_data.url ) {
+            source_data = {
+              window_id: window.id,
+              tab_ids: [ tab.id ]
+            }
+            source_tabs[ 0 ] = tab
+          }
+        }
+      }
+    }
   } else {
     console.warn( "Problem loading source tab", source_data )
     return null

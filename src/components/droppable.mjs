@@ -9,11 +9,57 @@ export function setTabTransferData( data_transfer, window_id, tab_ids ) {
 
 // @todo extract helper to pull data transfer type
 export function isTabTransfer( event_data ) {
-  return event_data && event_data.hasOwnProperty( 'tab_ids' )
+  if( event_data ) {
+    if( event_data.hasOwnProperty( 'tab_ids' ) ) {
+      return true
+    }
+    if( event_data.type === 'moz-tab' ) {
+      return true
+    }
+  }
+  return false
 }
 
 export function getTransferData( data_transfer ) {
-  const event_data = JSON.parse( data_transfer.getData( 'application/json' ) )
+  let event_data = null
+  const count = data_transfer.mozItemCount
+
+  for( let i = 0; i < count; i++ ) {
+    const types = data_transfer.mozTypesAt( i )
+    for( let t = 0; t < types.length; t++ ) {
+      console.info("  " + types[ t ] + ": ")
+      try {
+        const data = data_transfer.mozGetDataAt( types[ t ], i )
+        console.info("(" + (typeof data) + ") : <" + data + " >\n")
+      } catch( ex ) {
+        console.info("<>\n")
+        dump( ex )
+      }
+    }
+  }
+
+  // From bookmarks
+  if( data_transfer.types.includes( 'text/x-moz-place' ) ) {
+    console.info('text/x-moz-place', data_transfer.getData( 'text/x-moz-place' ) )
+  }
+  if( data_transfer.types.includes( 'text/x-moz-url' ) ) {
+    console.info('text/x-moz-url', data_transfer.getData( 'text/x-moz-url' ) )
+  }
+  // From Native Tab
+  // if( data_transfer.types.includes( 'application/x-moz-tabbrowser-tab' ) ) {
+  //   console.info('application/x-moz-tabbrowser-tab', data_transfer.getData( 'application/x-moz-tabbrowser-tab' ) )
+  // }
+  if( data_transfer.types.includes( 'text/x-moz-text-internal' ) ) {
+    event_data = { type: 'moz-tab', url: data_transfer.getData( 'text/x-moz-text-internal' ) }
+  }
+  if( data_transfer.types.includes( 'application/json' ) ) {
+    try {
+      event_data = JSON.parse( data_transfer.getData( 'application/json' ) )
+    } catch( ex ) {
+      console.info('problem parsing "application/json" type', data_transfer.getData( 'application/json' ))
+    }
+  }
+  // From extension
   // @todo error guard
   // console.info('getTransferData', event_data)
 

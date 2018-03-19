@@ -660,9 +660,7 @@ export function onTabMoved( store, source_data, target_data ) {
  */
 export function moveTabsToGroup( store, source_data, target_data ) {
   console.info('moveTabsToGroup', source_data, target_data)
-  const { tab_ids } = source_data
   let state = store.getState()
-
   const updates = []
   const move_data = getTabMoveData( state, source_data, target_data )
 
@@ -673,6 +671,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
 
   source_data = move_data.source_data
   target_data = move_data.target_data
+  const { tab_ids } = source_data
 
   const move_properties = {
     index: target_data.index

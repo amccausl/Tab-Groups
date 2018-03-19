@@ -17,25 +17,21 @@
     <article class="main">
       <section v-if="selected_section === 'preferences'">
         <form @submit.prevent>
-          <fieldset>
-            Theme:
-            <div class="browser-style">
-              <input type="radio" id="theme_light" value="light" v-model="preferences.theme" @input="selectTheme( 'light' )">
-              <label for="theme_light">Light</label>
-            </div>
-            <div class="browser-style">
-              <input type="radio" id="theme_dark" value="dark" v-model="preferences.theme" @input="selectTheme( 'dark' )">
-              <label for="theme_dark">Dark</label>
-            </div>
-          </fieldset>
-          <fieldset>
-            <label for="sidebar_tab_display">Sidebar Tab Display</label>
-            <select id="sidebar_tab_display" v-model="sidebar_tab_display">
-              <option value="large">Large</option>
-              <option value="small">Small</option>
-              <option value="none">None</option>
-            </select>
-          </fieldset>
+          Theme:
+          <div class="browser-style">
+            <input type="radio" id="theme_light" value="light" v-model="preferences.theme" @input="selectTheme( 'light' )">
+            <label for="theme_light">Light</label>
+          </div>
+          <div class="browser-style">
+            <input type="radio" id="theme_dark" value="dark" v-model="preferences.theme" @input="selectTheme( 'dark' )">
+            <label for="theme_dark">Dark</label>
+          </div>
+          <label for="sidebar_tab_display">Sidebar Tab Display</label>
+          <select id="sidebar_tab_display" v-model="sidebar_tab_display">
+            <option value="large">Large</option>
+            <option value="small">Small</option>
+            <option value="none">None</option>
+          </select>
 
           <label v-if="sidebar_tab_display !== 'none'" class="checkbox">
             <input class="checkbox__input" type="checkbox" v-model="show_pinned_tabs">
@@ -43,13 +39,13 @@
             <span class="checkbox__label">Show pinned tabs</span>
           </label>
 
-          <label v-if="preferences.theme === 'dark' && sidebar_tab_display !== 'none'" class="checkbox">
+          <label v-if="sidebar_tab_display !== 'none'" class="checkbox">
             <input class="checkbox__input" type="checkbox" v-model="show_tab_context">
             <span class="checkbox__icon"></span>
             <span class="checkbox__label">Show tab context</span>
           </label>
 
-          <label v-if="sidebar_tab_display !== 'none'" class="checkbox">
+          <label v-if="preferences.theme === 'dark' && sidebar_tab_display !== 'none'" class="checkbox">
             <input class="checkbox__input" type="checkbox" v-model="show_tab_icon_background">
             <span class="checkbox__icon"></span>
             <span class="checkbox__label">Show tab icon background</span>

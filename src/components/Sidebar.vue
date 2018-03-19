@@ -61,7 +61,7 @@
           >
             <div class="sidebar-tab-view-item" :class="{ active: tab.active }">
               <div class="sidebar-tab-view-item-icon">
-                <div></div>
+                <div v-if="show_tab_icon_background"></div>
                 <img :src="tab.icon_url"/>
               </div>
               <div class="sidebar-tab-view-item-text">
@@ -74,19 +74,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div v-if="tab_group_context_menu.open" class="tab-group-context-menu-ctx" @click="closeTabGroupMore" @click.right="closeTabGroupMore"></div>
-    <div v-if="tab_group_context_menu.open" class="tab-group-context-menu" :style="{ top: tab_group_context_menu.y + 'px', right: tab_group_context_menu.x + 'px' }">
-      <!-- @todo localize -->
-      <!-- @todo icons -->
-      <!-- <div class="tab-group-context-menu-item"><span>R</span>eload Tabs</div> -->
-      <div class="tab-group-context-menu-item" v-if="!isGroupMuted( tab_group_context_menu.tab_group_id )" @click="muteTabGroup( tab_group_context_menu.tab_group_id )"><span>M</span>ute Tabs</div>
-      <div class="tab-group-context-menu-item" v-else @click="unmuteTabGroup( tab_group_context_menu.tab_group_id )">Un<span>m</span>ute Tabs</div>
-      <!-- @todo separator -->
-      <!-- <div class="tab-group-context-menu-item">Re<span>n</span>ame</div> -->
-      <!-- <div class="tab-group-context-menu-item">Move to New <span>W</span>indow</div> -->
-      <!-- <div class="tab-group-context-menu-item" @click="archiveTabGroup( tab_group_context_menu.tab_group_id )"><span>A</span>rchive</div> -->
-      <div class="tab-group-context-menu-item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span>C</span>lose</div>
     </div>
     <div :class="[ `action-strip`, `action-strip--${ theme }` ]">
       <div :class="[ `action-strip__button`, `action-strip--${ theme }__button` ]"
@@ -104,6 +91,19 @@
           <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
         </svg>
       </div>
+    </div>
+    <div v-if="tab_group_context_menu.open" class="tab-group-context-menu-ctx" @click="closeTabGroupMore" @click.right="closeTabGroupMore"></div>
+    <div v-if="tab_group_context_menu.open" class="tab-group-context-menu" :style="{ top: tab_group_context_menu.y + 'px', right: tab_group_context_menu.x + 'px' }">
+      <!-- @todo localize -->
+      <!-- @todo icons -->
+      <!-- <div class="tab-group-context-menu-item"><span>R</span>eload Tabs</div> -->
+      <div class="tab-group-context-menu-item" v-if="!isGroupMuted( tab_group_context_menu.tab_group_id )" @click="muteTabGroup( tab_group_context_menu.tab_group_id )"><span>M</span>ute Tabs</div>
+      <div class="tab-group-context-menu-item" v-else @click="unmuteTabGroup( tab_group_context_menu.tab_group_id )">Un<span>m</span>ute Tabs</div>
+      <!-- @todo separator -->
+      <!-- <div class="tab-group-context-menu-item" @click="renameTabGroup( tab_group_context_menu.tab_group_id )">Re<span>n</span>ame</div> -->
+      <!-- <div class="tab-group-context-menu-item">Move to New <span>W</span>indow</div> -->
+      <!-- <div class="tab-group-context-menu-item" @click="archiveTabGroup( tab_group_context_menu.tab_group_id )"><span>A</span>rchive</div> -->
+      <div class="tab-group-context-menu-item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span>C</span>lose</div>
     </div>
   </body>
 </template>
@@ -486,7 +486,7 @@ $action-strip--dark__separator--color: $grey-90-a80 !default;
 $pinned-tab-list--light__item--background-color: #e3e4e6 !default;
 $pinned-tab-list--light__item--active--background-color: #f5f6f7 !default;
 $pinned-tab-list--light__ink--color: $grey-90-a80 !default;
-$pinned-tab-list--light__ink--hover--color: #252526 !default;
+$pinned-tab-list--light__ink--hover--color: $light-header-hover-background !default;
 $pinned-tab-list--light__ink--active--color: $blue-50 !default;
 
 $pinned-tab-list--dark__item--background-color: #0c0c0d !default;
