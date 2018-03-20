@@ -17,18 +17,23 @@
       </div>
     </div>
     <div class="sidebar-tab-group-list" @click.right.prevent>
-      <div class="sidebar-tab-group-list-item"
+      <div class="sidebar-tab-group-list-item tab-group-item"
+          :class="[ ! tab_group.open && active_tab_group_id === tab_group.id ? 'tab-group-item--active' : '' ]"
           v-for="tab_group in tab_groups" :key="tab_group.id"
       >
-        <div class="sidebar-tab-group-list-item-header"
+        <div :class="[ 'tab-group-list-item-header', `tab-group-list-item-header--${ theme }`, ! tab_group.open && active_tab_group_id === tab_group.id ? 'tab-group-list-item-header--active' : '' ]"
             v-on:click="onTabGroupClick( tab_group )"
             @dragenter="onTabGroupDragEnter( $event, tab_group )" @dragover="onTabGroupDragOver( $event, tab_group )" @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
         >
-          <div v-if="! tab_group.open && active_tab_group_id === tab_group.id" class="active-bar"></div>
           <svg v-if="sidebar_tab_display !== 'none'" class="carat-icon" :class="{ open: tab_group.open }" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
             <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
           </svg>
-          <span class="text" contenteditable="true" spellcheck="false" @click.stop @blur="onTabGroupNameUpdate( $event, tab_group )" @keyup.enter="onTabGroupNamePressEnter">{{ tab_group.title }}</span>
+          <span v-if="rename_tab_group_id === tab_group.id" class="tab-group-list-item-header__title tab-group-list-item-header__title--editing" :ref="title"
+              contenteditable="true" spellcheck="false" @click.stop @focus="onTabGroupTitleFocus( $event, tab_group )" @blur="onTabGroupTitleBlur( $event, tab_group )" @keyup.enter="onTabGroupTitlePressEnter( $event, tab_group )"
+          >{{ tab_group.title }}</span>
+          <span v-else class="tab-group-list-item-header__title">
+            {{ tab_group.title }}
+          </span>
 
           <svg v-if="tab_group.muted" class="audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
             <g :fill="context_fill">
@@ -43,7 +48,7 @@
             </g>
           </svg>
 
-          <span class="sidebar-tab-group-list-item-header-tab-count">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
+          <span class="tab-group-list-item-header__tabs-count">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
           <button class="more" @click.stop="openTabGroupMore( $event, tab_group )">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <path :fill="context_fill" d="M2 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"></path>
@@ -100,7 +105,7 @@
       <div class="tab-group-context-menu-item" v-if="!isGroupMuted( tab_group_context_menu.tab_group_id )" @click="muteTabGroup( tab_group_context_menu.tab_group_id )"><span>M</span>ute Tabs</div>
       <div class="tab-group-context-menu-item" v-else @click="unmuteTabGroup( tab_group_context_menu.tab_group_id )">Un<span>m</span>ute Tabs</div>
       <!-- @todo separator -->
-      <!-- <div class="tab-group-context-menu-item" @click="renameTabGroup( tab_group_context_menu.tab_group_id )">Re<span>n</span>ame</div> -->
+      <div class="tab-group-context-menu-item" @click="renameTabGroup( tab_group_context_menu.tab_group_id )">Re<span>n</span>ame</div>
       <!-- <div class="tab-group-context-menu-item">Move to New <span>W</span>indow</div> -->
       <!-- <div class="tab-group-context-menu-item" @click="archiveTabGroup( tab_group_context_menu.tab_group_id )"><span>A</span>rchive</div> -->
       <div class="tab-group-context-menu-item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span>C</span>lose</div>
@@ -109,6 +114,8 @@
 </template>
 
 <script>
+import Vue from 'vue'
+
 import {
   createGroupAction,
   updateGroupAction,
@@ -160,6 +167,7 @@ export default {
       context_styles: {},
       is_dragging: false,
       is_tab_group_open: {},
+      rename_tab_group_id: null,
       search_text: '',
       search_resolved: true,
       selected_tab_ids: [],
@@ -305,6 +313,14 @@ export default {
       window.background.unmuteTabGroup( window.store, this.window_id, tab_group_id )
       this.tab_group_context_menu.open = false
     },
+    renameTabGroup( tab_group_id ) {
+      this.rename_tab_group_id = tab_group_id
+      this.tab_group_context_menu.open = false
+
+      Vue.nextTick( () => {
+        this.$el.querySelector( '.tab-group-list-item-header__title--editing' ).focus()
+      })
+    },
     isSelected( tab ) {
       return this.selected_tab_ids.includes( tab.id )
     },
@@ -318,7 +334,10 @@ export default {
     onTabDrop,
     onTabGroupClick( tab_group ) {
       if( this.sidebar_tab_display === 'none' ) {
-        // @todo activate tab group
+        if( tab_group.active_tab_id ) {
+
+        }
+        console.info('tab_group', tab_group.active_tab_id)
       } else {
         tab_group.open = ! tab_group.open
       }
@@ -326,15 +345,24 @@ export default {
     onTabGroupDragEnter,
     onTabGroupDragOver,
     onTabGroupDrop,
-    onTabGroupNamePressEnter( event ) {
-      console.info('onTabGroupNamePressEnter', event)
+    onTabGroupTitleFocus( event, tab_group ) {
+      console.info('onTabGroupTitleFocus', event, tab_group)
+      const range = document.createRange()
+      range.selectNodeContents( event.target )
+      const sel = window.getSelection()
+      sel.removeAllRanges()
+      sel.addRange( range )
+    },
+    onTabGroupTitlePressEnter( event, tab_group ) {
+      console.info('onTabGroupTitlePressEnter', event)
       event.preventDefault()
       event.target.textContent = event.target.textContent.replace( /\n/g, '' )
       event.currentTarget.blur()
       window.getSelection().removeAllRanges()
     },
-    onTabGroupNameUpdate( event, tab_group ) {
-      console.info('onTabGroupNameUpdate', event, event.target.textContent)
+    onTabGroupTitleBlur( event, tab_group ) {
+      console.info('onTabGroupTitleBlur', event, event.target.textContent)
+      this.rename_tab_group_id = null
       window.store.dispatch( updateGroupAction( tab_group.id, this.window_id, { title: event.target.textContent } ) )
     },
     onUpdateSearchText: debounce( function( search_text ) {
@@ -423,6 +451,10 @@ $action-strip--dark__separator--color: $grey-90-a80 !default;
 
   &__button--no-grow {
     flex: 0;
+  }
+
+  &__empty {
+    flex: 1;
   }
 
   &__button-text {
@@ -618,6 +650,78 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
   }
 }
 
+// =============================================================================
+// Tab Group List Item Header
+// =============================================================================
+
+// @todo use photon colors
+$tab-group-list-item-header--light__primary-text--color: $grey-90 !default;
+$tab-group-list-item-header--light__secodary-text--color: $grey-50 !default;
+$tab-group-list-item-header--light__ink--active--color: $blue-50 !default;
+
+$tab-group-list-item-header--dark__primary-text--color: $white-100 !default;
+$tab-group-list-item-header--dark__secodary-text--color: $grey-10 !default;
+$tab-group-list-item-header--dark__ink--active--color: $blue-50 !default;
+
+.tab-group-list-item-header {
+  padding: 10px 0 10px 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  &--active::before {
+    content: '';
+    background-color: $blue-50;
+    height: 37px;
+    width: 4px;
+    margin: -11px 10px -11px -10px;
+  }
+
+  &--large {
+  }
+
+  &--light {
+    background-color: $white-100;
+    border-bottom: $light-border-color 1px solid;
+  }
+
+  &--dark {
+    background-color: black;
+    border-bottom: $light-border-color 1px solid;
+  }
+
+  &__title {
+    flex: 1;
+    white-space: nowrap;
+    text-overflow: clip;
+  }
+
+  &__tabs-count {
+    text-align: right;
+    flex-grow: 0;
+    margin-left: 8px;
+    white-space: nowrap;
+  }
+
+  // @todo is there a way to DRY this?
+  // @todo use theming pattern above
+  &--light &__tabs-count {
+    color: $tab-group-list-item-header--light__secodary-text--color;
+  }
+
+  &--dark &__tabs-count {
+    color: $tab-group-list-item-header--dark__secodary-text--color;
+  }
+}
+
+// =============================================================================
+// Tab List
+// =============================================================================
+
 .sidebar-tab-group-list {
   width: 100%;
   display: flex;
@@ -630,24 +734,6 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
 
 .sidebar-tab-group-list-item {
   flex: 0;
-}
-
-.sidebar-tab-group-list-item-header {
-  padding: 10px 0 10px 10px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-
-  > .active-bar {
-    height: 37px;
-    width: 4px;
-    margin: -11px 10px -11px -10px;
-    background-color: $blue-50;
-  }
 }
 
 button.more {
@@ -685,7 +771,7 @@ button.more {
   color: $grey-90;
 }
 
-.tab-group-context-menu:before {
+.tab-group-context-menu::before {
   position: absolute;
   top: -7px;
   right: 4px;
@@ -713,19 +799,6 @@ button.more {
   > span {
     text-decoration: underline;
   }
-}
-
-.sidebar-tab-group-list-item-header > span {
-  flex: 1;
-  white-space: nowrap;
-  text-overflow: clip;
-}
-
-.sidebar-tab-group-list-item-header > .sidebar-tab-group-list-item-header-tab-count {
-  text-align: right;
-  flex-grow: 0;
-  margin-left: 8px;
-  white-space: nowrap;
 }
 
 .sidebar-tab-group-tabs-list {
@@ -865,11 +938,6 @@ button.more {
     background-color: $light-header-active-background;
   }
 
-  .sidebar-tab-group-list-item-header {
-    background-color: $white-100;
-    border-bottom: $light-border-color 1px solid;
-  }
-
   button.more:hover {
     background-color: $light-header-hover-background;
   }
@@ -925,11 +993,6 @@ button.more {
 
   .sidebar-tab-group-tabs-list-item.target .sidebar-tab-view-item.active {
     background-color: $dark-header-active-background;
-  }
-
-  .sidebar-tab-group-list-item-header {
-    background-color: black;
-    border-bottom: $light-border-color 1px solid;
   }
 
   button.more:hover {
