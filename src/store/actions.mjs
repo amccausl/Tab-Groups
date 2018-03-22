@@ -53,13 +53,6 @@ export function activateGroupAction( tab_group_id, window_id ) {
   }
 }
 
-export function createGroupAction( window_id ) {
-  return {
-    type: GROUP_CREATE,
-    window_id
-  }
-}
-
 export function removeGroupAction( tab_group_id, window_id ) {
   return {
     type: GROUP_REMOVE,

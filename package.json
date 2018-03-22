@@ -21,7 +21,7 @@
     "url": "https://github.com/amccausl/Tab-Groups/issues"
   },
   "dependencies": {
-    "vue": "2.5.15"
+    "vue": "2.5.16"
   },
   "devDependencies": {
     "ajv": "6.2.1",
@@ -39,7 +39,7 @@
     "rollup-plugin-vue": "3.0.0",
     "tap": "11.1.2",
     "typescript": "2.7.2",
-    "vue-template-compiler": "2.5.15",
-    "web-ext": "2.4.0"
+    "vue-template-compiler": "2.5.16",
+    "web-ext": "2.5.0"
   }
 }

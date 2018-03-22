@@ -329,15 +329,18 @@ function mapTabGroup( state, window_id, tab_group_id, fn ) {
   })
 }
 
-export function createGroup( state, { window_id } ) {
-  const new_tab_group = createTabGroup( getNewTabGroupId( state ), [] )
+export function createGroup( state, { window_id, new_tab_group } ) {
+  if( ! new_tab_group ) {
+    new_tab_group = createTabGroup( getNewTabGroupId( state ), [] )
+  }
   return Object.assign( {}, state, {
     windows: state.windows.map( window => {
       if( window.id !== window_id ) {
         return window
       }
       return Object.assign( {}, window, {
-        tab_groups: [ ...window.tab_groups, new_tab_group ]
+        tab_groups: [ ...window.tab_groups, new_tab_group ],
+        active_tab_group_id: new_tab_group.id
       })
     })
   })
@@ -538,7 +541,7 @@ export function updateTabImage( state, { tab_id, window_id, preview_image_uri } 
  *   { window_id, index, pinned }
  *   { window_id, tab_group_id }
  *   { window_id, tab_group_id, tab_group_index }
-//  *   { window_id, pinned }
+ *   { window_id, tab_group }
  */
 export function moveTabs( state, { source_data, target_data } ) {
   let { windows } = state
@@ -606,6 +609,7 @@ export function moveTabs( state, { source_data, target_data } ) {
       })
 
       if( window.id === target_data.window_id && target_data.tab_group ) {
+        active_tab_group_id = target_data.tab_group.id
         tab_groups.push( target_data.tab_group )
       }
 

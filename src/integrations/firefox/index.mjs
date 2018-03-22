@@ -18,9 +18,11 @@ import {
   updateConfigAction,
 } from '../../store/actions.mjs'
 import {
+  createTabGroup,
   default_config,
   findTab,
   findTabGroup,
+  getNewTabGroupId,
   getSourceTabGroupData,
   getTabMoveData,
 } from '../../store/helpers.mjs'
@@ -177,6 +179,40 @@ export function bindBrowserEvents( store ) {
       console.info('contextualIdentities.onRemoved', contextualIdentity)
     })
   }
+
+  store.subscribe( () => {
+    const state = store.getState()
+    if( browser.tabs.show && browser.tabs.hide ) {
+      console.info('updating tab show state')
+      const show_ids = []
+      const hide_ids = []
+      const updates = []
+
+      for( let window of state.windows ) {
+        // @todo check for noop
+        for( let tab_group of window.tab_groups ) {
+          if( tab_group.hasOwnProperty( 'pinned' ) ) {
+            continue
+          }
+          if( window.active_tab_group_id === tab_group.id ) {
+            show_ids.push( ...tab_group.tabs.map( tab => tab.id ) )
+          } else {
+            // @todo pin tab if hide not possible
+            hide_ids.push( ...tab_group.tabs.map( tab => tab.id ) )
+          }
+        }
+        break
+      }
+      if( hide_ids.length ) {
+        updates.push( browser.tabs.hide( hide_ids ) )
+        // updates.push( ...hide_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: true } ) ) )
+      }
+      if( show_ids.length ) {
+        updates.push( browser.tabs.show( show_ids ) )
+        // updates.push( ...show_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: false } ) ) )
+      }
+    }
+  })
 }
 
 /**
@@ -422,47 +458,7 @@ export function openTabGroupsPage() {
  * @todo should this include the window_id?
  */
 export function setTabActive( store, window_id, tab_id ) {
-  const state = store.getState()
-  const updates = []
-
-  updates.push( browser.tabs.update( tab_id, { active: true } ) )
-
-  if( browser.tabs.show && browser.tabs.hide ) {
-    const show_ids = []
-    const hide_ids = []
-
-    for( let window of state.windows ) {
-      if( window.id !== window_id ) {
-        continue
-      }
-      // @todo check for noop
-      for( let tab_group of window.tab_groups ) {
-        if( tab_group.hasOwnProperty( 'pinned' ) ) {
-          if( tab_group.tabs.some( tab => tab.id === tab_id ) ) {
-            break
-          }
-          continue
-        }
-        if( tab_group.tabs.some( tab => tab.id === tab_id ) ) {
-          show_ids.push( ...tab_group.tabs.map( tab => tab.id ) )
-        } else {
-          // @todo pin tab if hide not possible
-          hide_ids.push( ...tab_group.tabs.map( tab => tab.id ) )
-        }
-      }
-      if( hide_ids.length ) {
-        updates.push( browser.tabs.hide( hide_ids ) )
-        // updates.push( ...hide_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: true } ) ) )
-      }
-      if( show_ids.length ) {
-        updates.push( browser.tabs.show( show_ids ) )
-        // updates.push( ...show_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: false } ) ) )
-      }
-      break
-    }
-  }
-
-  return Promise.all( updates )
+  return browser.tabs.update( tab_id, { active: true } )
 }
 
 /**
@@ -484,6 +480,33 @@ export function unmuteTab( store, window_id, tab_id ) {
   const change_info = { muted: false }
   console.info('browser.tabs.update', tab_id, change_info)
   return browser.tabs.update( tab_id, change_info )
+}
+
+export function createGroup( store, window_id, source_data ) {
+  const state = store.getState()
+  const tab_group = createTabGroup( getNewTabGroupId( state ), [] )
+  const target_data = {
+    window_id,
+    tab_group
+  }
+
+  if( source_data ) {
+    // @todo queue move?
+    moveTabsToGroup( store, source_data, target_data )
+    // @todo call process to activate the new group?  maybe in caller
+    return Promise.resolve( tab_group )
+  }
+
+  return browser.tabs.create({ windowId: window_id })
+    .then( browser_tab => {
+      source_data = {
+        window_id,
+        tab_ids: [ browser_tab.id ]
+      }
+      // @todo call process to activate the new group?  maybe in caller
+      return moveTabsToGroup( store, source_data, target_data )
+    })
+    .then( () => tab_group )
 }
 
 export function closeTabGroup( store, window_id, tab_group_id ) {
@@ -673,32 +696,22 @@ export function moveTabsToGroup( store, source_data, target_data ) {
   target_data = move_data.target_data
   const { tab_ids } = source_data
 
-  const move_properties = {
-    index: target_data.index
-  }
-
-  if( source_data.window_id !== target_data.window_id ) {
-    move_properties.windowId = target_data.window_id
-  }
   store.dispatch( moveTabsAction( source_data, target_data ) )
 
   // Reload the state
   state = store.getState()
 
-  if( browser.tabs.show && browser.tabs.hide ) {
-    const target_window = state.windows.find( window => window.id === target_data.window_id )
-    const tab_ids = source_data.tabs.map( tab => tab.id )
-    if( target_data.tab_group_id === target_window.active_tab_group_id ) {
-      console.info('browser.tabs.show', tab_ids)
-      updates.push( browser.tabs.show( tab_ids ) )
-    } else {
-      console.info('browser.tabs.hide', tab_ids)
-      updates.push( browser.tabs.hide( tab_ids ) )
+  if( target_data.index != null ) {
+    const move_properties = {
+      index: target_data.index
     }
-  }
 
-  console.info('browser.tabs.move', tab_ids, move_properties)
-  updates.push( browser.tabs.move( tab_ids, move_properties ) )
+    if( source_data.window_id !== target_data.window_id ) {
+      move_properties.windowId = target_data.window_id
+    }
+    console.info('browser.tabs.move', tab_ids, move_properties)
+    updates.push( browser.tabs.move( tab_ids, move_properties ) )
+  }
 
   return Promise.all( updates )
 }

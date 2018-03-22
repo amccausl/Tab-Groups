@@ -8,6 +8,7 @@ import {
   closeTab,
   muteTab,
   unmuteTab,
+  createGroup,
   closeTabGroup,
   muteTabGroup,
   unmuteTabGroup,
@@ -66,10 +67,12 @@ window.getStore = function() {
 }
 
 // Proxy public methods from integrations to reduce duplication in app js
+// @todo standardize naming
 window.moveTabsToGroup = moveTabsToGroup
 window.closeTab = closeTab
 window.muteTab = muteTab
 window.unmuteTab = unmuteTab
+window.createGroup = createGroup
 window.closeTabGroup = closeTabGroup
 window.muteTabGroup = muteTabGroup
 window.unmuteTabGroup = unmuteTabGroup

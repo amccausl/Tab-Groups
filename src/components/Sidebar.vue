@@ -117,7 +117,6 @@
 import Vue from 'vue'
 
 import {
-  createGroupAction,
   updateGroupAction,
 } from '../store/actions.mjs'
 import {
@@ -272,8 +271,8 @@ export default {
     getCountMessage,
     createTabGroup() {
       // Create new group with default properties in the store
-      window.store.dispatch( createGroupAction( this.window_id ) )
-      // @todo create new tab in the new group
+      window.background.createGroup( window.store, this.window_id )
+        .then( tab_group => this.renameTabGroup( tab_group.id ) )
     },
     openTabGroupMore( event, tab_group ) {
       console.info('openTabGroupMore', event, tab_group )
@@ -314,11 +313,15 @@ export default {
       this.tab_group_context_menu.open = false
     },
     renameTabGroup( tab_group_id ) {
+      console.info('renameTabGroup', tab_group_id)
       this.rename_tab_group_id = tab_group_id
       this.tab_group_context_menu.open = false
 
       Vue.nextTick( () => {
-        this.$el.querySelector( '.tab-group-list-item-header__title--editing' ).focus()
+        const el = this.$el.querySelector( '.tab-group-list-item-header__title--editing' )
+        if( el != null ) {
+          el.focus()
+        }
       })
     },
     isSelected( tab ) {
@@ -344,7 +347,21 @@ export default {
     },
     onTabGroupDragEnter,
     onTabGroupDragOver,
-    onTabGroupDrop,
+    onTabGroupDrop( event, tab_group ) {
+      event.preventDefault()
+      const source_data = getTransferData( event.dataTransfer )
+      console.info('onTabGroupDrop', tab_group, event, source_data)
+      if( isTabTransfer( source_data ) ) {
+        if( tab_group == null ) {
+          console.info('detected tab drop', source_data)
+          this.resetDragState()
+          return window.background.createGroup( window.store, this.window_id, source_data )
+            .then( tab_group => this.renameTabGroup( tab_group.id ) )
+        } else {
+          onTabGroupDrop( event, tab_group )
+        }
+      }
+    },
     onTabGroupTitleFocus( event, tab_group ) {
       console.info('onTabGroupTitleFocus', event, tab_group)
       const range = document.createRange()
@@ -363,6 +380,7 @@ export default {
     onTabGroupTitleBlur( event, tab_group ) {
       console.info('onTabGroupTitleBlur', event, event.target.textContent)
       this.rename_tab_group_id = null
+      // @todo skip if empty, reset
       window.store.dispatch( updateGroupAction( tab_group.id, this.window_id, { title: event.target.textContent } ) )
     },
     onUpdateSearchText: debounce( function( search_text ) {
