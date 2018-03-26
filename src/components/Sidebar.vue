@@ -672,14 +672,18 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
 // Tab Group List Item Header
 // =============================================================================
 
-// @todo use photon colors
-$tab-group-list-item-header--light__primary-text--color: $grey-90 !default;
-$tab-group-list-item-header--light__secodary-text--color: $grey-50 !default;
-$tab-group-list-item-header--light__ink--active--color: $blue-50 !default;
-
-$tab-group-list-item-header--dark__primary-text--color: $white-100 !default;
-$tab-group-list-item-header--dark__secodary-text--color: $grey-10 !default;
-$tab-group-list-item-header--dark__ink--active--color: $blue-50 !default;
+$tab-group-list-item-header__themes: (
+  light: (
+    header--background-color: $white-100,
+    primary-text--color: $grey-90,
+    secodary-text--color: $grey-50,
+  ),
+  dark: (
+    header--background-color: black,
+    primary-text--color: $white-100,
+    secodary-text--color: $grey-10,
+  )
+);
 
 .tab-group-list-item-header {
   padding: 10px 0 10px 10px;
@@ -702,16 +706,6 @@ $tab-group-list-item-header--dark__ink--active--color: $blue-50 !default;
   &--large {
   }
 
-  &--light {
-    background-color: $white-100;
-    border-bottom: $light-border-color 1px solid;
-  }
-
-  &--dark {
-    background-color: black;
-    border-bottom: $light-border-color 1px solid;
-  }
-
   &__title {
     flex: 1;
     white-space: nowrap;
@@ -725,14 +719,15 @@ $tab-group-list-item-header--dark__ink--active--color: $blue-50 !default;
     white-space: nowrap;
   }
 
-  // @todo is there a way to DRY this?
-  // @todo use theming pattern above
-  &--light &__tabs-count {
-    color: $tab-group-list-item-header--light__secodary-text--color;
-  }
+  @each $theme, $colors in $tab-group-list-item-header__themes {
+    &--#{$theme} {
+      background-color: map-get( $colors, header--background-color );
+      border-bottom: $light-border-color 1px solid;
+    }
 
-  &--dark &__tabs-count {
-    color: $tab-group-list-item-header--dark__secodary-text--color;
+    &--#{$theme} &__tabs-count {
+      color: map-get( $colors, secodary-text--color )
+    }
   }
 }
 
