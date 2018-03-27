@@ -128,6 +128,11 @@ export function onTabGroupDragEnter( event, tab_group ) {
   event.preventDefault()
 }
 
+export function onTabGroupDragLeave( event, tab_group ) {
+  console.info('onTabGroupDragLeave', tab_group, event)
+  this.target_tab_group_new = false
+}
+
 export function onTabGroupDragOver( event, tab_group ) {
   event.preventDefault()
   const event_data = getTransferData( event.dataTransfer )

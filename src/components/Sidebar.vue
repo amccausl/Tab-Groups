@@ -83,7 +83,7 @@
       </div>
     </div>
     <div :class="[ `empty-dropzone`, `empty-dropzone--${ theme }`, target_tab_group_new ? `empty-dropzone--${ theme }--active` : `` ]"
-          @dragenter="onTabGroupDragEnter( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
+          @dragenter="onTabGroupDragEnter( $event )" @dragleave="onTabGroupDragLeave( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
     >
       <svg :class="[ `empty-dropzone__icon`, `empty-dropzone--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
         <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
@@ -140,6 +140,7 @@ import {
   onTabDragEnd,
   onTabDrop,
   onTabGroupDragEnter,
+  onTabGroupDragLeave,
   onTabGroupDragOver,
   onTabGroupDrop,
   resetDragState,
@@ -356,6 +357,7 @@ export default {
       }
     },
     onTabGroupDragEnter,
+    onTabGroupDragLeave,
     onTabGroupDragOver,
     onTabGroupDrop( event, tab_group ) {
       event.preventDefault()
@@ -434,7 +436,11 @@ $light-header-hover-background: #cccdcf;
 $light-awesome-bar-background: #474749; // @todo
 $light-border-color: #e0e0e1;
 
-%transition {
+// =============================================================================
+// Helpers
+// =============================================================================
+
+%slow-transition {
   transition-duration: 250ms;
   transition-timing-function: cubic-bezier(.07,.95,0,1);
 }
@@ -515,7 +521,7 @@ $action-strip__themes: (
   border-bottom: solid 1px transparent;
 
   &__button {
-    @extend %transition;
+    @extend %slow-transition;
     transition-property: background-color;
     flex: 1;
     display: flex;
@@ -872,9 +878,8 @@ button.more {
 
   &__item {
     padding: 4px 8px;
+    @extend %slow-transition;
     transition-property: background-color;
-    transition-duration: 250ms;
-    transition-timing-function: cubic-bezier(.07,.95,0,1);
 
     &:hover {
       background-color: $grey-20;
@@ -925,9 +930,8 @@ button.more {
 }
 
 .sidebar-tab-view-item {
+  @extend %slow-transition;
   transition-property: margin-top, margin-left;
-  transition-duration: 250ms;
-  transition-timing-function: cubic-bezier(.07,.95,0,1);
 }
 
 .sidebar-tab-view-item {
@@ -983,9 +987,8 @@ button.more {
   width: 6px;
   margin-right: 4px;
   margin-bottom: 1px;
+  @extend %slow-transition;
   transition-property: transform;
-  transition-duration: 250ms;
-  transition-timing-function: cubic-bezier(.07,.95,0,1);
 }
 
 .carat-icon.open {
