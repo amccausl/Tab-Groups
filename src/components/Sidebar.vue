@@ -82,8 +82,15 @@
         </div>
       </div>
     </div>
+    <div :class="[ `empty-dropzone`, `empty-dropzone--${ theme }`, target_tab_group_new ? `empty-dropzone--${ theme }--active` : `` ]"
+          @dragenter="onTabGroupDragEnter( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
+    >
+      <svg :class="[ `empty-dropzone__icon`, `empty-dropzone--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
+        <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
+      </svg>
+    </div>
     <div :class="[ `action-strip`, `action-strip--${ theme }` ]">
-      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button` ]"
+      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button`, target_tab_group_new ? `action-strip--${ theme }__button--active` : `` ]"
           @click.left="createTabGroup()" @click.right.prevent
           @dragenter="onTabGroupDragEnter( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
       >
@@ -93,7 +100,7 @@
         <span :class="[ `action-strip__button-text`, `action-strip--${ theme }__button-text` ]">{{ __MSG_tab_group_new__ }}</span>
       </div>
       <!-- <input class="sidebar-header-search" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/> -->
-      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button`, `action-strip__button--no-grow` ]" @click="openOptionsPage()">
+      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button`, `action-strip--${ theme }--active__button`, `action-strip__button--no-grow` ]" @click="openOptionsPage()">
         <svg :class="[ `action-strip__icon`, `action-strip--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
         </svg>
@@ -179,6 +186,7 @@ export default {
       show_tab_icon_background: true,
       pinned_tabs: [],
       tab_groups: [],
+      target_tab_group_new: false,
       target_tab_group_id: null,
       target_tab_group_index: null,
       target_tab_id: null,
@@ -426,6 +434,11 @@ $light-header-hover-background: #cccdcf;
 $light-awesome-bar-background: #474749; // @todo
 $light-border-color: #e0e0e1;
 
+%transition {
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(.07,.95,0,1);
+}
+
 .sidebar {
   width: 100%;
   height: 100vh;
@@ -436,18 +449,62 @@ $light-border-color: #e0e0e1;
 }
 
 // =============================================================================
+// Empty Dropzone
+// =============================================================================
+
+$empty-dropzone__themes: (
+  light: (
+    --background-color: $white-100,
+    --active--background-color: $light-header-hover-background,
+    --active--color: $grey-90-a80,
+  ),
+  dark: (
+    --background-color: black,
+    --active--background-color: #5b5b5d,
+    --active--color: #d0d0d0,
+  )
+);
+
+.empty-dropzone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+
+  // @todo remove drop target
+  // @todo centered plus icon
+
+  @each $theme, $colors in $empty-dropzone__themes {
+    &--#{$theme} {
+      background-color: map-get( $colors, --background-color );
+
+      &--active {
+        background-color: map-get( $colors, --active--background-color );
+        fill: map-get( $colors, --active--color );
+      }
+    }
+  }
+}
+
+// =============================================================================
 // Action Strip
 // =============================================================================
 
-$action-strip--light__button--background-color: #f5f6f7 !default;
-$action-strip--light__button--hover--background-color: #d0d0d0 !default;
-$action-strip--light__text--color: $grey-90-a80 !default;
-$action-strip--light__separator--color: #cccccc !default;
-
-$action-strip--dark__button--background-color: #323234 !default;
-$action-strip--dark__button--hover--background-color: #5b5b5d !default;
-$action-strip--dark__text--color: #d0d0d0 !default;
-$action-strip--dark__separator--color: $grey-90-a80 !default;
+$action-strip__themes: (
+  light: (
+    __button--background-color: #f5f6f7,
+    __button--hover--background-color: #d0d0d0,
+    __separator--color: #cccccc,
+    __text--color: $grey-90-a80,
+  ),
+  dark: (
+    __button--background-color: #323234,
+    __button--hover--background-color: #5b5b5d,
+    __separator--color: $grey-90-a80,
+    __text--color: #d0d0d0,
+  )
+);
 
 .action-strip {
   display: flex;
@@ -458,14 +515,13 @@ $action-strip--dark__separator--color: $grey-90-a80 !default;
   border-bottom: solid 1px transparent;
 
   &__button {
+    @extend %transition;
+    transition-property: background-color;
     flex: 1;
     display: flex;
     align-items: center;
     padding: 0 8px;
     height: 32px;
-    transition-property: background-color;
-    transition-duration: 250ms;
-    transition-timing-function: cubic-bezier(.07,.95,0,1);
     cursor: pointer;
   }
 
@@ -481,41 +537,24 @@ $action-strip--dark__separator--color: $grey-90-a80 !default;
     padding-left: 4px;
   }
 
-  &--light {
-    &__button {
-      background-color: $action-strip--light__button--background-color;
-      border-bottom: solid 1px $action-strip--light__separator--color;
-    }
+  @each $theme, $colors in $action-strip__themes {
+    &--#{$theme} {
+      &__button {
+        background-color: map-get( $colors, __button--background-color );
 
-    &__button:hover {
-      background-color: $action-strip--light__button--hover--background-color;
-    }
+        &:hover,
+        &--active {
+          background-color: map-get( $colors, __button--hover--background-color );
+        }
+      }
 
-    &__button-text {
-      color: $action-strip--light__text--color;
-    }
+      &__button-text {
+        color: map-get( $colors, __text--color );
+      }
 
-    &__icon {
-      fill: $action-strip--light__text--color;
-    }
-  }
-
-  &--dark {
-    &__button {
-      background-color: $action-strip--dark__button--background-color;
-      border-bottom: solid 1px $action-strip--dark__separator--color;
-    }
-
-    &__button:hover {
-      background-color: $action-strip--dark__button--hover--background-color;
-    }
-
-    &__button-text {
-      color: $action-strip--dark__text--color;
-    }
-
-    &__icon {
-      fill: $action-strip--dark__text--color;
+      &__icon {
+        fill: map-get( $colors, __text--color );
+      }
     }
   }
 }
@@ -775,7 +814,6 @@ $tab-group-list-item-header__themes: (
   justify-content: flex-start;
   align-items: stretch;
   overflow-y: auto;
-  flex: 1;
 }
 
 .sidebar-tab-group-list-item {

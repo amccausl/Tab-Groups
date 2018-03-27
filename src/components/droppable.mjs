@@ -124,6 +124,7 @@ export function onTabGroupDragEnter( event, tab_group ) {
   console.info('onTabGroupDragEnter', tab_group, event)
   event.dataTransfer.effectAllowed = 'move'
   event.dataTransfer.dropEffect = 'move'
+  this.target_tab_group_new = ( tab_group == null )
   event.preventDefault()
 }
 
