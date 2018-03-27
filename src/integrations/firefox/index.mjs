@@ -144,26 +144,7 @@ export function bindBrowserEvents( store ) {
 
   browser.tabs.onUpdated.addListener( ( tab_id, change_info, browser_tab ) => {
     console.info('tabs.onUpdated', tab_id, change_info, browser_tab)
-    const state = store.getState()
-    // If change_info.audible && tab_group.muted, mute tab
-    if( change_info.hasOwnProperty( 'audible' ) ) {
-      for( let window of state.windows ) {
-        if( window.id !== browser_tab.windowId ) {
-          continue
-        }
-        for( let tab_group of window.tab_groups ) {
-          if( ! tab_group.tabs.some( tab => tab.id === tab_id ) ) {
-            continue
-          }
-          if( change_info.audible && tab_group.muted ) {
-            browser.tabs.update( tab_id, { muted: true } )
-          }
-          break
-        }
-        break
-      }
-    }
-    store.dispatch( updateTabAction( browser_tab, change_info ) )
+    onTabUpdated( store, tab_id, change_info, browser_tab )
   })
 
   if( browser.contextualIdentities ) {
@@ -368,15 +349,6 @@ export function setConfig( key, value ) {
         return browser.storage.local.set( local_storage )
       }
     )
-}
-
-/**
- * Set the current theme by id
- * @param theme_id
- * @todo is there a safe async way to do this?
- */
-export function setTheme( theme_id ) {
-  return setConfig( 'theme', theme_id )
 }
 
 function resetWindowState( window ) {
@@ -589,6 +561,33 @@ export function onTabCreated( store, browser_tab ) {
   }
 
   store.dispatch( addTabAction( browser_tab ) )
+}
+
+export function onTabUpdated( store, tab_id, change_info, browser_tab ) {
+  const state = store.getState()
+  // If change_info.audible && tab_group.muted, mute tab
+  if( change_info.hasOwnProperty( 'audible' ) ) {
+    for( let window of state.windows ) {
+      if( window.id !== browser_tab.windowId ) {
+        continue
+      }
+      for( let tab_group of window.tab_groups ) {
+        if( ! tab_group.tabs.some( tab => tab.id === tab_id ) ) {
+          continue
+        }
+        if( change_info.audible && tab_group.muted ) {
+          browser.tabs.update( tab_id, { muted: true } )
+        }
+        break
+      }
+      break
+    }
+  }
+  if( change_info.hasOwnProperty( 'sharingState' ) ) {
+    // @todo if the update is only sharingState, and no actual change is detected
+    return
+  }
+  store.dispatch( updateTabAction( browser_tab, change_info ) )
 }
 
 export function onTabRemoved( store, tab_id, window_id ) {

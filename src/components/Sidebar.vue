@@ -4,7 +4,7 @@
       <div v-for="pinned_tab in pinned_tabs" :key="pinned_tab.id"
           :class="[ `pinned-tab-list__item`, `pinned-tab-list--${ theme }__item`, { 'pinned-tab-list__item--active': pinned_tab.active, selected: isSelected( pinned_tab ) } ]"
           :title="pinned_tab.title"
-          @click.ctrl="toggleTabSelection( pinned_tab )" @click.exact="openTab( pinned_tab )" @click.middle="closeTab( pinned_tab )"
+          @click.ctrl="toggleTabSelection( pinned_tab )" @click.exact="openTab( pinned_tab.id )" @click.middle="closeTab( pinned_tab )"
       >
         <span :class="[ `pinned-tab-list__ink`, `pinned-tab-list--${ theme }__ink` ]"></span>
         <div :class="[ `pinned-tab-list__tab`, `pinned-tab-list--${ theme }__tab`, pinned_tab.active ? `pinned-tab-list--${ theme }__tab--active` : `` ]">
@@ -21,35 +21,37 @@
           :class="[ ! tab_group.open && active_tab_group_id === tab_group.id ? 'tab-group-item--active' : '' ]"
           v-for="tab_group in tab_groups" :key="tab_group.id"
       >
-        <div :class="[ 'tab-group-list-item-header', `tab-group-list-item-header--${ theme }`, ! tab_group.open && active_tab_group_id === tab_group.id ? 'tab-group-list-item-header--active' : '' ]"
+        <div :class="[ 'tab-group-list-item-header', `tab-group-list-item-header--${ theme }`, active_tab_group_id === tab_group.id ? 'tab-group-list-item-header--active' : '' ]"
             v-on:click="onTabGroupClick( tab_group )"
             @dragenter="onTabGroupDragEnter( $event, tab_group )" @dragover="onTabGroupDragOver( $event, tab_group )" @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
         >
-          <svg v-if="sidebar_tab_display !== 'none'" class="carat-icon" :class="{ open: tab_group.open }" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
-            <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
-          </svg>
-          <span v-if="rename_tab_group_id === tab_group.id" class="tab-group-list-item-header__title tab-group-list-item-header__title--editing" :ref="title"
-              contenteditable="true" spellcheck="false" @click.stop @focus="onTabGroupTitleFocus( $event, tab_group )" @blur="onTabGroupTitleBlur( $event, tab_group )" @keyup.enter="onTabGroupTitlePressEnter( $event, tab_group )"
-          >{{ tab_group.title }}</span>
-          <span v-else class="tab-group-list-item-header__title">
-            {{ tab_group.title }}
-          </span>
+          <div :class="[ 'tab-group-list-item-header__main', `tab-group-list-item-header--${ theme }__main` ]">
+            <svg v-if="sidebar_tab_display !== 'none'" class="carat-icon" :class="{ open: tab_group.open }" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
+              <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
+            </svg>
+            <span v-if="rename_tab_group_id === tab_group.id" class="tab-group-list-item-header__title tab-group-list-item-header__title--editing" :ref="title"
+                contenteditable="true" spellcheck="false" @click.stop @focus="onTabGroupTitleFocus( $event, tab_group )" @blur="onTabGroupTitleBlur( $event, tab_group )" @keyup.enter="onTabGroupTitlePressEnter( $event, tab_group )"
+            >{{ tab_group.title }}</span>
+            <span v-else class="tab-group-list-item-header__title">
+              {{ tab_group.title }}
+            </span>
 
-          <svg v-if="tab_group.muted" class="audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-            <g :fill="context_fill">
-              <path d="M13 8a2.813 2.813 0 0 0-.465-1.535l-.744.744A1.785 1.785 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
-              <path d="M13.273 5.727A3.934 3.934 0 0 1 14 8a3.984 3.984 0 0 1-2.742 3.775.5.5 0 0 0 .316.949A4.985 4.985 0 0 0 15 8a4.93 4.93 0 0 0-1.012-2.988zm-4.603 7.99a.2.2 0 0 0 .33-.152V10l-2.154 2.154zm6.037-12.424a1 1 0 0 0-1.414 0L9 5.586V2.544a.25.25 0 0 0-.413-.19L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618a2.186 2.186 0 0 0 1.659 2.118l-2.366 2.366a1 1 0 1 0 1.414 1.414l12-12a1 1 0 0 0 0-1.414z"></path>
-            </g>
-          </svg>
-          <svg v-else-if="tab_group.audible" class="audio-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-            <g :fill="context_fill">
-              <path d="M8.587 2.354L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618A2.191 2.191 0 0 0 4.191 11H5.5l3.17 2.717a.2.2 0 0 0 .33-.152V2.544a.25.25 0 0 0-.413-.19zm2.988.921a.5.5 0 0 0-.316.949 3.97 3.97 0 0 1 0 7.551.5.5 0 0 0 .316.949 4.971 4.971 0 0 0 0-9.449z"></path>
-              <path d="M13 8a3 3 0 0 0-2.056-2.787.5.5 0 1 0-.343.939A2.008 2.008 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
-            </g>
-          </svg>
+            <svg v-if="tab_group.muted" class="audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+              <g :fill="context_fill">
+                <path d="M13 8a2.813 2.813 0 0 0-.465-1.535l-.744.744A1.785 1.785 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
+                <path d="M13.273 5.727A3.934 3.934 0 0 1 14 8a3.984 3.984 0 0 1-2.742 3.775.5.5 0 0 0 .316.949A4.985 4.985 0 0 0 15 8a4.93 4.93 0 0 0-1.012-2.988zm-4.603 7.99a.2.2 0 0 0 .33-.152V10l-2.154 2.154zm6.037-12.424a1 1 0 0 0-1.414 0L9 5.586V2.544a.25.25 0 0 0-.413-.19L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618a2.186 2.186 0 0 0 1.659 2.118l-2.366 2.366a1 1 0 1 0 1.414 1.414l12-12a1 1 0 0 0 0-1.414z"></path>
+              </g>
+            </svg>
+            <svg v-else-if="tab_group.audible" class="audio-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+              <g :fill="context_fill">
+                <path d="M8.587 2.354L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618A2.191 2.191 0 0 0 4.191 11H5.5l3.17 2.717a.2.2 0 0 0 .33-.152V2.544a.25.25 0 0 0-.413-.19zm2.988.921a.5.5 0 0 0-.316.949 3.97 3.97 0 0 1 0 7.551.5.5 0 0 0 .316.949 4.971 4.971 0 0 0 0-9.449z"></path>
+                <path d="M13 8a3 3 0 0 0-2.056-2.787.5.5 0 1 0-.343.939A2.008 2.008 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
+              </g>
+            </svg>
 
-          <span class="tab-group-list-item-header__tabs-count">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
-          <button class="more" @click.stop="openTabGroupMore( $event, tab_group )">
+            <span class="tab-group-list-item-header__tabs-count">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
+          </div>
+          <button :class="[ 'tab-group-list-item-header__more-button', `tab-group-list-item-header--${ theme }__more-button` ]" @click.stop="openTabGroupMore( $event, tab_group )">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <path :fill="context_fill" d="M2 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"></path>
             </svg>
@@ -60,7 +62,7 @@
               v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
               v-if="! search_text || ! search_resolved || tab.matched" :title="tab.title"
               :class="{ active: tab.active, selected: isSelected( tab ), source: isSelected( tab ) && is_dragging, target: target_tab_id === tab.id && ! isSelected( tab ) }"
-              @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab )" @click.middle="closeTab( tab )"
+              @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab.id )" @click.middle="closeTab( tab )"
               draggable="true" @dragstart="onTabDragStart( $event, tab )" @dragend="onTabDragEnd( $event )" @drop="onTabDrop( $event, tab )"
               @dragover="onTabDragOver( $event, tab_group, tab )"
           >
@@ -97,18 +99,18 @@
         </svg>
       </div>
     </div>
-    <div v-if="tab_group_context_menu.open" class="tab-group-context-menu-ctx" @click="closeTabGroupMore" @click.right="closeTabGroupMore"></div>
-    <div v-if="tab_group_context_menu.open" class="tab-group-context-menu" :style="{ top: tab_group_context_menu.y + 'px', right: tab_group_context_menu.x + 'px' }">
+    <div v-if="tab_group_context_menu.open" class="context-menu__ctx" @click="closeTabGroupMore" @click.right="closeTabGroupMore"></div>
+    <div v-if="tab_group_context_menu.open" class="context-menu__content" :style="{ top: tab_group_context_menu.y + 'px', right: tab_group_context_menu.x + 'px' }">
       <!-- @todo localize -->
       <!-- @todo icons -->
-      <!-- <div class="tab-group-context-menu-item"><span>R</span>eload Tabs</div> -->
-      <div class="tab-group-context-menu-item" v-if="!isGroupMuted( tab_group_context_menu.tab_group_id )" @click="muteTabGroup( tab_group_context_menu.tab_group_id )"><span>M</span>ute Tabs</div>
-      <div class="tab-group-context-menu-item" v-else @click="unmuteTabGroup( tab_group_context_menu.tab_group_id )">Un<span>m</span>ute Tabs</div>
+      <!-- <div class="context-menu__item"><span>R</span>eload Tabs</div> -->
+      <div class="context-menu__item" v-if="!isGroupMuted( tab_group_context_menu.tab_group_id )" @click="muteTabGroup( tab_group_context_menu.tab_group_id )"><span class="context-menu__item-hotkey">M</span>ute Tabs</div>
+      <div class="context-menu__item" v-else @click="unmuteTabGroup( tab_group_context_menu.tab_group_id )">Un<span class="context-menu__item-hotkey">m</span>ute Tabs</div>
       <!-- @todo separator -->
-      <div class="tab-group-context-menu-item" @click="renameTabGroup( tab_group_context_menu.tab_group_id )">Re<span>n</span>ame</div>
-      <!-- <div class="tab-group-context-menu-item">Move to New <span>W</span>indow</div> -->
-      <!-- <div class="tab-group-context-menu-item" @click="archiveTabGroup( tab_group_context_menu.tab_group_id )"><span>A</span>rchive</div> -->
-      <div class="tab-group-context-menu-item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span>C</span>lose</div>
+      <div class="context-menu__item" @click="renameTabGroup( tab_group_context_menu.tab_group_id )">Re<span class="context-menu__item-hotkey">n</span>ame</div>
+      <!-- <div class="context-menu__item">Move to New <span>W</span>indow</div> -->
+      <!-- <div class="context-menu__item" @click="archiveTabGroup( tab_group_context_menu.tab_group_id )"><span>A</span>rchive</div> -->
+      <div class="context-menu__item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span class="context-menu__item-hotkey">C</span>lose</div>
     </div>
   </body>
 </template>
@@ -287,10 +289,10 @@ export default {
       this.tab_group_context_menu.open = false
       this.tab_group_context_menu.tab_group_id = null
     },
-    openTab( tab ) {
-      console.info('openTab', tab)
+    openTab( tab_id ) {
+      console.info('openTab', tab_id)
       this.selected_tab_ids.splice( 0, this.selected_tab_ids.length )
-      window.background.setTabActive( window.store, this.window_id, tab.id )
+      window.background.setTabActive( window.store, this.window_id, tab_id )
     },
     closeTab( tab ) {
       console.info('closeTab', tab)
@@ -337,8 +339,8 @@ export default {
     onTabDrop,
     onTabGroupClick( tab_group ) {
       if( this.sidebar_tab_display === 'none' ) {
-        if( tab_group.active_tab_id ) {
-
+        if( tab_group.active_tab_id && tab_group.tabs.length ) {
+          this.openTab( tab_group.active_tab_id || tab_group.tabs[ 0 ].id )
         }
         console.info('tab_group', tab_group.active_tab_id)
       } else {
@@ -358,7 +360,7 @@ export default {
           return window.background.createGroup( window.store, this.window_id, source_data )
             .then( tab_group => this.renameTabGroup( tab_group.id ) )
         } else {
-          onTabGroupDrop( event, tab_group )
+          onTabGroupDrop.call( this, event, tab_group )
         }
       }
     },
@@ -674,19 +676,20 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
 
 $tab-group-list-item-header__themes: (
   light: (
-    header--background-color: $white-100,
+    --background-color: $white-100,
+    --hover--background-color: $light-header-hover-background,
     primary-text--color: $grey-90,
     secodary-text--color: $grey-50,
   ),
   dark: (
-    header--background-color: black,
+    --background-color: black,
+    --hover--background-color: #5b5b5d,
     primary-text--color: $white-100,
     secodary-text--color: $grey-10,
   )
 );
 
 .tab-group-list-item-header {
-  padding: 10px 0 10px 10px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -694,16 +697,26 @@ $tab-group-list-item-header__themes: (
   position: sticky;
   top: 0;
   z-index: 1;
+  position: sticky;
+
+  &:hover {
+    cursor: pointer;
+  }
 
   &--active::before {
     content: '';
     background-color: $blue-50;
-    height: 37px;
+    height: 32px;
     width: 4px;
-    margin: -11px 10px -11px -10px;
   }
 
-  &--large {
+  &__main {
+    padding: 7px 2px 8px;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 
   &__title {
@@ -719,10 +732,30 @@ $tab-group-list-item-header__themes: (
     white-space: nowrap;
   }
 
+  &__more-button {
+    padding: 8px 4px;
+    display: flex;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+  }
+
   @each $theme, $colors in $tab-group-list-item-header__themes {
     &--#{$theme} {
-      background-color: map-get( $colors, header--background-color );
       border-bottom: $light-border-color 1px solid;
+      background-color: map-get( $colors, --background-color );
+
+      &__main {
+        &:hover {
+          background-color: map-get( $colors, --hover--background-color );
+        }
+      }
+
+      &__more-button {
+        &:hover {
+          background-color: map-get( $colors, --hover--background-color );
+        }
+      }
     }
 
     &--#{$theme} &__tabs-count {
@@ -761,58 +794,64 @@ button.more {
 // Context Menu
 // =============================================================================
 
-.tab-group-context-menu-ctx {
-  z-index: 1;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-}
-
-.tab-group-context-menu {
-  z-index: 2;
-  position: absolute;
-  padding: 2px 0;
-  background-color: $white-100;
-  border: solid 1px $grey-90-a20;
-  border-radius: 2px;
-  box-shadow: 0 4px 16px rgba(12,12,13,.1);
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  color: $grey-90;
-}
-
-.tab-group-context-menu::before {
-  position: absolute;
-  top: -7px;
-  right: 4px;
-  width: 12px;
-  height: 12px;
-  transform: rotate(45deg);
-  clip-path: polygon(0% 0, 100% 0, 0 100%);
-  box-shadow: 0 4px 16px rgba(12,12,13,.1);
-  background-color: $white-100;
-  border: solid 1px $grey-90-a20;
-  content: "";
-}
-
-.tab-group-context-menu-item {
-  padding: 4px 8px;
-  transition-property: background-color;
-  transition-duration: 250ms;
-  transition-timing-function: cubic-bezier(.07,.95,0,1);
-
-  &:hover {
-    background-color: $grey-20;
-    cursor: pointer;
+.context-menu {
+  &__ctx {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
   }
 
-  > span {
-    text-decoration: underline;
+  &__content {
+    z-index: 2;
+    position: absolute;
+    padding: 2px 0;
+    background-color: $white-100;
+    border: solid 1px $grey-90-a20;
+    border-radius: 2px;
+    box-shadow: 0 4px 16px rgba(12,12,13,.1);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    color: $grey-90;
+
+    &::before {
+      position: absolute;
+      top: -7px;
+      right: 4px;
+      width: 12px;
+      height: 12px;
+      transform: rotate(45deg);
+      clip-path: polygon(0% 0, 100% 0, 0 100%);
+      box-shadow: 0 4px 16px rgba(12,12,13,.1);
+      background-color: $white-100;
+      border: solid 1px $grey-90-a20;
+      content: "";
+    }
+  }
+
+  &__item {
+    padding: 4px 8px;
+    transition-property: background-color;
+    transition-duration: 250ms;
+    transition-timing-function: cubic-bezier(.07,.95,0,1);
+
+    &:hover {
+      background-color: $grey-20;
+      cursor: pointer;
+    }
+
+    &-hotkey {
+      text-decoration: underline;
+    }
   }
 }
+
+// =============================================================================
+// Tab List Item
+// =============================================================================
 
 .sidebar-tab-group-tabs-list {
   display: flex;
