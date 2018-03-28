@@ -15,7 +15,7 @@ npm run build && npm run debug
 
 This is not ready for public consumption, but if you're curious you can load in firefox.
 
-1. Install [Node.js](https://nodejs.org/en/) for your platform
+1. Follow instructions to [install `web-ext`](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Getting_started_with_web-ext)
 2. `git clone git@github.com:amccausl/Tab-Groups.git` and open directory in terminal
 3. `npm install`
 4. `npm run build` on linux/mac or `npm run build-windows` on windows

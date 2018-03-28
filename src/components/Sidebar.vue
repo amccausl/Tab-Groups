@@ -1,5 +1,14 @@
 <template>
   <body class="sidebar" :class="theme">
+    <div :class="[ `action-strip`, `action-strip--${ theme }` ]">
+      <input v-if="is_search_enabled" :class="[ `action-strip__search`, `action-strip--${ theme }__search` ]" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/>
+      <div v-else :class="[ `action-strip__spacer`, `action-strip--${ theme }__spacer` ]"></div>
+      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button`, `action-strip__button--no-grow` ]" @click="openOptionsPage()">
+        <svg :class="[ `action-strip__button-icon`, `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+          <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
+        </svg>
+      </div>
+    </div>
     <div v-if="show_pinned_tabs" :class="[ `pinned-tab-list`, `pinned-tab-list--${ theme }` ]" @click.right.prevent>
       <div v-for="pinned_tab in pinned_tabs" :key="pinned_tab.id"
           :class="[ `pinned-tab-list__item`, `pinned-tab-list--${ theme }__item`, { 'pinned-tab-list__item--active': pinned_tab.active, selected: isSelected( pinned_tab ) } ]"
@@ -94,16 +103,10 @@
           @click.left="createTabGroup()" @click.right.prevent
           @dragenter="onTabGroupDragEnter( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
       >
-        <svg :class="[ `action-strip__icon`, `action-strip--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+        <svg :class="[ `action-strip__button-icon`, `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
         </svg>
         <span :class="[ `action-strip__button-text`, `action-strip--${ theme }__button-text` ]">{{ __MSG_tab_group_new__ }}</span>
-      </div>
-      <!-- <input class="sidebar-header-search" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/> -->
-      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button`, `action-strip--${ theme }--active__button`, `action-strip__button--no-grow` ]" @click="openOptionsPage()">
-        <svg :class="[ `action-strip__icon`, `action-strip--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-          <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
-        </svg>
       </div>
     </div>
     <div v-if="tab_group_context_menu.open" class="context-menu__ctx" @click="closeTabGroupMore" @click.right="closeTabGroupMore"></div>
@@ -115,6 +118,7 @@
       <div class="context-menu__item" v-else @click="unmuteTabGroup( tab_group_context_menu.tab_group_id )">Un<span class="context-menu__item-hotkey">m</span>ute Tabs</div>
       <!-- @todo separator -->
       <div class="context-menu__item" @click="renameTabGroup( tab_group_context_menu.tab_group_id )">Re<span class="context-menu__item-hotkey">n</span>ame</div>
+      <div class="context-menu__item" @click="copyTabGroupAsText( tab_group_context_menu.tab_group_id )"><span class="context-menu__item-hotkey">C</span>opy as text</div>
       <!-- <div class="context-menu__item">Move to New <span>W</span>indow</div> -->
       <!-- <div class="context-menu__item" @click="archiveTabGroup( tab_group_context_menu.tab_group_id )"><span>A</span>rchive</div> -->
       <div class="context-menu__item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span class="context-menu__item-hotkey">C</span>lose</div>
@@ -335,6 +339,9 @@ export default {
         }
       })
     },
+    copyTabGroupAsText( tab_group_id ) {
+      console.info('copyTabGroupAsText', tab_group_id)
+    },
     isSelected( tab ) {
       return this.selected_tab_ids.includes( tab.id )
     },
@@ -472,14 +479,20 @@ $empty-dropzone__themes: (
 );
 
 .empty-dropzone {
+  @extend %slow-transition;
+  transition-property: background-color;
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: transparent;
 
-  // @todo remove drop target
-  // @todo centered plus icon
+  &__icon {
+    @extend %slow-transition;
+    transition-property: opacity;
+    display: none; // Remove the spacer when not required (list is full)
+    opacity: 0;
+  }
 
   @each $theme, $colors in $empty-dropzone__themes {
     &--#{$theme} {
@@ -488,6 +501,11 @@ $empty-dropzone__themes: (
       &--active {
         background-color: map-get( $colors, --active--background-color );
         fill: map-get( $colors, --active--color );
+      }
+
+      &--active &__icon {
+        display: block;
+        opacity: 1;
       }
     }
   }
@@ -501,12 +519,18 @@ $action-strip__themes: (
   light: (
     __button--background-color: #f5f6f7,
     __button--hover--background-color: #d0d0d0,
+    __search--background-color: $white-100,
+    __search--color: $ink-90,
+    __search--border-color: #ccc,
     __separator--color: #cccccc,
     __text--color: $grey-90-a80,
   ),
   dark: (
     __button--background-color: #323234,
     __button--hover--background-color: #5b5b5d,
+    __search--background-color: $dark-awesome-bar-background,
+    __search--color: $white-100,
+    __search--border-color: $dark-awesome-bar-background,
     __separator--color: $grey-90-a80,
     __text--color: #d0d0d0,
   )
@@ -535,12 +559,21 @@ $action-strip__themes: (
     flex: 0;
   }
 
-  &__empty {
-    flex: 1;
-  }
-
   &__button-text {
     padding-left: 4px;
+  }
+
+  &__search {
+    flex: 0;
+    padding: 4px 8px;
+    margin: 4px;
+    border-radius: $photon-border-radius;
+    max-width: 50%;
+  }
+
+  &__spacer {
+    flex: 1;
+    height: 32px;
   }
 
   @each $theme, $colors in $action-strip__themes {
@@ -558,39 +591,44 @@ $action-strip__themes: (
         color: map-get( $colors, __text--color );
       }
 
-      &__icon {
+      &__button-icon {
         fill: map-get( $colors, __text--color );
+      }
+
+      &__search {
+        background-color: map-get( $colors, __search--background-color );
+        color: map-get( $colors, __search--color );
+        border: 1px solid map-get( $colors, __search--border-color );
+      }
+
+      &__spacer {
+        background-color: map-get( $colors, __button--background-color );
       }
     }
   }
 }
-
-/*
-.sidebar-header-search {
-  flex: 0;
-  padding: 4px 8px;
-  margin: 4px;
-  border-radius: $photon-border-radius;
-  max-width: 50%;
-}
-*/
 
 // =============================================================================
 // Pinned Tab List
 // =============================================================================
 
 // @todo use photon colors
-$pinned-tab-list--light__item--background-color: #e3e4e6 !default;
-$pinned-tab-list--light__item--active--background-color: #f5f6f7 !default;
-$pinned-tab-list--light__ink--color: $grey-90-a80 !default;
-$pinned-tab-list--light__ink--hover--color: $light-header-hover-background !default;
-$pinned-tab-list--light__ink--active--color: $blue-50 !default;
-
-$pinned-tab-list--dark__item--background-color: #0c0c0d !default;
-$pinned-tab-list--dark__item--active--background-color: #323234 !default;
-$pinned-tab-list--dark__ink--color: #545455 !default;
-$pinned-tab-list--dark__ink--hover--color: #252526 !default;
-$pinned-tab-list--dark__ink--active--color: $blue-50 !default;
+$pinned-tab-list__themes: (
+  light: (
+    __item--background-color: #e3e4e6,
+    __item--active--background-color: #f5f6f7,
+    __ink--color: $grey-90-a80,
+    __ink--hover--color: $light-header-hover-background,
+    __ink--active--color: $blue-50,
+  ),
+  dark: (
+    __item--background-color: #0c0c0d,
+    __item--active--background-color: #323234,
+    __ink--color: #545455,
+    __ink--hover--color: #252526,
+    __ink--active--color: $blue-50,
+  )
+);
 
 // @todo may be tab-list--pinned or plural tabs
 // @todo fix active state
@@ -603,7 +641,7 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
 
   &__item {
     padding-top: 1px;
-    margin-left: -3px;
+    margin-left: -1px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -614,6 +652,7 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
   &__ink {
     min-width: 1px;
     height: 24px;
+    margin-left: -1px;
   }
 
   &__tab {
@@ -632,83 +671,44 @@ $pinned-tab-list--dark__ink--active--color: $blue-50 !default;
     }
   }
 
-  &--light {
-    &__item {
-      &:hover {
-        border-right-color: $pinned-tab-list--light__ink--color;
-        border-left-color: $pinned-tab-list--light__ink--color;
-        background-color: $pinned-tab-list--light__ink--hover--color;
-      }
-
-      &--active {
-        border-left-color: $pinned-tab-list--light__item--background-color;
-        background-color: $pinned-tab-list--light__item--active--background-color;
-
+  @each $theme, $colors in $pinned-tab-list__themes {
+    &--#{$theme} {
+      &__item {
         &:hover {
-          border-left-color: $pinned-tab-list--light__item--background-color;
-          background-color: $pinned-tab-list--light__item--active--background-color;
+          border-right: solid 1px map-get( $colors, __ink--color );
+          border-left: solid 1px map-get( $colors, __ink--color );
+          background-color: map-get( $colors, __ink--hover--color );
+        }
+
+        &--active {
+          border-left: solid 1px map-get( $colors, __item--background-color );
+          background-color: map-get( $colors, __item--active--background-color );
+
+          &:hover {
+            border-left: solid 1px map-get( $colors, __item--background-color );
+            background-color: map-get( $colors, __item--active--background-color );
+          }
         }
       }
-    }
 
-    &__ink {
-      background-color: $pinned-tab-list--light__ink--color;
-    }
-
-    &__tab {
-      border-top-color: $pinned-tab-list--light__item--background-color;
-
-      &:hover {
-        border-top-color: $pinned-tab-list--light__ink--color;
+      &__ink {
+        background-color: map-get( $colors, __ink--color );
       }
 
-      &--active {
-        border-top-color: $pinned-tab-list--light__ink--active--color;
-        border-right-color: $pinned-tab-list--light__item--background-color;
+      &__tab {
+        border-top-color: map-get( $colors, __item--background-color );
 
         &:hover {
-          border-top-color: $pinned-tab-list--light__ink--active--color;
+          border-top-color: map-get( $colors, __ink--color );
         }
-      }
-    }
-  }
 
-  &--dark {
-    &__item {
-      &:hover {
-        border-right: solid 1px $pinned-tab-list--dark__ink--color;
-        border-left: solid 1px $pinned-tab-list--dark__ink--color;
-        background-color: $pinned-tab-list--dark__ink--hover--color;
-      }
+        &--active {
+          border-top-color: map-get( $colors, __ink--active--color );
+          border-right: solid 1px map-get( $colors, __item--background-color );
 
-      &--active {
-        border-left: solid 1px $pinned-tab-list--dark__item--background-color;
-        background-color: $pinned-tab-list--dark__item--active--background-color;
-
-        &:hover {
-          border-left: solid 1px $pinned-tab-list--dark__item--background-color;
-          background-color: $pinned-tab-list--dark__item--active--background-color;
-        }
-      }
-    }
-
-    &__ink {
-      background-color: $pinned-tab-list--dark__ink--color;
-    }
-
-    &__tab {
-      border-top-color: $pinned-tab-list--dark__item--background-color;
-
-      &:hover {
-        border-top-color: $pinned-tab-list--dark__ink--color;
-      }
-
-      &--active {
-        border-top-color: $pinned-tab-list--dark__ink--active--color;
-        border-right: solid 1px $pinned-tab-list--dark__item--background-color;
-
-        &:hover {
-          border-top-color: $pinned-tab-list--dark__ink--active--color;
+          &:hover {
+            border-top-color: map-get( $colors, __ink--active--color );
+          }
         }
       }
     }
@@ -820,6 +820,14 @@ $tab-group-list-item-header__themes: (
   justify-content: flex-start;
   align-items: stretch;
   overflow-y: auto;
+}
+
+.light .sidebar-tab-group-list {
+  border-top: solid 1px $grey-90-a80;
+}
+
+.dark .sidebar-tab-group-list {
+  border-top: solid 1px #545455;
 }
 
 .sidebar-tab-group-list-item {
@@ -1064,12 +1072,6 @@ button.more {
   &.sidebar {
     color: $white-100;
     background-color: $dark-header-background;
-  }
-
-  .sidebar-header-search {
-    background-color: $dark-awesome-bar-background;
-    color: $white-100;
-    border: none;
   }
 
   .sidebar-tab-group-tabs-list {
