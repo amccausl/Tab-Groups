@@ -38,12 +38,7 @@
             <svg v-if="sidebar_tab_display !== 'none'" class="carat-icon" :class="{ open: tab_group.open }" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
               <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
             </svg>
-            <span v-if="rename_tab_group_id === tab_group.id" class="tab-group-list-item-header__title tab-group-list-item-header__title--editing" :ref="title"
-                contenteditable="true" spellcheck="false" @click.stop @focus="onTabGroupTitleFocus( $event, tab_group )" @blur="onTabGroupTitleBlur( $event, tab_group )" @keyup.enter="onTabGroupTitlePressEnter( $event, tab_group )"
-            >{{ tab_group.title }}</span>
-            <span v-else class="tab-group-list-item-header__title">
-              {{ tab_group.title }}
-            </span>
+            <editable v-model="tab_group.title" @input="onTabGroupTitleInput( $event, tab_group )" :active="rename_tab_group_id === tab_group.id"></editable>
 
             <svg v-if="tab_group.muted" class="audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <g :fill="context_fill">
@@ -160,11 +155,13 @@ import {
   INK_90,
 } from './photon-colors'
 
+import Editable from './Editable.vue'
 import TabIcon from './TabIcon.vue'
 
 export default {
   name: 'sidebar',
   components: {
+    Editable,
     TabIcon,
   },
   data() {
@@ -381,26 +378,12 @@ export default {
         }
       }
     },
-    onTabGroupTitleFocus( event, tab_group ) {
-      console.info('onTabGroupTitleFocus', event, tab_group)
-      const range = document.createRange()
-      range.selectNodeContents( event.target )
-      const sel = window.getSelection()
-      sel.removeAllRanges()
-      sel.addRange( range )
-    },
-    onTabGroupTitlePressEnter( event, tab_group ) {
-      console.info('onTabGroupTitlePressEnter', event)
-      event.preventDefault()
-      event.target.textContent = event.target.textContent.replace( /\n/g, '' )
-      event.currentTarget.blur()
-      window.getSelection().removeAllRanges()
-    },
-    onTabGroupTitleBlur( event, tab_group ) {
-      console.info('onTabGroupTitleBlur', event, event.target.textContent)
+    onTabGroupTitleInput( title, tab_group ) {
+      console.info('onTabGroupTitleInput', title, tab_group)
+      // Update interferes with the editable div if it happens too quickly
       this.rename_tab_group_id = null
       // @todo skip if empty, reset
-      window.store.dispatch( updateGroupAction( tab_group.id, this.window_id, { title: event.target.textContent } ) )
+      window.store.dispatch( updateGroupAction( tab_group.id, this.window_id, { title } ) )
     },
     onUpdateSearchText: debounce( function( search_text ) {
       console.info('runSearch', search_text)
@@ -895,7 +878,8 @@ button.more {
     }
 
     &-hotkey {
-      text-decoration: underline;
+      // @todo add this once support is added, not MVP
+      // text-decoration: underline;
     }
   }
 }
