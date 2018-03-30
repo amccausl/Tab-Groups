@@ -1,63 +1,62 @@
 <template>
   <body class="sidebar" :class="theme">
-    <div :class="[ `action-strip`, `action-strip--${ theme }` ]">
-      <input v-if="is_search_enabled" :class="[ `action-strip__search`, `action-strip--${ theme }__search` ]" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/>
-      <div v-else :class="[ `action-strip__spacer`, `action-strip--${ theme }__spacer` ]"></div>
-      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button`, `action-strip__button--no-grow` ]" @click="openOptionsPage()">
-        <svg :class="[ `action-strip__button-icon`, `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+    <div :class="[ `action-strip--${ theme }` ]">
+      <input v-if="is_search_enabled" :class="[ `action-strip--${ theme }__search` ]" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/>
+      <div v-else :class="[ `action-strip--${ theme }__spacer` ]"></div>
+      <div :class="[ `action-strip--${ theme }__button`, `action-strip--${ theme }__button--no-grow` ]" @click="openOptionsPage()">
+        <svg :class="[ `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
         </svg>
       </div>
     </div>
-    <div v-if="show_pinned_tabs" :class="[ `pinned-tab-list`, `pinned-tab-list--${ theme }` ]" @click.right.prevent>
+    <div v-if="show_pinned_tabs" :class="[ `pinned-tab-list--${ theme }` ]" @click.right.prevent>
       <div v-for="pinned_tab in pinned_tabs" :key="pinned_tab.id"
-          :class="[ `pinned-tab-list__item`, `pinned-tab-list--${ theme }__item`, { 'pinned-tab-list__item--active': pinned_tab.active, selected: isSelected( pinned_tab ) } ]"
+          :class="[ `pinned-tab-list--${ theme }__item`, pinned_tab.active ? `pinned-tab-list--${ theme }__item--active` : '', isSelected( pinned_tab ) ? `pinned-tab-list--${ theme }__item--selected` : '' ]"
           :title="pinned_tab.title"
           @click.ctrl="toggleTabSelection( pinned_tab )" @click.exact="openTab( pinned_tab.id )" @click.middle="closeTab( pinned_tab )"
       >
-        <span :class="[ `pinned-tab-list__ink`, `pinned-tab-list--${ theme }__ink` ]"></span>
-        <div :class="[ `pinned-tab-list__tab`, `pinned-tab-list--${ theme }__tab`, pinned_tab.active ? `pinned-tab-list--${ theme }__tab--active` : `` ]">
+        <span :class="[ `pinned-tab-list--${ theme }__ink` ]"></span>
+        <div :class="[ `pinned-tab-list--${ theme }__tab` ]">
           <tab-icon :theme="theme" :tab="pinned_tab"></tab-icon>
           <!-- @todo fade styling for pinned tabs if search -->
           <!-- https://design.firefox.com/favicon.ico -->
-          <div v-if="pinned_tab.context_id" class="pinned-tab-list__tab-context" :style="context_styles[ pinned_tab.context_id ]"></div>
+          <div v-if="pinned_tab.context_id" :class="[ `pinned-tab-list--${ theme }__tab-context` ]" :style="context_styles[ pinned_tab.context_id ]"></div>
         </div>
-        <span :class="[ `pinned-tab-list__ink` ]"></span>
+        <!-- Add a span to fix centering for tab content -->
       </div>
     </div>
-    <div class="sidebar-tab-group-list" @click.right.prevent>
-      <div class="sidebar-tab-group-list-item tab-group-item"
-          :class="[ ! tab_group.open && active_tab_group_id === tab_group.id ? 'tab-group-item--active' : '' ]"
+    <div :class="[ `sidebar-tab-group-list--${ theme }` ]" @click.right.prevent>
+      <div :class="[ `sidebar-tab-group-list--${ theme }__item`, `tab-group-item`, ! tab_group.open && active_tab_group_id === tab_group.id ? 'tab-group-item--active' : '' ]"
           v-for="tab_group in tab_groups" :key="tab_group.id"
       >
-        <div :class="[ `tab-group-list-item-header`, `tab-group-list-item-header--${ theme }`, active_tab_group_id === tab_group.id ? `tab-group-list-item-header--active` : `` ]"
+        <div :class="[ `tab-group-list-item-header--${ theme }`, active_tab_group_id === tab_group.id ? `tab-group-list-item-header--active` : `` ]"
             v-on:click="onTabGroupClick( tab_group )"
             @dragenter="onTabGroupDragEnter( $event, tab_group )" @dragover="onTabGroupDragOver( $event, tab_group )" @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
         >
-          <div :class="[ `tab-group-list-item-header__main`, `tab-group-list-item-header--${ theme }__main` ]">
-            <svg v-if="sidebar_tab_display !== 'none'" class="carat-icon" :class="{ open: tab_group.open }" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
+          <div :class="[ `tab-group-list-item-header--${ theme }__main` ]">
+            <svg v-if="sidebar_tab_display !== 'none'" :class="[ `tab-group-list-item-header--${ theme }__carat-icon`, tab_group.open ? `tab-group-list-item-header--${ theme }__carat-icon--open` : `` ]" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
               <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
             </svg>
-            <div :class="[ `tab-group-list-item-header__title`, `tab-group-list-item-header--${ theme }__title`, rename_tab_group_id === tab_group.id ? `tab-group-list-item-header--${ theme }__title--editing` : `` ]">
-              <editable class="tab-group-list-item-header__title-editable" v-model="tab_group.title" @input="onTabGroupTitleInput( $event, tab_group )" :active="rename_tab_group_id === tab_group.id"></editable>
+            <div :class="[ `tab-group-list-item-header--${ theme }__title`, rename_tab_group_id === tab_group.id ? `tab-group-list-item-header--${ theme }__title--editing` : `` ]">
+              <editable :class="[ `tab-group-list-item-header--${ theme }__title-editable` ]" v-model="tab_group.title" @input="onTabGroupTitleInput( $event, tab_group )" :active="rename_tab_group_id === tab_group.id"></editable>
             </div>
 
-            <svg v-if="tab_group.muted" class="audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <svg v-if="tab_group.muted" :class="[ `tab-group-list-item-header--${ theme }__icon`, `tab-group-list-item-header--${ theme }__icon--audio-mute` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <g :fill="context_fill">
                 <path d="M13 8a2.813 2.813 0 0 0-.465-1.535l-.744.744A1.785 1.785 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
                 <path d="M13.273 5.727A3.934 3.934 0 0 1 14 8a3.984 3.984 0 0 1-2.742 3.775.5.5 0 0 0 .316.949A4.985 4.985 0 0 0 15 8a4.93 4.93 0 0 0-1.012-2.988zm-4.603 7.99a.2.2 0 0 0 .33-.152V10l-2.154 2.154zm6.037-12.424a1 1 0 0 0-1.414 0L9 5.586V2.544a.25.25 0 0 0-.413-.19L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618a2.186 2.186 0 0 0 1.659 2.118l-2.366 2.366a1 1 0 1 0 1.414 1.414l12-12a1 1 0 0 0 0-1.414z"></path>
               </g>
             </svg>
-            <svg v-else-if="tab_group.audible" class="audio-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <svg v-else-if="tab_group.audible" :class="[ `tab-group-list-item-header--${ theme }__icon`, `tab-group-list-item-header--${ theme }__icon--audio` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <g :fill="context_fill">
                 <path d="M8.587 2.354L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618A2.191 2.191 0 0 0 4.191 11H5.5l3.17 2.717a.2.2 0 0 0 .33-.152V2.544a.25.25 0 0 0-.413-.19zm2.988.921a.5.5 0 0 0-.316.949 3.97 3.97 0 0 1 0 7.551.5.5 0 0 0 .316.949 4.971 4.971 0 0 0 0-9.449z"></path>
                 <path d="M13 8a3 3 0 0 0-2.056-2.787.5.5 0 1 0-.343.939A2.008 2.008 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
               </g>
             </svg>
 
-            <span class="tab-group-list-item-header__tabs-count">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
+            <span :class="[ `tab-group-list-item-header--${ theme }__tabs-count` ]">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
           </div>
-          <button :class="[ `tab-group-list-item-header__more-button`, `tab-group-list-item-header--${ theme }__more-button` ]" @click.stop="openTabGroupMore( $event, tab_group )">
+          <button :class="[ `tab-group-list-item-header--${ theme }__more-button` ]" @click.stop="openTabGroupMore( $event, tab_group )">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <path :fill="context_fill" d="M2 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"></path>
             </svg>
@@ -88,7 +87,7 @@
         </div>
       </div>
     </div>
-    <div :class="[ `empty-dropzone`, `empty-dropzone--${ theme }`, target_tab_group_new ? `empty-dropzone--${ theme }--active` : `` ]"
+    <div :class="[ `empty-dropzone--${ theme }`, target_tab_group_new ? `empty-dropzone--${ theme }--active` : `` ]"
           @dragenter="onTabGroupDragEnter( $event )" @dragleave="onTabGroupDragLeave( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
     >
       <!-- @todo disabled because looks odd on drop for full scrolling size, will revisit -->
@@ -96,15 +95,15 @@
         <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
       </svg> -->
     </div>
-    <div :class="[ `action-strip`, `action-strip--${ theme }` ]">
-      <div :class="[ `action-strip__button`, `action-strip--${ theme }__button`, target_tab_group_new ? `action-strip--${ theme }__button--active` : `` ]"
+    <div :class="[ `action-strip--${ theme }` ]">
+      <div :class="[ `action-strip--${ theme }__button`, target_tab_group_new ? `action-strip--${ theme }__button--active` : `` ]"
           @click.left="createTabGroup()" @click.right.prevent
           @dragenter="onTabGroupDragEnter( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
       >
-        <svg :class="[ `action-strip__button-icon`, `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+        <svg :class="[ `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
         </svg>
-        <span :class="[ `action-strip__button-text`, `action-strip--${ theme }__button-text` ]">{{ __MSG_tab_group_new__ }}</span>
+        <span :class="[ `action-strip--${ theme }__button-text` ]">{{ __MSG_tab_group_new__ }}</span>
       </div>
     </div>
     <div v-if="tab_group_context_menu.open" class="context-menu__ctx" @click="closeTabGroupMore" @click.right="closeTabGroupMore"></div>
@@ -464,35 +463,32 @@ $empty-dropzone__themes: (
   )
 );
 
-.empty-dropzone {
-  @extend %slow-transition;
-  transition-property: background-color;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: transparent;
-
-  &__icon {
+@each $theme, $colors in $empty-dropzone__themes {
+  .empty-dropzone--#{$theme} {
     @extend %slow-transition;
-    transition-property: opacity;
-    display: none; // Remove the spacer when not required (list is full)
-    opacity: 0;
-  }
+    transition-property: background-color;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    background-color: map-get( $colors, --background-color );
 
-  @each $theme, $colors in $empty-dropzone__themes {
-    &--#{$theme} {
-      background-color: map-get( $colors, --background-color );
+    &--active {
+      background-color: map-get( $colors, --active--background-color );
+      fill: map-get( $colors, --active--color );
+    }
 
-      &--active {
-        background-color: map-get( $colors, --active--background-color );
-        fill: map-get( $colors, --active--color );
-      }
+    &__icon {
+      @extend %slow-transition;
+      transition-property: opacity;
+      display: none; // Remove the spacer when not required (list is full)
+      opacity: 0;
+    }
 
-      &--active &__icon {
-        display: block;
-        opacity: 1;
-      }
+    &--active &__icon {
+      display: block;
+      opacity: 1;
     }
   }
 }
@@ -522,74 +518,60 @@ $action-strip__themes: (
   )
 );
 
-.action-strip {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: stretch;
-  height: 32px;
-  border-bottom: solid 1px transparent;
-
-  &__button {
-    @extend %slow-transition;
-    transition-property: background-color;
-    flex: 1;
+@each $theme, $colors in $action-strip__themes {
+  .action-strip--#{$theme} {
     display: flex;
-    align-items: center;
-    padding: 0 8px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
     height: 32px;
-    cursor: pointer;
-  }
+    border-bottom: solid 1px transparent;
 
-  &__button--no-grow {
-    flex: 0;
-  }
+    &__button {
+      @extend %slow-transition;
+      transition-property: background-color;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      height: 32px;
+      cursor: pointer;
+      background-color: map-get( $colors, __button--background-color );
 
-  &__button-text {
-    padding-left: 4px;
-  }
-
-  &__search {
-    flex: 0;
-    padding: 4px 8px;
-    margin: 4px;
-    border-radius: $photon-border-radius;
-    max-width: 50%;
-  }
-
-  &__spacer {
-    flex: 1;
-    height: 32px;
-  }
-
-  @each $theme, $colors in $action-strip__themes {
-    &--#{$theme} {
-      &__button {
-        background-color: map-get( $colors, __button--background-color );
-
-        &:hover,
-        &--active {
-          background-color: map-get( $colors, __button--hover--background-color );
-        }
+      &--no-grow {
+        flex: 0;
       }
 
-      &__button-text {
-        color: map-get( $colors, __text--color );
+      &:hover,
+      &--active {
+        background-color: map-get( $colors, __button--hover--background-color );
       }
+    }
 
-      &__button-icon {
-        fill: map-get( $colors, __text--color );
-      }
+    &__button-text {
+      padding-left: 4px;
+      color: map-get( $colors, __text--color );
+    }
 
-      &__search {
-        background-color: map-get( $colors, __search--background-color );
-        color: map-get( $colors, __search--color );
-        border: 1px solid map-get( $colors, __search--border-color );
-      }
+    &__button-icon {
+      fill: map-get( $colors, __text--color );
+    }
 
-      &__spacer {
-        background-color: map-get( $colors, __button--background-color );
-      }
+    &__search {
+      flex: 0;
+      padding: 4px 8px;
+      margin: 4px;
+      border-radius: $photon-border-radius;
+      max-width: 50%;
+      background-color: map-get( $colors, __search--background-color );
+      color: map-get( $colors, __search--color );
+      border: 1px solid map-get( $colors, __search--border-color );
+    }
+
+    &__spacer {
+      flex: 1;
+      height: 32px;
+      background-color: map-get( $colors, __button--background-color );
     }
   }
 }
@@ -598,13 +580,15 @@ $action-strip__themes: (
 // Pinned Tab List
 // =============================================================================
 
+$pinned-tab-list__item--width: 40px;
+
 // @todo use photon colors
 $pinned-tab-list__themes: (
   light: (
     __item--background-color: #e3e4e6,
     __item--active--background-color: #f5f6f7,
-    __ink--color: $grey-90-a80,
-    __ink--hover--color: $light-header-hover-background,
+    __ink--color: #a5a6a7,
+    __ink--hover--color: #cccdcf,
     __ink--active--color: $blue-50,
   ),
   dark: (
@@ -619,84 +603,75 @@ $pinned-tab-list__themes: (
 // @todo may be tab-list--pinned or plural tabs
 // @todo fix active state
 
-.pinned-tab-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 40px);
-  grid-auto-columns: min-content;
-  grid-auto-rows: max-content;
+@each $theme, $colors in $pinned-tab-list__themes {
+  .pinned-tab-list--#{$theme} {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, $pinned-tab-list__item--width);
+    grid-auto-columns: min-content;
+    grid-auto-rows: max-content;
+    background-color: map-get( $colors, __item--background-color );
 
-  &__item {
-    padding-top: 1px;
-    margin-left: -1px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-right: solid 1px transparent;
-    border-left: solid 1px transparent;
-  }
+    &__item {
+      margin-left: -1px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      border-right: solid 1px transparent;
+      border-left: solid 1px transparent;
+      border-top: solid 1px transparent;
+      cursor: pointer;
 
-  &__ink {
-    min-width: 1px;
-    height: 24px;
-    margin-left: -1px;
-  }
-
-  &__tab {
-    padding: 6px 8px 6px 7px;
-    border-top: solid 2px transparent;
-    border-right: solid 1px transparent;
-    cursor: pointer;
-
-    &:hover {
-      z-index: 10;
-    }
-
-    &--active {
-      z-index: 5;
-      cursor: none;
-    }
-  }
-
-  @each $theme, $colors in $pinned-tab-list__themes {
-    &--#{$theme} {
-      &__item {
-        &:hover {
-          border-right: solid 1px map-get( $colors, __ink--color );
-          border-left: solid 1px map-get( $colors, __ink--color );
-          background-color: map-get( $colors, __ink--hover--color );
-        }
-
-        &--active {
-          border-left: solid 1px map-get( $colors, __item--background-color );
-          background-color: map-get( $colors, __item--active--background-color );
-
-          &:hover {
-            border-left: solid 1px map-get( $colors, __item--background-color );
-            background-color: map-get( $colors, __item--active--background-color );
-          }
-        }
+      &:hover {
+        border-right-color: map-get( $colors, __ink--color );
+        border-left-color: map-get( $colors, __ink--color );
+        background-color: map-get( $colors, __ink--hover--color );
       }
 
-      &__ink {
-        background-color: map-get( $colors, __ink--color );
-      }
-
-      &__tab {
+      &--active {
+        cursor: none;
         border-top-color: map-get( $colors, __item--background-color );
+        border-right-color: map-get( $colors, __ink--color );
+        border-left-color: map-get( $colors, __ink--color );
+        background-color: map-get( $colors, __item--active--background-color );
 
         &:hover {
-          border-top-color: map-get( $colors, __ink--color );
-        }
-
-        &--active {
-          border-top-color: map-get( $colors, __ink--active--color );
-          border-right: solid 1px map-get( $colors, __item--background-color );
-
-          &:hover {
-            border-top-color: map-get( $colors, __ink--active--color );
-          }
+          border-top-color: map-get( $colors, __item--background-color );
+          border-left-color: map-get( $colors, __ink--color );
+          background-color: map-get( $colors, __item--active--background-color );
         }
       }
+    }
+
+    &__ink {
+      min-width: 1px;
+      height: 24px;
+      margin-left: -1px;
+      background-color: map-get( $colors, __ink--color );
+    }
+
+    &__tab {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      width: $pinned-tab-list__item--width;
+      padding: 6px 0;
+      border-top: solid 2px transparent;
+      border-top-color: map-get( $colors, __item--background-color );
+    }
+
+    &__item--active &__tab {
+      z-index: 5;
+      border-top-color: map-get( $colors, __ink--active--color );
+    }
+
+    &__item:hover &__tab {
+      z-index: 10;
+      border-top-color: map-get( $colors, __ink--color );
+    }
+
+    &__item--active:hover &__tab {
+      border-top-color: map-get( $colors, __ink--active--color );
     }
   }
 }
@@ -720,148 +695,158 @@ $tab-group-list-item-header__themes: (
   )
 );
 
-.tab-group-list-item-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  position: sticky;
-
-  &:hover {
-    cursor: pointer;
-  }
-
-  &--active::before {
-    content: '';
-    background-color: $blue-50;
-    height: 32px;
-    width: 4px;
-  }
-
-  &__main {
-    padding: 7px 2px 8px;
-    flex: 1;
+@each $theme, $colors in $tab-group-list-item-header__themes {
+  .tab-group-list-item-header--#{$theme} {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-  }
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    position: sticky;
+    border-bottom: $light-border-color 1px solid;
+    background-color: map-get( $colors, --background-color );
 
-  &__title {
-    flex: 1;
-    white-space: nowrap;
-    text-overflow: clip;
-    overflow-x: hidden;
-    position: relative;
-
-    &::after {
-      content: "";
-      width: 8px;
-      padding: 8px 4px;
-      float: right;
-      position: absolute;
-      right: 0;
-      top: 0;
+    &:hover {
+      cursor: pointer;
     }
-  }
 
-  &__title-editable {
-    max-height: 16px;
-    max-width: 10px;
-  }
+    &--active::before {
+      content: '';
+      background-color: $blue-50;
+      height: 32px;
+      width: 4px;
+    }
 
-  &__tabs-count {
-    padding-left: 4px;
-    text-align: right;
-    flex-grow: 0;
-    white-space: nowrap;
-  }
-
-  &__more-button {
-    padding: 8px 4px;
-    display: flex;
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-  }
-
-  @each $theme, $colors in $tab-group-list-item-header__themes {
-    &--#{$theme} {
-      border-bottom: $light-border-color 1px solid;
+    &__main {
+      @extend %slow-transition;
+      transition-property: background-color opacity;
+      padding: 7px 2px 8px;
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
       background-color: map-get( $colors, --background-color );
 
-      &__main {
-        &:hover {
-          background-color: map-get( $colors, --hover--background-color );
-        }
-      }
-
-      &__title {
-        &::after {
-          background: linear-gradient( to right, rgba( map-get( $colors, --background-color ), 0 ), rgba( map-get( $colors, --background-color ), 1 ) );
-        }
-
-        // Reset the fade out while the field is editing to prevent odd gradient display on long titles (scrollable)
-        &--editing::after {
-          background: linear-gradient( to right, rgba( map-get( $colors, --background-color ), 0 ), rgba( map-get( $colors, --background-color ), 0 ) );
-        }
-      }
-
-      &__main:hover &__title::after {
-        background: linear-gradient( to right, rgba( map-get( $colors, --hover--background-color ), 0 ), rgba( map-get( $colors, --hover--background-color ), 1 ) );
-      }
-
-      &__main:hover &__title--editing::after {
-        background: linear-gradient( to right, rgba( map-get( $colors, --hover--background-color ), 0 ), rgba( map-get( $colors, --hover--background-color ), 0 ) );
-      }
-
-      &__more-button {
-        &:hover {
-          background-color: map-get( $colors, --hover--background-color );
-        }
+      &:hover {
+        background-color: map-get( $colors, --hover--background-color );
       }
     }
 
-    &--#{$theme} &__tabs-count {
-      color: map-get( $colors, secodary-text--color )
+    &__title {
+      flex: 1;
+      white-space: nowrap;
+      text-overflow: clip;
+      overflow-x: hidden;
+      position: relative;
+
+      &::after {
+        @extend %slow-transition;
+        transition-property: background-color opacity;
+        content: "";
+        width: 8px;
+        padding: 8px 4px;
+        float: right;
+        position: absolute;
+        right: 0;
+        top: 0;
+        background: linear-gradient( to right, rgba( map-get( $colors, --background-color ), 0 ), rgba( map-get( $colors, --background-color ), 1 ) );
+      }
+
+      // Reset the fade out while the field is editing to prevent odd gradient display on long titles (scrollable)
+      &--editing::after {
+        background: linear-gradient( to right, rgba( map-get( $colors, --background-color ), 0 ), rgba( map-get( $colors, --background-color ), 0 ) );
+      }
     }
+
+    &__title-editable {
+      max-height: 16px;
+      max-width: 10px;
+    }
+
+    &__main:hover &__title::after {
+      background: linear-gradient( to right, rgba( map-get( $colors, --hover--background-color ), 0 ), rgba( map-get( $colors, --hover--background-color ), 1 ) );
+    }
+
+    &__main:hover &__title--editing::after {
+      background: linear-gradient( to right, rgba( map-get( $colors, --hover--background-color ), 0 ), rgba( map-get( $colors, --hover--background-color ), 0 ) );
+    }
+
+    &__tabs-count {
+      padding-left: 4px;
+      text-align: right;
+      flex-grow: 0;
+      white-space: nowrap;
+    }
+
+    &__icon {
+      height: 16px;
+      width: 16px;
+      margin-right: 4px;
+    }
+
+    &__carat-icon {
+      @extend %slow-transition;
+      transition-property: transform;
+      width: 6px;
+      margin-right: 4px;
+      margin-bottom: 1px;
+      fill: map-get( $colors, primary-text--color );
+
+      &--open {
+        transform: rotate(90deg);
+      }
+    }
+
+    &__more-button {
+      @extend %slow-transition;
+      transition-property: background-color;
+      padding: 8px 4px;
+      display: flex;
+      border: none;
+      background-color: transparent;
+      cursor: pointer;
+
+      &:hover {
+        background-color: map-get( $colors, --hover--background-color );
+      }
+    }
+  }
+
+  &--#{$theme} &__tabs-count {
+    color: map-get( $colors, secodary-text--color );
   }
 }
 
 // =============================================================================
-// Tab List
+// Tab Group List
 // =============================================================================
 
-.sidebar-tab-group-list {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-  overflow-y: auto;
-}
+$sidebar-tab-group-list__themes: (
+  light: (
+    separator--color: #e0e0e1,
+  ),
+  dark: (
+    separator--color: #545455,
+  )
+);
 
-.light .sidebar-tab-group-list {
-  border-top: solid 1px $grey-90-a80;
-}
+@each $theme, $colors in $sidebar-tab-group-list__themes {
+  .sidebar-tab-group-list--#{$theme} {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    overflow-y: auto;
+    border-top: solid 1px map-get( $colors, separator--color )
 
-.dark .sidebar-tab-group-list {
-  border-top: solid 1px #545455;
-}
-
-.sidebar-tab-group-list-item {
-  flex: 0;
-}
-
-button.more {
-  display: flex;
-  margin: 0 0 0 4px;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
+    &__item {
+      flex: 0;
+    }
+  }
 }
 
 // =============================================================================
@@ -947,31 +932,40 @@ button.more {
     background-color: purple;
   }
 
+  &.source {
+    display: none;
+  }
+
   &.source .sidebar-tab-view-item {
     margin-left: 8px;
   }
 
-  &.target {
-    background-color: red;
-
-    .sidebar-tab-view-item {
-      margin-top: 54px;
-    }
+  &.target .sidebar-tab-view-item {
+    margin-top: 54px;
   }
 }
 
 .sidebar-tab-view-item {
   @extend %slow-transition;
-  transition-property: margin-top, margin-left;
-}
-
-.sidebar-tab-view-item {
+  transition-property: margin-top margin-left background-color;
   display: flex;
   align-items: center;
   width: 100%;
   white-space: nowrap;
   text-overflow: clip;
   cursor: pointer;
+  position: relative;
+
+  &::after {
+    content: "";
+    height: 32px;
+    width: 8px;
+    padding: 8px 4px;
+    float: right;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
 }
 
 .sidebar-tab-view-item-icon {
@@ -1014,18 +1008,6 @@ button.more {
   margin-right: 4px;
 }
 
-.carat-icon {
-  width: 6px;
-  margin-right: 4px;
-  margin-bottom: 1px;
-  @extend %slow-transition;
-  transition-property: transform;
-}
-
-.carat-icon.open {
-  transform: rotate(90deg);
-}
-
 .light {
   &.sidebar {
     color: $ink-90;
@@ -1050,22 +1032,6 @@ button.more {
     background-color: $white-100;
   }
 
-  .pinned-tab-list-item.active {
-    background-color: $light-header-active-background;
-  }
-
-  .pinned-tab-list-item:hover {
-    background-color: $light-header-hover-background;
-  }
-
-  .pinned-tab-list-item.active:hover {
-    background-color: $light-header-active-background;
-  }
-
-  button.more:hover {
-    background-color: $light-header-hover-background;
-  }
-
   .sidebar-tab-view-item.active {
     background-color: $light-header-active-background;
   }
@@ -1084,10 +1050,6 @@ button.more {
 
   .sidebar-tab-view-item-url {
     color: $grey-50;
-  }
-
-  .carat-icon {
-    fill: black;
   }
 }
 
@@ -1113,22 +1075,6 @@ button.more {
     background-color: $dark-header-active-background;
   }
 
-  button.more:hover {
-    background-color: $dark-header-hover-background;
-  }
-
-  .pinned-tab-list-item.active {
-    background-color: $dark-header-active-background;
-  }
-
-  .pinned-tab-list-item:hover {
-    background-color: $dark-header-hover-background;
-  }
-
-  .pinned-tab-list-item.active:hover {
-    background-color: $dark-header-active-background;
-  }
-
   .sidebar-tab-view-item.active {
     background-color: $dark-header-active-background;
   }
@@ -1151,10 +1097,6 @@ button.more {
 
   .sidebar-tab-view-item-url {
     color: $grey-50;
-  }
-
-  .carat-icon {
-    fill: $white-100;
   }
 }
 </style>

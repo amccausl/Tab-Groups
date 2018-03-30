@@ -1,6 +1,6 @@
 <template>
   <div class="tab-icon">
-    <img class="tab-icon__img" :src="tab.icon_url" @error="onIconLoadError"/>
+    <img class="tab-icon__img" :src="icon_url" :data-size="size" @error="onIconLoadError"/>
     <svg v-if="tab.muted" class="tab-icon__state audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
         @click.prevent="unmuteTab( $event, tab.id )"
     >
@@ -24,11 +24,10 @@
 import {
   INK_90,
 } from './photon-colors'
-// @todo size as parameter
 
 export default {
   name: 'tab-icon',
-  props: [ 'theme', 'tab' ],
+  props: [ 'theme', 'tab', 'size' ],
   data() {
     return {
       window_id: window.current_window_id,
@@ -42,7 +41,18 @@ export default {
         default:
           return INK_90
       }
-    }
+    },
+    icon_url() {
+      switch( this.tab.icon_url ) {
+        case 'chrome://mozapps/skin/extensions/extensionGeneric-16.svg':
+          return '/icons/extensionGeneric.svg'
+        case 'chrome://branding/content/icon32.png':
+          if( this.theme === 'dark' ) {
+            return `/icons/firefox-logo-glyph.svg`
+          }
+      }
+      return this.tab.icon_url
+    },
   },
   created() {
   },

@@ -644,7 +644,7 @@ export function moveTab( state, { tab_id, window_id, index } ) {
     index,
   }
 
-  if( source_tab_group_data.group_id !== 0 ) {
+  if( source_tab_group_data.group_id == null || source_tab_group_data.group_id !== 0 ) {
     target_data.pinned = false
   }
 

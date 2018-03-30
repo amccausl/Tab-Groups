@@ -287,14 +287,7 @@ export function getTabState( browser_tab ) {
 
 function getIconUrl( browser_tab ) {
   if( browser_tab.favIconUrl != null ) {
-    switch( browser_tab.favIconUrl ) {
-      case 'chrome://mozapps/skin/extensions/extensionGeneric-16.svg':
-        return '/icons/extensionGeneric.svg'
-      case 'chrome://branding/content/icon32.png':
-        return '/icons/firefox-logo-glyph.svg'
-      default:
-        return browser_tab.favIconUrl
-    }
+    return browser_tab.favIconUrl
   }
 }
 

@@ -68,6 +68,7 @@ export function getTransferData( data_transfer ) {
 
 export function resetDragState() {
   this.is_dragging = false
+  this.target_tab_group_new = false
   this.target_tab_group_id = null
   this.target_tab_group_index = null
   this.target_tab_id = null
