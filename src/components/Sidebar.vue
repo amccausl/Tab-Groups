@@ -30,15 +30,17 @@
           :class="[ ! tab_group.open && active_tab_group_id === tab_group.id ? 'tab-group-item--active' : '' ]"
           v-for="tab_group in tab_groups" :key="tab_group.id"
       >
-        <div :class="[ 'tab-group-list-item-header', `tab-group-list-item-header--${ theme }`, active_tab_group_id === tab_group.id ? 'tab-group-list-item-header--active' : '' ]"
+        <div :class="[ `tab-group-list-item-header`, `tab-group-list-item-header--${ theme }`, active_tab_group_id === tab_group.id ? `tab-group-list-item-header--active` : `` ]"
             v-on:click="onTabGroupClick( tab_group )"
             @dragenter="onTabGroupDragEnter( $event, tab_group )" @dragover="onTabGroupDragOver( $event, tab_group )" @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
         >
-          <div :class="[ 'tab-group-list-item-header__main', `tab-group-list-item-header--${ theme }__main` ]">
+          <div :class="[ `tab-group-list-item-header__main`, `tab-group-list-item-header--${ theme }__main` ]">
             <svg v-if="sidebar_tab_display !== 'none'" class="carat-icon" :class="{ open: tab_group.open }" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
               <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
             </svg>
-            <editable v-model="tab_group.title" @input="onTabGroupTitleInput( $event, tab_group )" :active="rename_tab_group_id === tab_group.id"></editable>
+            <div :class="[ `tab-group-list-item-header__title`, `tab-group-list-item-header--${ theme }__title`, rename_tab_group_id === tab_group.id ? `tab-group-list-item-header--${ theme }__title--editing` : `` ]">
+              <editable class="tab-group-list-item-header__title-editable" v-model="tab_group.title" @input="onTabGroupTitleInput( $event, tab_group )" :active="rename_tab_group_id === tab_group.id"></editable>
+            </div>
 
             <svg v-if="tab_group.muted" class="audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <g :fill="context_fill">
@@ -55,7 +57,7 @@
 
             <span class="tab-group-list-item-header__tabs-count">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
           </div>
-          <button :class="[ 'tab-group-list-item-header__more-button', `tab-group-list-item-header--${ theme }__more-button` ]" @click.stop="openTabGroupMore( $event, tab_group )">
+          <button :class="[ `tab-group-list-item-header__more-button`, `tab-group-list-item-header--${ theme }__more-button` ]" @click.stop="openTabGroupMore( $event, tab_group )">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <path :fill="context_fill" d="M2 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"></path>
             </svg>
@@ -89,9 +91,10 @@
     <div :class="[ `empty-dropzone`, `empty-dropzone--${ theme }`, target_tab_group_new ? `empty-dropzone--${ theme }--active` : `` ]"
           @dragenter="onTabGroupDragEnter( $event )" @dragleave="onTabGroupDragLeave( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
     >
-      <svg :class="[ `empty-dropzone__icon`, `empty-dropzone--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
+      <!-- @todo disabled because looks odd on drop for full scrolling size, will revisit -->
+      <!-- <svg :class="[ `empty-dropzone__icon`, `empty-dropzone--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
         <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
-      </svg>
+      </svg> -->
     </div>
     <div :class="[ `action-strip`, `action-strip--${ theme }` ]">
       <div :class="[ `action-strip__button`, `action-strip--${ theme }__button`, target_tab_group_new ? `action-strip--${ theme }__button--active` : `` ]"
@@ -751,12 +754,29 @@ $tab-group-list-item-header__themes: (
     flex: 1;
     white-space: nowrap;
     text-overflow: clip;
+    overflow-x: hidden;
+    position: relative;
+
+    &::after {
+      content: "";
+      width: 8px;
+      padding: 8px 4px;
+      float: right;
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+  }
+
+  &__title-editable {
+    max-height: 16px;
+    max-width: 10px;
   }
 
   &__tabs-count {
+    padding-left: 4px;
     text-align: right;
     flex-grow: 0;
-    margin-left: 8px;
     white-space: nowrap;
   }
 
@@ -777,6 +797,25 @@ $tab-group-list-item-header__themes: (
         &:hover {
           background-color: map-get( $colors, --hover--background-color );
         }
+      }
+
+      &__title {
+        &::after {
+          background: linear-gradient( to right, rgba( map-get( $colors, --background-color ), 0 ), rgba( map-get( $colors, --background-color ), 1 ) );
+        }
+
+        // Reset the fade out while the field is editing to prevent odd gradient display on long titles (scrollable)
+        &--editing::after {
+          background: linear-gradient( to right, rgba( map-get( $colors, --background-color ), 0 ), rgba( map-get( $colors, --background-color ), 0 ) );
+        }
+      }
+
+      &__main:hover &__title::after {
+        background: linear-gradient( to right, rgba( map-get( $colors, --hover--background-color ), 0 ), rgba( map-get( $colors, --hover--background-color ), 1 ) );
+      }
+
+      &__main:hover &__title--editing::after {
+        background: linear-gradient( to right, rgba( map-get( $colors, --hover--background-color ), 0 ), rgba( map-get( $colors, --hover--background-color ), 0 ) );
       }
 
       &__more-button {

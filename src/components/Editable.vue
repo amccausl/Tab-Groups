@@ -44,6 +44,7 @@ export default {
     },
     onBlur() {
       this.$emit( 'input', this.$el.innerText.replace( /\n/g, "" ) )
+      this.$el.parentElement.scrollLeft = 0
     },
     onPressEnter() {
       this.$el.blur()
@@ -69,9 +70,6 @@ export default {
 
 // @todo some of these properties should be moved into calling context
 .editable {
-  flex: 1;
-  max-height: 16px;
-  max-width: 80vw;
   white-space: nowrap;
   text-overflow: clip;
 
