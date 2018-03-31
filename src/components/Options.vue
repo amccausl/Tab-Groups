@@ -8,66 +8,60 @@
       <nav class="sidenav">
         <ul>
           <li :class="{ 'active': selected_section === 'preferences' }">
-            <a href="javascript:void(0)" @click="selectSection( 'preferences' )">Preferences</a>
+            <a href="javascript:void(0)" @click="selectSection( 'preferences' )">{{ __MSG_options_section_preferences__ }}</a>
           </li>
           <li :class="{ 'active': selected_section === 'data' }">
-            <a href="javascript:void(0)" @click="selectSection( 'data' )">Data</a>
+            <a href="javascript:void(0)" @click="selectSection( 'data' )">{{ __MSG_options_section_data__ }}</a>
           </li>
           <li :class="{ 'active': selected_section === 'debug' }">
-            <a href="javascript:void(0)" @click="selectSection( 'debug' )">Debug</a>
+            <a href="javascript:void(0)" @click="selectSection( 'debug' )">{{ __MSG_options_section_debug__ }}</a>
           </li>
         </ul>
       </nav>
       <article class="main">
         <section v-if="selected_section === 'preferences'">
           <form @submit.prevent>
-            Theme:
+            {{ __MSG_options_theme__ }}:
             <div class="browser-style">
               <input type="radio" id="theme_light" value="light" v-model="preferences.theme" @input="selectTheme( 'light' )">
-              <label for="theme_light">Light</label>
+              <label for="theme_light">{{ __MSG_options_theme_light__ }}</label>
             </div>
             <div class="browser-style">
               <input type="radio" id="theme_dark" value="dark" v-model="preferences.theme" @input="selectTheme( 'dark' )">
-              <label for="theme_dark">Dark</label>
+              <label for="theme_dark">{{ __MSG_options_theme_dark__ }}</label>
             </div>
-            <!-- <label for="sidebar_tab_display">Sidebar Tab Display</label>
-            <select id="sidebar_tab_display" v-model="sidebar_tab_display">
-              <option value="large">Large</option>
-              <option value="small">Small</option>
-              <option value="none">None</option>
-            </select> -->
 
             <fieldset>
-              <legend>Sidebar</legend>
+              <legend>{{ __MSG_options_sidebar_legend__ }}</legend>
 
               <label class="checkbox">
                 <input class="checkbox__input" type="checkbox" v-model="show_tabs_count">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label">Show tabs count on group</span>
+                <span class="checkbox__label">{{ __MSG_options_sidebar_show_tabs_count__ }}</span>
               </label>
 
               <label class="checkbox">
                 <input class="checkbox__input" type="checkbox" v-model="show_tabs">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label">Show tabs</span>
+                <span class="checkbox__label">{{ __MSG_options_sidebar_show_tabs__ }}</span>
               </label>
 
               <label v-if="show_tabs" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_pinned_tabs">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label">Show pinned tabs</span>
+                <span class="checkbox__label">{{ __MSG_options_sidebar_show_pinned_tabs__ }}</span>
               </label>
 
               <label v-if="show_tabs" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_tab_context">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label">Show tab context</span>
+                <span class="checkbox__label">{{ __MSG_options_sidebar_show_tab_context__ }}</span>
               </label>
 
               <label v-if="show_tabs && preferences.theme === 'dark'" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_tab_icon_background">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label">Show tab icon background</span>
+                <span class="checkbox__label">{{ __MSG_options_sidebar_show_tab_icon_background__ }}</span>
               </label>
             </fieldset>
           </form>
@@ -104,7 +98,6 @@ export default {
     return {
       preferences: {
         theme: 'dark',
-        sidebar_tab_display: 'none',
         show_tabs_count: false,
         show_tabs: false,
         show_pinned_tabs: false,
@@ -115,13 +108,41 @@ export default {
     }
   },
   computed: {
-    sidebar_tab_display: {
-      get() {
-        return this.preferences.sidebar_tab_display
-      },
-      set( value ) {
-        setConfig( 'sidebar_tab_display', value )
-      }
+    __MSG_options_section_preferences__() {
+      return window.background.getMessage( "options_section_preferences" )
+    },
+    __MSG_options_section_data__() {
+      return window.background.getMessage( "options_section_data" )
+    },
+    __MSG_options_section_debug__() {
+      return window.background.getMessage( "options_section_debug" )
+    },
+    __MSG_options_theme__() {
+      return window.background.getMessage( "options_theme" )
+    },
+    __MSG_options_theme_light__() {
+      return window.background.getMessage( "options_theme_light" )
+    },
+    __MSG_options_theme_dark__() {
+      return window.background.getMessage( "options_theme_dark" )
+    },
+    __MSG_options_sidebar_legend__() {
+      return window.background.getMessage( "options_sidebar_legend" )
+    },
+    __MSG_options_sidebar_show_tabs_count__() {
+      return window.background.getMessage( "options_sidebar_show_tabs_count" )
+    },
+    __MSG_options_sidebar_show_tabs__() {
+      return window.background.getMessage( "options_sidebar_show_tabs" )
+    },
+    __MSG_options_sidebar_show_pinned_tabs__() {
+      return window.background.getMessage( "options_sidebar_show_pinned_tabs" )
+    },
+    __MSG_options_sidebar_show_tab_context__() {
+      return window.background.getMessage( "options_sidebar_show_tab_context" )
+    },
+    __MSG_options_sidebar_show_tab_icon_background__() {
+      return window.background.getMessage( "options_sidebar_show_tab_icon_background" )
     },
     show_tabs: {
       get() {

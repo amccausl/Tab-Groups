@@ -1,17 +1,77 @@
 {
   "extension_name": {
-    "message": "Tab Groups",
+    "message": "Tab Focus",
     "description": "Name of the extension."
   },
 
   "extension_description": {
-    "message": "Tab Groups are an easy way to organize a lot of tabs. You can switch between groups, and quickly search through all of your tabs to switch to a specific one.",
+    "message": "Tab Focus is an easy way to organize a lot of tabs. You can switch between groups, and quickly search through all of your tabs to switch to a specific one.",
     "description": "Description of the extension."
   },
 
   "sidebar_name": {
     "message": "Grouped Tabs",
     "description": "Name of the sidebar."
+  },
+
+  "options_section_preferences": {
+    "message": "Preferences",
+    "description": ""
+  },
+
+  "options_section_data": {
+    "message": "Data",
+    "description": ""
+  },
+
+  "options_section_debug": {
+    "message": "Debug",
+    "description": ""
+  },
+
+  "options_theme": {
+    "message": "Theme",
+    "description": ""
+  },
+
+  "options_theme_light": {
+    "message": "Light",
+    "description": ""
+  },
+
+  "options_theme_dark": {
+    "message": "Dark",
+    "description": ""
+  },
+
+  "options_sidebar_legend": {
+    "message": "Sidebar",
+    "description": ""
+  },
+
+  "options_sidebar_show_tabs_count": {
+    "message": "Show tabs count on group",
+    "description": ""
+  },
+
+  "options_sidebar_show_tabs": {
+    "message": "Show tabs",
+    "description": ""
+  },
+
+  "options_sidebar_show_pinned_tabs": {
+    "message": "Show pinned tabs",
+    "description": ""
+  },
+
+  "options_sidebar_show_tab_context": {
+    "message": "Show tab context",
+    "description": ""
+  },
+
+  "options_sidebar_show_tab_icon_background": {
+    "message": "Show tab icon background",
+    "description": ""
   },
 
   "tab_group_name_placeholder": {
