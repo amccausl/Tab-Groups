@@ -916,10 +916,12 @@ $sidebar-tab-group-list__themes: (
 }
 
 .sidebar-tab-group-tabs-list-item {
+  @extend %slow-transition;
+  transition-property: min-height;
   width: 100%;
   flex: 0;
   overflow-x: hidden;
-  min-height: 54px;
+  min-height: 52px;
 
   &.selected {
     /* @todo themed */
@@ -934,8 +936,12 @@ $sidebar-tab-group-list__themes: (
     margin-left: 8px;
   }
 
-  &.target .sidebar-tab-view-item {
-    margin-top: 54px;
+  &.target {
+    min-height: 106px;
+
+    & .sidebar-tab-view-item {
+      margin-top: 54px;
+    }
   }
 }
 
