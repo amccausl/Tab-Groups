@@ -17,7 +17,7 @@
       >
         <span :class="[ `pinned-tab-list--${ theme }__ink` ]"></span>
         <div :class="[ `pinned-tab-list--${ theme }__tab` ]">
-          <tab-icon :theme="theme" :tab="pinned_tab"></tab-icon>
+          <tab-icon :theme="theme" :tab="pinned_tab" size="16"></tab-icon>
           <!-- @todo fade styling for pinned tabs if search -->
           <!-- https://design.firefox.com/favicon.ico -->
           <div v-if="pinned_tab.context_id" :class="[ `pinned-tab-list--${ theme }__tab-context` ]" :style="context_styles[ pinned_tab.context_id ]"></div>
@@ -74,8 +74,8 @@
           >
             <div class="sidebar-tab-view-item" :class="{ active: tab.active }">
               <div class="sidebar-tab-view-item-icon">
-                <div v-if="show_tab_icon_background"></div>
-                <img :src="tab.icon_url"/>
+                <div v-if="show_tab_icon_background" class="sidebar-tab-view-item-icon-background"></div>
+                <tab-icon :theme="theme" :tab="tab" size="24"></tab-icon>
               </div>
               <div class="sidebar-tab-view-item-text">
                 <span class="sidebar-tab-view-item-title">{{ tab.title }}</span>
@@ -201,7 +201,7 @@ export default {
   },
   created() {
     onStateChange( state => {
-      this.theme = state.config.theme
+      this.theme = ( state.config.theme === 'dark' ? 'dark' : 'light' )
       this.show_tabs_count = state.config.show_tabs_count
       this.show_tabs = state.config.show_tabs
       this.show_pinned_tabs = this.show_tabs && state.config.show_pinned_tabs
@@ -968,13 +968,13 @@ $sidebar-tab-group-list__themes: (
   height: 32px;
   margin: 0 4px;
 
-  > div {
+  > .sidebar-tab-view-item-icon-background {
     position: absolute;
     padding: 16px;
     border-radius: 16px;
   }
 
-  > img {
+  > .tab-icon {
     position: absolute;
     width: 24px;
     height: 24px;
@@ -1081,7 +1081,7 @@ $sidebar-tab-group-list__themes: (
     background-color: $dark-header-active-background;
   }
 
-  .sidebar-tab-view-item-icon > div {
+  .sidebar-tab-view-item-icon > .sidebar-tab-view-item-icon-background {
     background-color: $grey-50;
   }
 

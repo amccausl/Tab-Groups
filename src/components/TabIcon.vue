@@ -1,6 +1,6 @@
 <template>
   <div class="tab-icon">
-    <img class="tab-icon__img" :src="icon_url" :data-size="size" @error="onIconLoadError"/>
+    <img class="tab-icon__img" :src="icon_url" :style="{ height: `${ size }px`, width: `${ size }px` }" @error="onIconLoadError"/>
     <svg v-if="tab.muted" class="tab-icon__state audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
         @click.prevent="unmuteTab( $event, tab.id )"
     >
