@@ -27,12 +27,12 @@ export function getTransferData( data_transfer ) {
   for( let i = 0; i < count; i++ ) {
     const types = data_transfer.mozTypesAt( i )
     for( let t = 0; t < types.length; t++ ) {
-      console.info("  " + types[ t ] + ": ")
+      // console.info("  " + types[ t ] + ": ")
       try {
         const data = data_transfer.mozGetDataAt( types[ t ], i )
-        console.info("(" + (typeof data) + ") : <" + data + " >\n")
+        // console.info("(" + (typeof data) + ") : <" + data + ">\n")
       } catch( ex ) {
-        console.info("<>\n")
+        // console.info("<>\n")
         dump( ex )
       }
     }

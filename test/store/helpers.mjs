@@ -7,6 +7,7 @@ import {
   findTab,
   getTabGroupsPersistState,
   getTabMoveData,
+  getTargetIndex,
 } from '../../src/store/helpers.mjs'
 
 export const base_new_browser_tab = {
@@ -215,6 +216,34 @@ function testGetTabMoveDataNewGroup( t ) {
   t.end()
 }
 
+function testGetTargetIndex( t ) {
+  t.test( moveToLaterIndex )
+  t.end()
+}
+
+function moveToLaterIndex( t ) {
+  const moving_tab = createTestTab({ id: 3 })
+  const tab_group = createTabGroup( 2, [
+    moving_tab,
+    createTestTab({ id: 4 }),
+    createTestTab({ id: 5 })
+  ])
+  const target_window = createWindow( 1, [
+    createPinnedTabGroup( [] ),
+    tab_group
+  ])
+
+  const target_data = { window_id: target_window.id, tab_group_id: tab_group.id, tab_group_index: 1 }
+  const ignored_tabs = [ moving_tab ]
+
+  let target_index_data = getTargetIndex( target_window, target_data, ignored_tabs )
+  t.same( target_index_data, {
+    index: 0,
+    tab_group_index: 0
+  })
+  t.end()
+}
+
 function testPersistence( t ) {
   let state = getInitialState()
   let tab_groups_state = getTabGroupsPersistState( state.windows[ 0 ] )
@@ -237,6 +266,7 @@ export default function( tap ) {
   tap.test( testGetTabMoveData )
   tap.test( testGetTabMoveDataMiddle )
   tap.test( testGetTabMoveDataNewGroup )
+  tap.test( testGetTargetIndex )
   tap.test( testPersistence )
   tap.end()
 }

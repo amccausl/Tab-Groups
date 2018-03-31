@@ -4,7 +4,7 @@ import {
 } from '../../src/integrations/index.mjs'
 import App from '../../src/store/reducers.mjs'
 
-import { createStore } from '../../src/store/redux-slim.mjs'
+import { createStore } from '../../src/store/dispatcher.mjs'
 import { getInitialState } from '../store/helpers.mjs'
 import { getMockBrowser } from './helpers.mjs'
 

@@ -1,4 +1,4 @@
-import { createStore } from './store/redux-slim.mjs'
+import { createStore } from './store/dispatcher.mjs'
 
 import { initAction } from './store/actions.mjs'
 import App, { init } from './store/reducers.mjs'

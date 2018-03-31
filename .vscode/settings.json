@@ -9,5 +9,7 @@
   "search.exclude": {
     "**/dist": true,
     "**/node_modules": true
-  }
+  },
+  "nodeTdd.minimal": false,
+  "nodeTdd.reporter": "tap"
 }
