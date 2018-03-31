@@ -22,7 +22,9 @@ export default {
   mounted() {
     this.$el.innerText = this.value
     if( this.active ) {
-      this.$el.focus()
+      Vue.nextTick( () => {
+        this.$el.focus()
+      })
     }
 
     this.$on( 'input', this.onInput )

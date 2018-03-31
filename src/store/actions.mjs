@@ -45,6 +45,14 @@ export function removeWindowAction( window_id ) {
   }
 }
 
+export function createGroupAction( new_tab_group, window_id ) {
+  return {
+    type: GROUP_CREATE,
+    new_tab_group,
+    window_id
+  }
+}
+
 export function activateGroupAction( tab_group_id, window_id ) {
   return {
     type: GROUP_ACTIVATE,

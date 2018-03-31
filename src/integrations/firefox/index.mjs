@@ -9,6 +9,7 @@ import {
   moveTabAction,
   moveTabsAction,
   attachTabAction,
+  createGroupAction,
   removeGroupAction,
   muteGroupAction,
   unmuteGroupAction,
@@ -37,6 +38,8 @@ const TAB_PREVIEW_IMAGE_DETAILS = {
 }
 
 const EMPTY = {}
+
+const TAB_GROUP_ID_MAP = new Map()
 
 // LOCALIZATION
 
@@ -481,6 +484,11 @@ export function createGroup( store, window_id, source_data ) {
     return Promise.resolve( tab_group )
   }
 
+  store.dispatch( createGroupAction( tab_group, window_id ) )
+
+  return Promise.resolve( tab_group )
+
+  /*
   return browser.tabs.create({ windowId: window_id })
     .then( browser_tab => {
       source_data = {
@@ -491,6 +499,7 @@ export function createGroup( store, window_id, source_data ) {
       return moveTabsToGroup( store, source_data, target_data )
     })
     .then( () => tab_group )
+  */
 }
 
 export function closeTabGroup( store, window_id, tab_group_id ) {
@@ -577,36 +586,39 @@ export function onTabActivated( store, tab_id, window_id ) {
 }
 
 export function onTabCreated( store, browser_tab ) {
-  return getTabGroupId( browser_tab.id )
-    .then( tab_group_id => {
-      console.info('tab created with id', tab_group_id)
-      // @todo find active group
-      const state = store.getState()
+  const state = store.getState()
 
-      if( ! browser_tab.openerTabId ) {
-        for( let window of state.windows ) {
-          if( window.id !== browser_tab.windowId ) {
-            continue
-          }
-          setTabGroupId( browser_tab.id, window.active_tab_group_id )
-          let index_offset = 0
-          for( let tab_group of window.tab_groups ) {
-            index_offset += tab_group.tabs_count
-            if( window.active_tab_group_id === tab_group.id ) {
-              if( browser_tab.index !== index_offset ) {
-                browser_tab.index = index_offset
-                console.info('tabs.move', [ browser_tab.id ], { index: browser_tab.index })
-                browser.tabs.move( [ browser_tab.id ], { index: browser_tab.index } )
-              }
-              break
-            }
+  if( ! browser_tab.openerTabId ) {
+    for( let window of state.windows ) {
+      if( window.id !== browser_tab.windowId ) {
+        continue
+      }
+      // setTabGroupId( browser_tab.id, window.active_tab_group_id )
+      let index_offset = 0
+      for( let tab_group of window.tab_groups ) {
+        index_offset += tab_group.tabs_count
+        if( window.active_tab_group_id === tab_group.id ) {
+          if( browser_tab.index !== index_offset ) {
+            browser_tab.index = index_offset
+            // console.info('tabs.move', [ browser_tab.id ], { index: browser_tab.index })
+            // browser.tabs.move( [ browser_tab.id ], { index: browser_tab.index } )
           }
           break
         }
       }
+      break
+    }
+  }
 
-      return store.dispatch( addTabAction( browser_tab ) )
-    })
+  // @todo any async tasks here may lead to race conditions
+  // getTabGroupId( browser_tab.id )
+  //   .then( tab_group_id => {
+  //     if( tab_group_id == null ) {
+        // @todo assign to the active group
+    //   }
+    // })
+
+  return store.dispatch( addTabAction( browser_tab ) )
 }
 
 export function onTabUpdated( store, tab_id, change_info, browser_tab ) {

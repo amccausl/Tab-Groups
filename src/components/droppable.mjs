@@ -155,16 +155,6 @@ export function onTabGroupDragLeave( event, tab_group ) {
   }
 }
 
-export function onTabGroupDragOver( event, tab_group ) {
-  event.preventDefault()
-  const event_data = getTransferData( event.dataTransfer )
-  // console.info('onTabGroupDragOver', tab_group, event)
-  if( isTabTransfer( event_data ) ) {
-    event.dataTransfer.effectAllowed = 'move'
-    event.dataTransfer.dropEffect = 'move'
-  }
-}
-
 export function onTabGroupDrop( event, tab_group ) {
   event.preventDefault()
   const source_data = getTransferData( event.dataTransfer )

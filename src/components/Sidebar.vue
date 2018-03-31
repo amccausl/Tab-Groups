@@ -32,7 +32,8 @@
         <div :class="[ `tab-group-list-item-header--${ theme }`, active_tab_group_id === tab_group.id ? `tab-group-list-item-header--${ theme }--active` : ``, target_tab_group_id === tab_group.id && target_tab_group_index == null ? `tab-group-list-item-header--${ theme }--target` : `` ]"
             @click="onTabGroupClick( tab_group )"
             @dragenter="onTabGroupDragEnter( $event, tab_group )" @dragleave="onTabGroupDragLeave( $event, tab_group )"
-            @dragover="onTabGroupDragOver( $event, tab_group )" @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
+            @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
+            @dragover.prevent
         >
           <div :class="[ `tab-group-list-item-header--${ theme }__main` ]">
             <svg v-if="show_tabs" :class="[ `tab-group-list-item-header--${ theme }__carat-icon`, tab_group.open ? `tab-group-list-item-header--${ theme }__carat-icon--open` : `` ]" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
@@ -89,7 +90,12 @@
       </div>
     </div>
     <div :class="[ `empty-dropzone--${ theme }`, target_tab_group_new ? `empty-dropzone--${ theme }--target` : `` ]"
-          @dragenter="onTabGroupDragEnter( $event )" @dragleave="onTabGroupDragLeave( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
+        @click.right.prevent
+        @dragenter="onTabGroupDragEnter"
+        @dragover.prevent
+        @dragleave="onTabGroupDragLeave"
+        @dragend="onTabGroupDragEnd"
+        @drop="onTabGroupDrop"
     >
       <!-- @todo disabled because looks odd on drop for full scrolling size, will revisit -->
       <!-- <svg :class="[ `empty-dropzone__icon`, `empty-dropzone--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
@@ -99,8 +105,11 @@
     <div :class="[ `action-strip--${ theme }` ]">
       <div :class="[ `action-strip--${ theme }__button`, target_tab_group_new ? `action-strip--${ theme }__button--active` : `` ]"
           @click.left="createTabGroup()" @click.right.prevent
-          @dragenter="onTabGroupDragEnter( $event )" @dragleave="onTabGroupDragLeave( $event )"
-          @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
+          @dragenter="onTabGroupDragEnter"
+          @dragover.prevent
+          @dragleave="onTabGroupDragLeave"
+          @drop="onTabGroupDrop"
+          @dragend="onTabGroupDragEnd"
       >
         <svg :class="[ `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
@@ -144,7 +153,6 @@ import {
   onTabDrop,
   onTabGroupDragEnter,
   onTabGroupDragLeave,
-  onTabGroupDragOver,
   onTabGroupDrop,
   resetDragState,
   setTabTransferData,
@@ -290,6 +298,7 @@ export default {
       // Create new group with default properties in the store
       window.background.createGroup( window.store, this.window_id )
         .then( tab_group => {
+          console.info('created group', tab_group)
           Vue.nextTick( () => {
             this.renameTabGroup( tab_group.id )
           })
@@ -364,7 +373,6 @@ export default {
     },
     onTabGroupDragEnter,
     onTabGroupDragLeave,
-    onTabGroupDragOver,
     onTabGroupDrop( event, tab_group ) {
       event.preventDefault()
       const source_data = getTransferData( event.dataTransfer )
