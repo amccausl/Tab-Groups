@@ -29,6 +29,7 @@ import {
 
 const LOCAL_CONFIG_KEY = 'config'
 const WINDOW_TAB_GROUPS_KEY = 'tab_groups'
+const TAB_GROUP_ID_KEY = 'group_id'
 const TAB_PREVIEW_IMAGE_KEY = 'preview_image'
 
 const TAB_PREVIEW_IMAGE_DETAILS = {
@@ -62,11 +63,13 @@ export function bindBrowserEvents( store ) {
   //   console.info('runtime.onMessage', message, sender, sendResponse)
   // })
 
+  browser.sessions.onChanged.addListener( () => {
+    console.info('sessions.onChanged')
+  })
+
   browser.storage.onChanged.addListener( ( changes, area ) => {
     console.info('storage.onChanged', area, changes)
-    if( area === 'local' && changes[ LOCAL_CONFIG_KEY ] ) {
-      store.dispatch( updateConfigAction( changes[ LOCAL_CONFIG_KEY ].newValue || default_config ) )
-    }
+    onStorageChanged( store, changes, area )
   })
 
   // Attach listeners for changes to windows
@@ -74,31 +77,20 @@ export function bindBrowserEvents( store ) {
   browser.windows.onCreated.addListener( ( browser_window ) => {
     console.info('windows.onCreated', browser_window)
     if( browser_window.type === 'normal' ) {
-      store.dispatch( addWindowAction( browser_window ) )
+      onWindowCreated( browser_window )
     }
   })
 
   browser.windows.onRemoved.addListener( ( window_id ) => {
     console.info('windows.onRemoved', window_id)
-    store.dispatch( removeWindowAction( window_id ) )
+    onWindowRemoved( store, window_id )
   })
 
   // Attach listeners for changes to tabs
 
   browser.tabs.onActivated.addListener( ( { tabId, windowId } ) => {
     console.info('tabs.onActivated', tabId, windowId)
-    store.dispatch( activateTabAction( tabId, windowId ) )
-
-    // Start background task to get preview image
-    // NOTE: Not needed at the moment, disabled for now
-    // browser.tabs.captureVisibleTab( windowId, TAB_PREVIEW_IMAGE_DETAILS )
-    //   .then( preview_image_uri => {
-    //     store.dispatch( updateTabImageAction( tabId, windowId, preview_image_uri ) )
-    //     const tab = findTab( store.getState(), windowId, tabId )
-    //     if( tab && tab.preview_image ) {
-    //       setTabPreviewState( tab.id, tab.preview_image )
-    //     }
-    //   })
+    onTabActivated( store, tabId, windowId )
   })
 
   browser.tabs.onCreated.addListener( ( browser_tab ) => {
@@ -185,10 +177,12 @@ export function bindBrowserEvents( store ) {
         break
       }
       if( hide_ids.length ) {
+        console.info(`browser.tabs.hide( ${ JSON.stringify( hide_ids ) } )`)
         updates.push( browser.tabs.hide( hide_ids ) )
         // updates.push( ...hide_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: true } ) ) )
       }
       if( show_ids.length ) {
+        console.info(`browser.tabs.show( ${ JSON.stringify( show_ids ) } )`)
         updates.push( browser.tabs.show( show_ids ) )
         // updates.push( ...show_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: false } ) ) )
       }
@@ -216,10 +210,12 @@ export function loadBrowserState() {
       contextual_identities = _contextual_identities || []
       theme = _theme || {}
 
+      const browser_tab_group_ids = []
       const browser_tab_preview_images = []
 
       let window_tab_groups = []
       browser_tabs.forEach( tab => {
+        browser_tab_group_ids.push( getTabGroupId( tab.id ) )
         browser_tab_preview_images.push( getTabPreviewState( tab.id ) )
         if( window_ids.indexOf( tab.windowId ) === -1 ) {
           window_ids.push( tab.windowId )
@@ -227,16 +223,19 @@ export function loadBrowserState() {
         }
       })
 
-      return Promise.all( [ Promise.all( browser_tab_preview_images ), Promise.all( window_tab_groups ) ] )
+      return Promise.all( [ Promise.all( browser_tab_group_ids ), Promise.all( browser_tab_preview_images ), Promise.all( window_tab_groups ) ] )
     }
   ).then(
-    ( [ tab_preview_images, window_tab_groups ] ) => {
+    ( [ tab_group_ids, tab_preview_images, window_tab_groups ] ) => {
       const window_tab_groups_map = new Map()
       for( let i = 0; i < window_ids.length; i++ ) {
         window_tab_groups_map.set( window_ids[ i ], window_tab_groups[ i ] )
       }
       for( let i = 0; i < browser_tabs.length; i++ ) {
-        browser_tabs[ i ].preview_image = tab_preview_images[ i ]
+        browser_tabs[ i ].session = {
+          tab_group_id: tab_group_ids[ i ],
+          preview_image: tab_preview_images[ i ],
+        }
       }
       // This is the same structure from reducers.init
       return { browser_tabs, config, contextual_identities, theme, window_tab_groups_map }
@@ -304,6 +303,25 @@ export function setWindowTabGroupsState( window_id, tab_groups_state ) {
  * Fetch the preview image for a tab from session storage
  * @param tab_id
  */
+export function getTabGroupId( tab_id ) {
+  console.info(`browser.sessions.getTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY } )`)
+  return browser.sessions.getTabValue( tab_id, TAB_GROUP_ID_KEY )
+}
+
+/**
+ * Save the tab preview image and details to the
+ * @param tab_id
+ * @param group_id
+ */
+export function setTabGroupId( tab_id, group_id ) {
+  console.info(`browser.sessions.setTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY }, ${ group_id } )`)
+  return browser.sessions.setTabValue( tab_id, TAB_GROUP_ID_KEY, group_id )
+}
+
+/**
+ * Fetch the preview image for a tab from session storage
+ * @param tab_id
+ */
 export function getTabPreviewState( tab_id ) {
   return browser.sessions.getTabValue( tab_id, TAB_PREVIEW_IMAGE_KEY )
 }
@@ -349,6 +367,7 @@ function resetWindowState( window ) {
 }
 
 function resetTabState( tab ) {
+  return browser.sessions.removeTabValue( tab.id, TAB_GROUP_ID_KEY )
   return browser.sessions.removeTabValue( tab.id, TAB_PREVIEW_IMAGE_KEY )
 }
 
@@ -528,32 +547,66 @@ export function unmuteTabGroup( store, window_id, tab_group_id ) {
   })
 }
 
-export function onTabCreated( store, browser_tab ) {
-  // @todo find active group
-  const state = store.getState()
+export function onStorageChanged( store, changes, area ) {
+  if( area === 'local' && changes[ LOCAL_CONFIG_KEY ] ) {
+    store.dispatch( updateConfigAction( changes[ LOCAL_CONFIG_KEY ].newValue || default_config ) )
+  }
+}
 
-  if( ! browser_tab.openerTabId ) {
-    for( let window of state.windows ) {
-      if( window.id !== browser_tab.windowId ) {
-        continue
-      }
-      let index_offset = 0
-      for( let tab_group of window.tab_groups ) {
-        index_offset += tab_group.tabs_count
-        if( window.active_tab_group_id === tab_group.id ) {
-          if( browser_tab.index !== index_offset ) {
-            browser_tab.index = index_offset
-            console.info('tabs.move', [ browser_tab.id ], { index: browser_tab.index })
-            browser.tabs.move( [ browser_tab.id ], { index: browser_tab.index } )
+export function onWindowCreated( store, browser_window ) {
+  store.dispatch( addWindowAction( browser_window ) )
+}
+
+export function onWindowRemoved( store, window_id ) {
+  store.dispatch( removeWindowAction( window_id ) )
+}
+
+export function onTabActivated( store, tab_id, window_id ) {
+  store.dispatch( activateTabAction( tab_id, window_id ) )
+
+  // Start background task to get preview image
+  // NOTE: Not needed at the moment, disabled for now
+  // browser.tabs.captureVisibleTab( windowId, TAB_PREVIEW_IMAGE_DETAILS )
+  //   .then( preview_image_uri => {
+  //     store.dispatch( updateTabImageAction( tabId, windowId, preview_image_uri ) )
+  //     const tab = findTab( store.getState(), windowId, tabId )
+  //     if( tab && tab.preview_image ) {
+  //       setTabPreviewState( tab.id, tab.preview_image )
+  //     }
+  //   })
+}
+
+export function onTabCreated( store, browser_tab ) {
+  return getTabGroupId( browser_tab.id )
+    .then( tab_group_id => {
+      console.info('tab created with id', tab_group_id)
+      // @todo find active group
+      const state = store.getState()
+
+      if( ! browser_tab.openerTabId ) {
+        for( let window of state.windows ) {
+          if( window.id !== browser_tab.windowId ) {
+            continue
+          }
+          setTabGroupId( browser_tab.id, window.active_tab_group_id )
+          let index_offset = 0
+          for( let tab_group of window.tab_groups ) {
+            index_offset += tab_group.tabs_count
+            if( window.active_tab_group_id === tab_group.id ) {
+              if( browser_tab.index !== index_offset ) {
+                browser_tab.index = index_offset
+                console.info('tabs.move', [ browser_tab.id ], { index: browser_tab.index })
+                browser.tabs.move( [ browser_tab.id ], { index: browser_tab.index } )
+              }
+              break
+            }
           }
           break
         }
       }
-      break
-    }
-  }
 
-  store.dispatch( addTabAction( browser_tab ) )
+      return store.dispatch( addTabAction( browser_tab ) )
+    })
 }
 
 export function onTabUpdated( store, tab_id, change_info, browser_tab ) {
@@ -580,6 +633,10 @@ export function onTabUpdated( store, tab_id, change_info, browser_tab ) {
     // @todo if the update is only sharingState, and no actual change is detected
     return
   }
+  if( change_info.hasOwnProperty( 'hidden' ) ) {
+    // @todo if the update is only hidden, and no actual change is detected
+    return
+  }
   store.dispatch( updateTabAction( browser_tab, change_info ) )
 }
 
@@ -593,17 +650,6 @@ export function onTabMoved( store, source_data, target_data ) {
     console.info('ignoring move with equal index')
     return
   }
-  // const source_data = {
-  //   window_id
-  //   tab_id
-  //   index
-  // }
-
-  // const target_data = {
-  //   window_id
-  //   index
-  // }
-
 
   // Can skip dispatch step if this has already been handled
   if( store.is_dispatching ) {
@@ -692,6 +738,13 @@ export function moveTabsToGroup( store, source_data, target_data ) {
 
   // Reload the state
   state = store.getState()
+
+  if( target_data.tab_group_id ) {
+    tab_ids.forEach( ( tab_id ) => {
+      console.info(`browser.sessions.setTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY }, ${ JSON.stringify( target_data.tab_group_id ) } )`)
+      updates.push( browser.sessions.setTabValue( tab_id, TAB_GROUP_ID_KEY, target_data.tab_group_id ) )
+    })
+  }
 
   if( target_data.index != null ) {
     const move_properties = {
