@@ -121,17 +121,38 @@ export function onTabDrop( event, tab ) {
   this.resetDragState()
 }
 
+function getTabGroupDragProperties( tab_group ) {
+  return {
+    target_tab_group_new: ( tab_group == null ),
+    target_tab_group_id: ( tab_group != null ) ? tab_group.id : null,
+    target_tab_group_index: null,
+  }
+}
+
+const tab_group_drag_properties_reset = {
+  target_tab_group_new: false,
+  target_tab_group_id: null,
+  target_tab_group_index: null,
+}
+
+let tab_group_drag_target = null
+
 export function onTabGroupDragEnter( event, tab_group ) {
-  console.info('onTabGroupDragEnter', tab_group, event)
+  console.info('onTabGroupDragEnter', tab_group ? tab_group.id : null, event)
+  tab_group_drag_target = event.target
   event.dataTransfer.effectAllowed = 'move'
   event.dataTransfer.dropEffect = 'move'
-  this.target_tab_group_new = ( tab_group == null )
+  Object.assign( this, getTabGroupDragProperties( tab_group ) )
   event.preventDefault()
 }
 
 export function onTabGroupDragLeave( event, tab_group ) {
-  console.info('onTabGroupDragLeave', tab_group, event)
-  this.target_tab_group_new = false
+  console.info('onTabGroupDragLeave', tab_group ? tab_group.id : null, event)
+
+  // Leave is fired after the new enter, so detect if this is still the active group
+  if( tab_group_drag_target === event.target ) {
+    Object.assign( this, tab_group_drag_properties_reset )
+  }
 }
 
 export function onTabGroupDragOver( event, tab_group ) {

@@ -29,9 +29,10 @@
       <div :class="[ `sidebar-tab-group-list--${ theme }__item`, `tab-group-item`, ! tab_group.open && active_tab_group_id === tab_group.id ? 'tab-group-item--active' : '' ]"
           v-for="tab_group in tab_groups" :key="tab_group.id"
       >
-        <div :class="[ `tab-group-list-item-header--${ theme }`, active_tab_group_id === tab_group.id ? `tab-group-list-item-header--active` : `` ]"
-            v-on:click="onTabGroupClick( tab_group )"
-            @dragenter="onTabGroupDragEnter( $event, tab_group )" @dragover="onTabGroupDragOver( $event, tab_group )" @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
+        <div :class="[ `tab-group-list-item-header--${ theme }`, active_tab_group_id === tab_group.id ? `tab-group-list-item-header--${ theme }--active` : ``, target_tab_group_id === tab_group.id && target_tab_group_index == null ? `tab-group-list-item-header--${ theme }--target` : `` ]"
+            @click="onTabGroupClick( tab_group )"
+            @dragenter="onTabGroupDragEnter( $event, tab_group )" @dragleave="onTabGroupDragLeave( $event, tab_group )"
+            @dragover="onTabGroupDragOver( $event, tab_group )" @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
         >
           <div :class="[ `tab-group-list-item-header--${ theme }__main` ]">
             <svg v-if="sidebar_tab_display !== 'none'" :class="[ `tab-group-list-item-header--${ theme }__carat-icon`, tab_group.open ? `tab-group-list-item-header--${ theme }__carat-icon--open` : `` ]" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
@@ -87,7 +88,7 @@
         </div>
       </div>
     </div>
-    <div :class="[ `empty-dropzone--${ theme }`, target_tab_group_new ? `empty-dropzone--${ theme }--active` : `` ]"
+    <div :class="[ `empty-dropzone--${ theme }`, target_tab_group_new ? `empty-dropzone--${ theme }--target` : `` ]"
           @dragenter="onTabGroupDragEnter( $event )" @dragleave="onTabGroupDragLeave( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
     >
       <!-- @todo disabled because looks odd on drop for full scrolling size, will revisit -->
@@ -98,7 +99,8 @@
     <div :class="[ `action-strip--${ theme }` ]">
       <div :class="[ `action-strip--${ theme }__button`, target_tab_group_new ? `action-strip--${ theme }__button--active` : `` ]"
           @click.left="createTabGroup()" @click.right.prevent
-          @dragenter="onTabGroupDragEnter( $event )" @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
+          @dragenter="onTabGroupDragEnter( $event )" @dragleave="onTabGroupDragLeave( $event )"
+          @dragover="onTabGroupDragOver( $event )" @drop="onTabGroupDrop( $event )" @dragend="onTabGroupDragEnd( $event )"
       >
         <svg :class="[ `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
@@ -330,13 +332,6 @@ export default {
       console.info('renameTabGroup', tab_group_id)
       this.rename_tab_group_id = tab_group_id
       this.tab_group_context_menu.open = false
-
-      Vue.nextTick( () => {
-        const el = this.$el.querySelector( '.tab-group-list-item-header__title--editing' )
-        if( el != null ) {
-          el.focus()
-        }
-      })
     },
     copyTabGroupAsText( tab_group_id ) {
       console.info('copyTabGroupAsText', tab_group_id)
@@ -428,6 +423,14 @@ $light-header-hover-background: #cccdcf;
 $light-awesome-bar-background: #474749; // @todo
 $light-border-color: #e0e0e1;
 
+$__themes--light: (
+  --drop-target--background-color: $light-header-hover-background,
+);
+
+$__themes--dark: (
+  --drop-target--background-color: #5b5b5d,
+);
+
 // =============================================================================
 // Helpers
 // =============================================================================
@@ -453,13 +456,13 @@ $light-border-color: #e0e0e1;
 $empty-dropzone__themes: (
   light: (
     --background-color: $white-100,
-    --active--background-color: $light-header-hover-background,
-    --active--color: $grey-90-a80,
+    --target--background-color: map-get( $__themes--light, --drop-target--background-color ),
+    --target--color: $grey-90-a80,
   ),
   dark: (
     --background-color: black,
-    --active--background-color: #5b5b5d,
-    --active--color: #d0d0d0,
+    --target--background-color: map-get( $__themes--dark, --drop-target--background-color ),
+    --target--color: #d0d0d0,
   )
 );
 
@@ -474,9 +477,9 @@ $empty-dropzone__themes: (
     background-color: transparent;
     background-color: map-get( $colors, --background-color );
 
-    &--active {
-      background-color: map-get( $colors, --active--background-color );
-      fill: map-get( $colors, --active--color );
+    &--target {
+      background-color: map-get( $colors, --target--background-color );
+      fill: map-get( $colors, --target--color );
     }
 
     &__icon {
@@ -486,7 +489,7 @@ $empty-dropzone__themes: (
       opacity: 0;
     }
 
-    &--active &__icon {
+    &--target &__icon {
       display: block;
       opacity: 1;
     }
@@ -683,12 +686,14 @@ $pinned-tab-list__themes: (
 $tab-group-list-item-header__themes: (
   light: (
     --background-color: $white-100,
+    --drop-target--background-color: map-get( $__themes--light, --drop-target--background-color ),
     --hover--background-color: $light-header-hover-background,
     primary-text--color: $grey-90,
     secodary-text--color: $grey-50,
   ),
   dark: (
     --background-color: black,
+    --drop-target--background-color: map-get( $__themes--dark, --drop-target--background-color ),
     --hover--background-color: #5b5b5d,
     primary-text--color: $white-100,
     secodary-text--color: $grey-10,
@@ -719,6 +724,10 @@ $tab-group-list-item-header__themes: (
       width: 4px;
     }
 
+    &--target {
+      background-color: map-get( $colors, --drop-target--background-color );
+    }
+
     &__main {
       @extend %slow-transition;
       transition-property: background-color opacity;
@@ -728,7 +737,7 @@ $tab-group-list-item-header__themes: (
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      background-color: map-get( $colors, --background-color );
+      background-color: transparent;
 
       &:hover {
         background-color: map-get( $colors, --hover--background-color );
@@ -740,38 +749,17 @@ $tab-group-list-item-header__themes: (
       white-space: nowrap;
       text-overflow: clip;
       overflow-x: hidden;
-      position: relative;
-
-      &::after {
-        @extend %slow-transition;
-        transition-property: background-color opacity;
-        content: "";
-        width: 8px;
-        padding: 8px 4px;
-        float: right;
-        position: absolute;
-        right: 0;
-        top: 0;
-        background: linear-gradient( to right, rgba( map-get( $colors, --background-color ), 0 ), rgba( map-get( $colors, --background-color ), 1 ) );
-      }
+      mask-image: linear-gradient( to right, rgba(0, 0, 0, 1.0), rgba(0, 0, 0, 1.0) calc(100% - 10px), transparent );
 
       // Reset the fade out while the field is editing to prevent odd gradient display on long titles (scrollable)
-      &--editing::after {
-        background: linear-gradient( to right, rgba( map-get( $colors, --background-color ), 0 ), rgba( map-get( $colors, --background-color ), 0 ) );
+      &--editing {
+        mask-image: none;
       }
     }
 
     &__title-editable {
       max-height: 16px;
       max-width: 10px;
-    }
-
-    &__main:hover &__title::after {
-      background: linear-gradient( to right, rgba( map-get( $colors, --hover--background-color ), 0 ), rgba( map-get( $colors, --hover--background-color ), 1 ) );
-    }
-
-    &__main:hover &__title--editing::after {
-      background: linear-gradient( to right, rgba( map-get( $colors, --hover--background-color ), 0 ), rgba( map-get( $colors, --hover--background-color ), 0 ) );
     }
 
     &__tabs-count {
