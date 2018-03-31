@@ -35,7 +35,7 @@
             @dragover="onTabGroupDragOver( $event, tab_group )" @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
         >
           <div :class="[ `tab-group-list-item-header--${ theme }__main` ]">
-            <svg v-if="sidebar_tab_display !== 'none'" :class="[ `tab-group-list-item-header--${ theme }__carat-icon`, tab_group.open ? `tab-group-list-item-header--${ theme }__carat-icon--open` : `` ]" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
+            <svg v-if="show_tabs" :class="[ `tab-group-list-item-header--${ theme }__carat-icon`, tab_group.open ? `tab-group-list-item-header--${ theme }__carat-icon--open` : `` ]" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
               <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
             </svg>
             <div :class="[ `tab-group-list-item-header--${ theme }__title`, rename_tab_group_id === tab_group.id ? `tab-group-list-item-header--${ theme }__title--editing` : `` ]">
@@ -55,7 +55,7 @@
               </g>
             </svg>
 
-            <span :class="[ `tab-group-list-item-header--${ theme }__tabs-count` ]">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
+            <span v-if="show_tabs_count" :class="[ `tab-group-list-item-header--${ theme }__tabs-count` ]">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
           </div>
           <button :class="[ `tab-group-list-item-header--${ theme }__more-button` ]" @click.stop="openTabGroupMore( $event, tab_group )">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -63,7 +63,7 @@
             </svg>
           </button>
         </div>
-        <div v-if="tab_group.open && sidebar_tab_display !== 'none'" class="sidebar-tab-group-tabs-list">
+        <div v-if="tab_group.open && show_tabs" class="sidebar-tab-group-tabs-list">
           <div class="sidebar-tab-group-tabs-list-item"
               v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
               v-if="! search_text || ! search_resolved || tab.matched" :title="tab.title"
@@ -185,8 +185,8 @@ export default {
       search_text: '',
       search_resolved: true,
       selected_tab_ids: [],
-      sidebar_tab_display: 'none',
       show_tabs: true,
+      show_tabs_count: true,
       show_pinned_tabs: true,
       show_tab_context: true,
       show_tab_icon_background: true,
@@ -202,10 +202,11 @@ export default {
   created() {
     onStateChange( state => {
       this.theme = state.config.theme
-      this.sidebar_tab_display = state.config.sidebar_tab_display || 'none'
-      this.show_pinned_tabs = state.config.show_pinned_tabs
-      this.show_tab_context = state.config.show_tab_context
-      this.show_tab_icon_background = state.config.show_tab_icon_background
+      this.show_tabs_count = state.config.show_tabs_count
+      this.show_tabs = state.config.show_tabs
+      this.show_pinned_tabs = this.show_tabs && state.config.show_pinned_tabs
+      this.show_tab_context = this.show_tabs && state.config.show_tab_context
+      this.show_tab_icon_background = this.show_tabs && state.config.show_tab_icon_background
 
       for( let context_id in state.contexts || {} ) {
         this.context_styles[ context_id ] = {
@@ -288,7 +289,11 @@ export default {
     createTabGroup() {
       // Create new group with default properties in the store
       window.background.createGroup( window.store, this.window_id )
-        .then( tab_group => this.renameTabGroup( tab_group.id ) )
+        .then( tab_group => {
+          Vue.nextTick( () => {
+            this.renameTabGroup( tab_group.id )
+          })
+        })
     },
     openTabGroupMore( event, tab_group ) {
       console.info('openTabGroupMore', event, tab_group )
@@ -348,7 +353,7 @@ export default {
     onTabDragEnd,
     onTabDrop,
     onTabGroupClick( tab_group ) {
-      if( this.sidebar_tab_display === 'none' ) {
+      if( ! this.show_tabs ) {
         if( tab_group.active_tab_id && tab_group.tabs.length ) {
           this.openTab( tab_group.active_tab_id || tab_group.tabs[ 0 ].id )
         }
@@ -504,6 +509,7 @@ $action-strip__themes: (
   light: (
     __button--background-color: #f5f6f7,
     __button--hover--background-color: #d0d0d0,
+    __button--drop-target--background-color: map-get( $__themes--light, --drop-target--background-color ),
     __search--background-color: $white-100,
     __search--color: $ink-90,
     __search--border-color: #ccc,
@@ -513,6 +519,7 @@ $action-strip__themes: (
   dark: (
     __button--background-color: #323234,
     __button--hover--background-color: #5b5b5d,
+    __button--drop-target--background-color: map-get( $__themes--dark, --drop-target--background-color ),
     __search--background-color: $dark-awesome-bar-background,
     __search--color: $white-100,
     __search--border-color: $dark-awesome-bar-background,
@@ -604,7 +611,6 @@ $pinned-tab-list__themes: (
 );
 
 // @todo may be tab-list--pinned or plural tabs
-// @todo fix active state
 
 @each $theme, $colors in $pinned-tab-list__themes {
   .pinned-tab-list--#{$theme} {

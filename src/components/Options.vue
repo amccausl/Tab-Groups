@@ -1,69 +1,90 @@
 <template>
-  <body class="options">
-    <!-- @todo localize -->
-    <nav class="sidenav">
-      <ul>
-        <li :class="{ 'active': selected_section === 'preferences' }">
-          <a href="javascript:void(0)" @click="selectSection( 'preferences' )">Preferences</a>
-        </li>
-        <li :class="{ 'active': selected_section === 'data' }">
-          <a href="javascript:void(0)" @click="selectSection( 'data' )">Data</a>
-        </li>
-        <li :class="{ 'active': selected_section === 'debug' }">
-          <a href="javascript:void(0)" @click="selectSection( 'debug' )">Debug</a>
-        </li>
-      </ul>
-    </nav>
-    <article class="main">
-      <section v-if="selected_section === 'preferences'">
-        <form @submit.prevent>
-          Theme:
-          <div class="browser-style">
-            <input type="radio" id="theme_light" value="light" v-model="preferences.theme" @input="selectTheme( 'light' )">
-            <label for="theme_light">Light</label>
-          </div>
-          <div class="browser-style">
-            <input type="radio" id="theme_dark" value="dark" v-model="preferences.theme" @input="selectTheme( 'dark' )">
-            <label for="theme_dark">Dark</label>
-          </div>
-          <label for="sidebar_tab_display">Sidebar Tab Display</label>
-          <select id="sidebar_tab_display" v-model="sidebar_tab_display">
-            <option value="large">Large</option>
-            <option value="small">Small</option>
-            <option value="none">None</option>
-          </select>
+  <body>
+    <p>
+      Changing the visibility of tabs in the header bar is currently experimental, but can be enabled by updating <pre>extensions.webextensions.tabhide.enabled</pre> on <a href="about:config">about:config</a>
+    </p>
+    <div class="options">
+      <!-- @todo localize -->
+      <nav class="sidenav">
+        <ul>
+          <li :class="{ 'active': selected_section === 'preferences' }">
+            <a href="javascript:void(0)" @click="selectSection( 'preferences' )">Preferences</a>
+          </li>
+          <li :class="{ 'active': selected_section === 'data' }">
+            <a href="javascript:void(0)" @click="selectSection( 'data' )">Data</a>
+          </li>
+          <li :class="{ 'active': selected_section === 'debug' }">
+            <a href="javascript:void(0)" @click="selectSection( 'debug' )">Debug</a>
+          </li>
+        </ul>
+      </nav>
+      <article class="main">
+        <section v-if="selected_section === 'preferences'">
+          <form @submit.prevent>
+            Theme:
+            <div class="browser-style">
+              <input type="radio" id="theme_light" value="light" v-model="preferences.theme" @input="selectTheme( 'light' )">
+              <label for="theme_light">Light</label>
+            </div>
+            <div class="browser-style">
+              <input type="radio" id="theme_dark" value="dark" v-model="preferences.theme" @input="selectTheme( 'dark' )">
+              <label for="theme_dark">Dark</label>
+            </div>
+            <!-- <label for="sidebar_tab_display">Sidebar Tab Display</label>
+            <select id="sidebar_tab_display" v-model="sidebar_tab_display">
+              <option value="large">Large</option>
+              <option value="small">Small</option>
+              <option value="none">None</option>
+            </select> -->
 
-          <label v-if="sidebar_tab_display !== 'none'" class="checkbox">
-            <input class="checkbox__input" type="checkbox" v-model="show_pinned_tabs">
-            <span class="checkbox__icon"></span>
-            <span class="checkbox__label">Show pinned tabs</span>
-          </label>
+            <fieldset>
+              <legend>Sidebar</legend>
 
-          <label v-if="sidebar_tab_display !== 'none'" class="checkbox">
-            <input class="checkbox__input" type="checkbox" v-model="show_tab_context">
-            <span class="checkbox__icon"></span>
-            <span class="checkbox__label">Show tab context</span>
-          </label>
+              <label class="checkbox">
+                <input class="checkbox__input" type="checkbox" v-model="show_tabs_count">
+                <span class="checkbox__icon"></span>
+                <span class="checkbox__label">Show tabs count on group</span>
+              </label>
 
-          <label v-if="preferences.theme === 'dark' && sidebar_tab_display !== 'none'" class="checkbox">
-            <input class="checkbox__input" type="checkbox" v-model="show_tab_icon_background">
-            <span class="checkbox__icon"></span>
-            <span class="checkbox__label">Show tab icon background</span>
-          </label>
-        </form>
-      </section>
-      <section v-if="selected_section === 'data'">
-        <form @submit.prevent>
-          <button @click="clearAllData()" class="browser-style">Clear All Data</button>
-          <button @click="syncState()" class="browser-style">Sync State</button>
-        </form>
-      </section>
-      <section v-if="selected_section === 'debug'">
-        <form @submit.prevent>
-          <button @click="openSidebarPage()" class="browser-style">Open Sidebar Page</button>
-        </form>
-      </section>
-    </article>
+              <label class="checkbox">
+                <input class="checkbox__input" type="checkbox" v-model="show_tabs">
+                <span class="checkbox__icon"></span>
+                <span class="checkbox__label">Show tabs</span>
+              </label>
+
+              <label v-if="show_tabs" class="checkbox checkbox--nested">
+                <input class="checkbox__input" type="checkbox" v-model="show_pinned_tabs">
+                <span class="checkbox__icon"></span>
+                <span class="checkbox__label">Show pinned tabs</span>
+              </label>
+
+              <label v-if="show_tabs" class="checkbox checkbox--nested">
+                <input class="checkbox__input" type="checkbox" v-model="show_tab_context">
+                <span class="checkbox__icon"></span>
+                <span class="checkbox__label">Show tab context</span>
+              </label>
+
+              <label v-if="show_tabs && preferences.theme === 'dark'" class="checkbox checkbox--nested">
+                <input class="checkbox__input" type="checkbox" v-model="show_tab_icon_background">
+                <span class="checkbox__icon"></span>
+                <span class="checkbox__label">Show tab icon background</span>
+              </label>
+            </fieldset>
+          </form>
+        </section>
+        <section v-if="selected_section === 'data'">
+          <form @submit.prevent>
+            <button @click="clearAllData()" class="browser-style">Clear All Data</button>
+            <button @click="syncState()" class="browser-style">Sync State</button>
+          </form>
+        </section>
+        <section v-if="selected_section === 'debug'">
+          <form @submit.prevent>
+            <button @click="openSidebarPage()" class="browser-style">Open Sidebar Page</button>
+          </form>
+        </section>
+      </article>
+    </div>
   </body>
 </template>
 
@@ -82,14 +103,15 @@ export default {
   data() {
     return {
       preferences: {
-        theme: null,
+        theme: 'dark',
         sidebar_tab_display: 'none',
-        show_pinned_tabs: null,
-        show_tab_context: null,
-        show_tab_icon_background: null
+        show_tabs_count: false,
+        show_tabs: false,
+        show_pinned_tabs: false,
+        show_tab_context: false,
+        show_tab_icon_background: false,
       },
       selected_section: 'preferences',
-      window_ids: []
     }
   },
   computed: {
@@ -99,6 +121,22 @@ export default {
       },
       set( value ) {
         setConfig( 'sidebar_tab_display', value )
+      }
+    },
+    show_tabs: {
+      get() {
+        return this.preferences.show_tabs
+      },
+      set( value ) {
+        setConfig( 'show_tabs', value )
+      }
+    },
+    show_tabs_count: {
+      get() {
+        return this.preferences.show_tabs_count
+      },
+      set( value ) {
+        setConfig( 'show_tabs_count', value )
       }
     },
     show_pinned_tabs: {
@@ -129,16 +167,7 @@ export default {
   created() {
     onStateChange( state => {
       console.info('loadState', state)
-      let window_ids = state.windows.map( window => window.id )
-
-      // Use the extended splice to trigger change detection
-      Object.getPrototypeOf( this.window_ids ).splice.apply( this.window_ids, [ 0, this.window_ids.length, ...window_ids ] )
-
-      this.preferences.theme = state.config.theme
-      this.preferences.sidebar_tab_display = state.config.sidebar_tab_display
-      this.preferences.show_pinned_tabs = state.config.show_pinned_tabs
-      this.preferences.show_tab_context = state.config.show_tab_context
-      this.preferences.show_tab_icon_background = state.config.show_tab_icon_background
+      Object.assign( this.preferences, state.config )
     })
   },
   methods: {
@@ -212,6 +241,10 @@ export default {
   display: flex;
   align-items: flex-start;
   padding: 3px;
+
+  &--nested {
+    padding-left: 2em;
+  }
 
   &__input {
     // @todo need to determine how this is still selectable

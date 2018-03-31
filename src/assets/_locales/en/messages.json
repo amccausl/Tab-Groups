@@ -5,8 +5,13 @@
   },
 
   "extension_description": {
-    "message": "Tab Groups are an easy way to organize a lot of tabs. You can visually group related tabs, switch between groups, and quickly search through all of your tabs to switch to a specific one.",
+    "message": "Tab Groups are an easy way to organize a lot of tabs. You can switch between groups, and quickly search through all of your tabs to switch to a specific one.",
     "description": "Description of the extension."
+  },
+
+  "sidebar_name": {
+    "message": "Grouped Tabs",
+    "description": "Name of the sidebar."
   },
 
   "tab_group_name_placeholder": {

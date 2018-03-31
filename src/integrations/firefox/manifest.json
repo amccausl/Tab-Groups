@@ -27,19 +27,11 @@
   },
   "sidebar_action": {
     "default_icon": "icons/tab-groups.svg",
-    "default_title" : "__MSG_extension_name__",
+    "default_title" : "__MSG_sidebar_name__",
     "default_panel": "sidebar.html"
   },
   "options_ui": {
     "browser_style": true,
     "page": "options.html"
-  },
-  "commands": {
-    "_execute_sidebar_action": {
-      "description": "__MSG_tab_group_sidebar_action__",
-      "suggested_key": {
-        "default": "Ctrl+Shift+E"
-      }
-    }
   }
 }
