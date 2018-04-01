@@ -105,8 +105,15 @@
             "minimum": 1
           },
           "active_tab_id": {
-            "type": "integer",
-            "minimum": 1
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "tab_groups": {
             "type": "array",

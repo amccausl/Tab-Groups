@@ -80,7 +80,7 @@ export function bindBrowserEvents( store ) {
   browser.windows.onCreated.addListener( ( browser_window ) => {
     console.info('windows.onCreated', browser_window)
     if( browser_window.type === 'normal' ) {
-      onWindowCreated( browser_window )
+      onWindowCreated( store, browser_window )
     }
   })
 
