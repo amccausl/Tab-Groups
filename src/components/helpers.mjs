@@ -64,6 +64,18 @@ export function getFriendlyUrlText( uri_string ) {
 }
 
 /**
+ * Get a markdown string rendering for a tab group
+ * @param tab_group
+ */
+export function getTabGroupCopyText( tab_group ) {
+  let copy_text = `## ${ tab_group.title }`
+  tab_group.tabs.forEach( tab => {
+    copy_text += `\n- [${ tab.title }](${ tab.url })`
+  })
+  return copy_text
+}
+
+/**
  * Subscribe to changes from the store and add cleanup on window
  * @param fn
  */

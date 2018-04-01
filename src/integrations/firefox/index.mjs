@@ -587,29 +587,25 @@ export function onTabActivated( store, tab_id, window_id ) {
 
 export function onTabCreated( store, browser_tab ) {
   const state = store.getState()
+  const window = state.windows.find( window => window.id === browser_tab.windowId )
 
-  if( ! browser_tab.openerTabId ) {
-    for( let window of state.windows ) {
-      if( window.id !== browser_tab.windowId ) {
-        continue
-      }
-      // @todo move out of opener guard
-      // Dispatch async task to assign.  Will be queue before the create tab method returns, but executed afterwards
-      setTabGroupId( browser_tab.id, window.active_tab_group_id )
+  if( ! browser_tab.pinned ) {
+    // Dispatch async task to assign.  Will be queue before the create tab method returns, but executed afterwards
+    setTabGroupId( browser_tab.id, window.active_tab_group_id )
+  }
 
-      let index_offset = 0
-      for( let tab_group of window.tab_groups ) {
-        index_offset += tab_group.tabs_count
-        if( window.active_tab_group_id === tab_group.id ) {
-          if( browser_tab.index !== index_offset ) {
-            browser_tab.index = index_offset
-            // console.info('tabs.move', [ browser_tab.id ], { index: browser_tab.index })
-            // browser.tabs.move( [ browser_tab.id ], { index: browser_tab.index } )
-          }
-          break
+  if( false && ! browser_tab.openerTabId ) {
+    let index_offset = 0
+    for( let tab_group of window.tab_groups ) {
+      index_offset += tab_group.tabs_count
+      if( window.active_tab_group_id === tab_group.id ) {
+        if( browser_tab.index !== index_offset ) {
+          browser_tab.index = index_offset
+          // console.info('tabs.move', [ browser_tab.id ], { index: browser_tab.index })
+          // browser.tabs.move( [ browser_tab.id ], { index: browser_tab.index } )
         }
+        break
       }
-      break
     }
   }
 
@@ -635,6 +631,10 @@ export function onTabUpdated( store, tab_id, change_info, browser_tab ) {
       }
       break
     }
+  }
+  if( change_info.hasOwnProperty( 'isArticle' ) ) {
+    // @todo if the update is only isArticle, and no actual change is detected
+    return
   }
   if( change_info.hasOwnProperty( 'sharingState' ) ) {
     // @todo if the update is only sharingState, and no actual change is detected

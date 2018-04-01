@@ -1,6 +1,6 @@
 <template>
   <body class="sidebar" :class="theme">
-    <div :class="[ `action-strip--${ theme }` ]">
+    <div :class="[ `action-strip--${ theme }` ]" @click.right.prevent>
       <input v-if="is_search_enabled" :class="[ `action-strip--${ theme }__search` ]" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/>
       <div v-else :class="[ `action-strip--${ theme }__spacer` ]"></div>
       <div :class="[ `action-strip--${ theme }__button`, `action-strip--${ theme }__button--no-grow` ]" @click="openOptionsPage()">
@@ -126,7 +126,10 @@
       <div class="context-menu__item" v-else @click="unmuteTabGroup( tab_group_context_menu.tab_group_id )">Un<span class="context-menu__item-hotkey">m</span>ute Tabs</div>
       <!-- @todo separator -->
       <div class="context-menu__item" @click="renameTabGroup( tab_group_context_menu.tab_group_id )">Re<span class="context-menu__item-hotkey">n</span>ame</div>
-      <div class="context-menu__item" @click="copyTabGroupAsText( tab_group_context_menu.tab_group_id )"><span class="context-menu__item-hotkey">C</span>opy as text</div>
+      <div class="context-menu__item" @click="copyContextTabGroupAsText( $event, tab_group_context_menu.tab_group_id )">
+        <span class="context-menu__item-hotkey">C</span>opy as text
+        <textarea name="tab_groupcopy_text" v-model="tab_group_context_menu.tab_group_copy_text" style="position: fixed; right: -1000px"></textarea>
+      </div>
       <!-- <div class="context-menu__item">Move to New <span>W</span>indow</div> -->
       <!-- <div class="context-menu__item" @click="archiveTabGroup( tab_group_context_menu.tab_group_id )"><span>A</span>rchive</div> -->
       <div class="context-menu__item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span class="context-menu__item-hotkey">C</span>lose</div>
@@ -161,6 +164,7 @@ import {
   debounce,
   getCountMessage,
   getFriendlyUrlText,
+  getTabGroupCopyText,
   onStateChange,
 } from './helpers.mjs'
 import {
@@ -311,6 +315,7 @@ export default {
       this.tab_group_context_menu.x = document.body.clientWidth - box.right + 3
       this.tab_group_context_menu.y = box.bottom + 8
       this.tab_group_context_menu.tab_group_id = tab_group.id
+      this.tab_group_context_menu.tab_group_copy_text = getTabGroupCopyText( tab_group )
     },
     closeTabGroupMore( event ) {
       console.info('closeTabGroupMore', event )
@@ -347,8 +352,13 @@ export default {
       this.rename_tab_group_id = tab_group_id
       this.tab_group_context_menu.open = false
     },
-    copyTabGroupAsText( tab_group_id ) {
-      console.info('copyTabGroupAsText', tab_group_id)
+    copyContextTabGroupAsText( event ) {
+      console.info('copyContextTabGroupAsText', event)
+      const textarea_el = event.target.querySelector( 'textarea' )
+      textarea_el.select()
+      document.execCommand( 'copy' )
+      textarea_el.blur()
+      this.tab_group_context_menu.open = false
     },
     isSelected( tab ) {
       return this.selected_tab_ids.includes( tab.id )
@@ -1001,6 +1011,7 @@ $sidebar-tab-group-list__themes: (
   padding-top: 10px;
   padding-bottom: 10px;
   overflow: hidden;
+  mask-image: linear-gradient( to right, rgba(0, 0, 0, 1.0), rgba(0, 0, 0, 1.0) calc(100% - 10px), transparent );
 }
 
 .sidebar-tab-view-item-context {
