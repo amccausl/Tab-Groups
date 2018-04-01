@@ -94,7 +94,7 @@
         @dragenter="onTabGroupDragEnter"
         @dragover.prevent
         @dragleave="onTabGroupDragLeave"
-        @dragend="onTabGroupDragEnd"
+        @dragend="onTabDragEnd"
         @drop="onTabGroupDrop"
     >
       <!-- @todo disabled because looks odd on drop for full scrolling size, will revisit -->
@@ -109,7 +109,7 @@
           @dragover.prevent
           @dragleave="onTabGroupDragLeave"
           @drop="onTabGroupDrop"
-          @dragend="onTabGroupDragEnd"
+          @dragend="onTabDragEnd"
       >
         <svg :class="[ `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>

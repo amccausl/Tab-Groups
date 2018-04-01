@@ -593,7 +593,10 @@ export function onTabCreated( store, browser_tab ) {
       if( window.id !== browser_tab.windowId ) {
         continue
       }
-      // setTabGroupId( browser_tab.id, window.active_tab_group_id )
+      // @todo move out of opener guard
+      // Dispatch async task to assign.  Will be queue before the create tab method returns, but executed afterwards
+      setTabGroupId( browser_tab.id, window.active_tab_group_id )
+
       let index_offset = 0
       for( let tab_group of window.tab_groups ) {
         index_offset += tab_group.tabs_count
@@ -609,14 +612,6 @@ export function onTabCreated( store, browser_tab ) {
       break
     }
   }
-
-  // @todo any async tasks here may lead to race conditions
-  // getTabGroupId( browser_tab.id )
-  //   .then( tab_group_id => {
-  //     if( tab_group_id == null ) {
-        // @todo assign to the active group
-    //   }
-    // })
 
   return store.dispatch( addTabAction( browser_tab ) )
 }
