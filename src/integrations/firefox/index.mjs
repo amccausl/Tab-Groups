@@ -1,14 +1,5 @@
 import {
-  addWindowAction,
-  removeWindowAction,
-  activateTabAction,
-  addTabAction,
-  removeTabAction,
-  updateTabAction,
-  updateTabImageAction,
-  moveTabAction,
   moveTabsAction,
-  attachTabAction,
   createGroupAction,
   removeGroupAction,
   muteGroupAction,
@@ -16,7 +7,6 @@ import {
   startSearchAction,
   finishSearchAction,
   resetSearchAction,
-  updateConfigAction,
 } from '../../store/actions.mjs'
 import {
   createTabGroup,
@@ -24,7 +14,6 @@ import {
   findTab,
   findTabGroup,
   getNewTabGroupId,
-  getSourceTabGroupData,
   getTabMoveData,
 } from '../../store/helpers.mjs'
 
@@ -32,10 +21,6 @@ const LOCAL_CONFIG_KEY = 'config'
 const WINDOW_TAB_GROUPS_KEY = 'tab_groups'
 const TAB_GROUP_ID_KEY = 'group_id'
 const TAB_PREVIEW_IMAGE_KEY = 'preview_image'
-
-const TAB_PREVIEW_IMAGE_DETAILS = {
-  format: 'png'
-}
 
 const EMPTY = {}
 
@@ -118,7 +103,7 @@ export function getTabState( browser_tab ) {
     title: browser_tab.title,
     status: browser_tab.status,
     url: browser_tab.url,
-    icon_url: getIconUrl( browser_tab ),
+    icon_url: browser_tab.favIconUrl,
     preview_image: {
       width: browser_tab.width,
       height: browser_tab.height,
@@ -146,12 +131,6 @@ export function getTabState( browser_tab ) {
   }
 
   return tab
-}
-
-function getIconUrl( browser_tab ) {
-  if( browser_tab.favIconUrl != null ) {
-    return browser_tab.favIconUrl
-  }
 }
 
 /**

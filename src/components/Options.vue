@@ -1,10 +1,10 @@
 <template>
   <body>
     <p>
+      <!-- @todo localize -->
       Changing the visibility of tabs in the header bar is currently experimental, but can be enabled by updating <pre>extensions.webextensions.tabhide.enabled</pre> on <a href="about:config">about:config</a>
     </p>
     <div class="options">
-      <!-- @todo localize -->
       <nav class="sidenav">
         <ul>
           <li :class="{ 'active': selected_section === 'preferences' }">
@@ -68,6 +68,7 @@
         </section>
         <section v-if="selected_section === 'data'">
           <form @submit.prevent>
+            <!-- @todo localize -->
             <button @click="clearAllData()" class="browser-style">Clear All Data</button>
             <button @click="syncState()" class="browser-style">Sync State</button>
           </form>

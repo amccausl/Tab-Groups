@@ -92,6 +92,59 @@ export function findTabGroup( state, window_id, tab_group_id ) {
   }
 }
 
+export function getCreateTabTarget( state, browser_tab ) {
+  if( browser_tab.pinned ) {
+    // Ignore pinned tabs
+    return {
+      index: browser_tab.index,
+      tab_group_id: 0
+    }
+  }
+
+  const window = state.windows.find( window => window.id === browser_tab.windowId )
+  if( window != null ) {
+    let total_tabs_count = 0
+    window.tab_groups.forEach( tab_group => {
+      total_tabs_count += tab_group.tabs_count
+    })
+
+    if( browser_tab.openerTabId != null ) {
+      // Tab was opened by a pinned tab, move to start of active group instead
+      if( window.tab_groups[ 0 ].tabs.some( tab => tab.id === browser_tab.openerTabId ) ) {
+        let index_offset = 0
+        for( let tab_group of window.tab_groups ) {
+          if( tab_group.id === window.active_tab_group_id ) {
+            return {
+              index: index_offset,
+              tab_group_id: tab_group.id
+            }
+          }
+          index_offset += tab_group.tabs_count
+        }
+      }
+
+      return {
+        index: browser_tab.index,
+        tab_group_id: window.active_tab_group_id
+      }
+    } else if( browser_tab.index === total_tabs_count ) {
+      // This was probably created by native "New Tab" functionality
+      let index_offset = 0
+      for( let tab_group of window.tab_groups ) {
+        if( tab_group.id === window.active_tab_group_id ) {
+          return {
+            index: index_offset + tab_group.tabs_count,
+            tab_group_id: tab_group.id
+          }
+        }
+        index_offset += tab_group.tabs_count
+      }
+    }
+  }
+
+  return { index: browser_tab.index }
+}
+
 /**
  * Scan the state for the next available tab_group_id
  */

@@ -13,6 +13,7 @@ import {
 import {
   default_config,
   findTab,
+  getCreateTabTarget,
   getSourceTabGroupData,
 } from "../../store/helpers.mjs"
 
@@ -77,20 +78,7 @@ export function bindBrowserEvents( store ) {
   })
 
   browser.tabs.onMoved.addListener( ( tab_id, { windowId, fromIndex, toIndex } ) => {
-    console.info('tabs.onMoved', tab_id, windowId, fromIndex, toIndex)
-
-    const source_data = {
-      window_id: windowId,
-      tab_id,
-      index: fromIndex
-    }
-
-    const target_data = {
-      window_id: windowId,
-      index: toIndex
-    }
-
-    onTabMoved( store, source_data, target_data )
+    onTabMoved( store, tab_id, windowId, toIndex )
   })
 
   browser.tabs.onAttached.addListener( ( tab_id, { newWindowId, newPosition } ) => {
@@ -108,7 +96,6 @@ export function bindBrowserEvents( store ) {
   })
 
   browser.tabs.onUpdated.addListener( ( tab_id, change_info, browser_tab ) => {
-    console.info('tabs.onUpdated', tab_id, change_info, browser_tab)
     onTabUpdated( store, tab_id, change_info, browser_tab )
   })
 
@@ -195,26 +182,10 @@ export function onTabActivated( store, tab_id, window_id ) {
 
 export function onTabCreated( store, browser_tab ) {
   const state = store.getState()
-  const window = state.windows.find( window => window.id === browser_tab.windowId )
-
-  if( ! browser_tab.pinned ) {
-    // Dispatch async task to assign.  Will be queue before the create tab method returns, but executed afterwards
-    setTabGroupId( browser_tab.id, window.active_tab_group_id )
-  }
-
-  if( false && ! browser_tab.openerTabId ) {
-    let index_offset = 0
-    for( let tab_group of window.tab_groups ) {
-      index_offset += tab_group.tabs_count
-      if( window.active_tab_group_id === tab_group.id ) {
-        if( browser_tab.index !== index_offset ) {
-          browser_tab.index = index_offset
-          console.info('tabs.move', [ browser_tab.id ], { index: browser_tab.index })
-          browser.tabs.move( [ browser_tab.id ], { index: browser_tab.index } )
-        }
-        break
-      }
-    }
+  const { index } = getCreateTabTarget( state, browser_tab )
+  if( browser_tab.index !== index ) {
+    console.info('tabs.move', [ browser_tab.id ], { index })
+    browser.tabs.move( [ browser_tab.id ], { index } )
   }
 
   return store.dispatch( addTabAction( browser_tab ) )
@@ -240,18 +211,17 @@ export function onTabUpdated( store, tab_id, change_info, browser_tab ) {
       break
     }
   }
+  // @todo should omit ignored properties and check if result is empty instead
   if( change_info.hasOwnProperty( 'isArticle' ) ) {
-    // @todo if the update is only isArticle, and no actual change is detected
     return
   }
   if( change_info.hasOwnProperty( 'sharingState' ) ) {
-    // @todo if the update is only sharingState, and no actual change is detected
     return
   }
   if( change_info.hasOwnProperty( 'hidden' ) ) {
-    // @todo if the update is only hidden, and no actual change is detected
     return
   }
+  console.info(`onTabUpdated( tab_id=${ tab_id }, change_info=${ JSON.stringify( change_info ) } )`, browser_tab)
   store.dispatch( updateTabAction( browser_tab, change_info ) )
 }
 
@@ -260,61 +230,7 @@ export function onTabRemoved( store, tab_id, window_id ) {
   store.dispatch( removeTabAction( tab_id, window_id ) )
 }
 
-export function onTabMoved( store, source_data, target_data ) {
-  if( source_data.index === target_data.index ) {
-    console.info('ignoring move with equal index')
-    return
-  }
-
-  // Can skip dispatch step if this has already been handled
-  if( store.is_dispatching ) {
-    console.info('skipping move')
-    return
-  }
-
-  // @todo if extension tab is being moved, move back
-
-  // Run scan of state to detect if this crosses a tab_group threshold and move back
-  if( Math.abs( source_data.index - target_data.index ) === 1 ) {
-    const state = store.getState()
-    const target_window = state.windows.find( window => window.id === source_data.window_id )
-
-    source_data = Object.assign( {}, source_data,
-      getSourceTabGroupData( target_window, source_data )
-    )
-
-    console.info('source_data', source_data)
-
-    let is_cancelled = false
-    if( source_data.index + 1 === target_data.index ) {
-      // Is move down 1
-      if( source_data.tab_group_last ) {
-        is_cancelled = true
-      }
-    } else if( source_data.index - 1 === target_data.index ) {
-      // Is move up 1
-      if( source_data.tab_group_index === 0 ) {
-        is_cancelled = true
-
-        const move_source_data = {
-          window_id: source_data.window_id
-        }
-
-        moveTabsToGroup( store, move_source_data, target_data )
-      }
-    }
-
-    if( is_cancelled ) {
-      browser.tabs.move( [ source_data.tab_id ], { index: source_data.index } )
-      // @todo trigger move to tab group
-      console.warn('reversing move')
-      return
-    }
-  }
-
-  // Can skip dispatch step if this has already been handled
-  if( ! store.is_dispatching ) {
-    // @todo probably not required
-    store.dispatch( moveTabAction( source_data.tab_id, target_data.window_id, target_data.index ) )
-  }
+export function onTabMoved( store, tab_id, window_id, index ) {
+  console.info(`onTabMoved( tab_id=${ tab_id }, window_id=${ window_id }, index=${ index } )`)
+  store.dispatch( moveTabAction( tab_id, window_id, index ) )
 }
