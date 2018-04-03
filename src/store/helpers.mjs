@@ -1,7 +1,6 @@
 
 export const default_config = {
-  theme: 'light', // 'dark'
-  native_tab_move: 'group', // 'free', 'group-wrap'
+  theme: 'light',
 }
 
 export function createWindow( window_id, tab_groups ) {

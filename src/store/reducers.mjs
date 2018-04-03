@@ -138,6 +138,7 @@ export function init( state, { browser_tabs, config, contextual_identities, them
     // @todo this should be based on config setting
 
     let active_tab_id = null
+    let active_tab_group_id = null
     for( let browser_tab of window_tabs ) {
       if( browser_tab.active ) {
         active_tab_id = browser_tab.id
@@ -163,6 +164,9 @@ export function init( state, { browser_tabs, config, contextual_identities, them
       const last_tab_group_state = window_tab_groups_state[ window_tab_groups_state.length - 1 ]
       for( let tab_group_state of window_tab_groups_state ) {
         const tabs = ( last_tab_group_state === tab_group_state ? window_tabs : window_tabs.splice( 0, tab_group_state.tabs_count ) )
+        if( tabs.some( tab => tab.id === active_tab_id ) ) {
+          active_tab_group_id = tab_group_state.id
+        }
         window_tab_groups.push({
           id: tab_group_state.id,
           title: tab_group_state.title,
@@ -179,14 +183,14 @@ export function init( state, { browser_tabs, config, contextual_identities, them
 
     windows.push({
       id: window_id,
-      active_tab_group_id: window_tab_groups[ 1 ].id, // @todo
+      active_tab_group_id: active_tab_group_id || window_tab_groups[ 1 ].id,
       active_tab_id,
       tab_groups: window_tab_groups
     })
   }
 
   const init_state = {
-    config: config || initial_state.config,
+    config,
     contexts,
     windows
   }

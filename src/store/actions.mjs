@@ -23,10 +23,13 @@ import {
   TAB_ATTACH,
 } from './action-types.mjs'
 
-export function initAction({ browser_tabs, window_tab_groups_map }) {
+export function initAction({ browser_tabs, config, contextual_identities, theme, window_tab_groups_map }) {
   return {
     type: INIT,
     browser_tabs,
+    config,
+    contextual_identities,
+    theme,
     window_tab_groups_map
   }
 }
