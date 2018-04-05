@@ -16,7 +16,10 @@ import {
   loadBrowserState,
   moveTabsToGroup,
   openOptionsPage,
+  openSidebarPage,
+  resetBrowserState,
   runTabSearch,
+  setConfig,
   setTabActive,
   setWindowTabGroupsState,
 } from './integrations/index.mjs'
@@ -78,5 +81,8 @@ window.muteTabGroup = muteTabGroup
 window.unmuteTabGroup = unmuteTabGroup
 window.getMessage = getMessage
 window.openOptionsPage = openOptionsPage
+window.openSidebarPage = openSidebarPage
+window.resetBrowserState = resetBrowserState
 window.runTabSearch = runTabSearch
+window.setConfig = setConfig
 window.setTabActive = setTabActive

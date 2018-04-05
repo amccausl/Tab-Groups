@@ -1,6 +1,10 @@
 
 export const default_config = {
-  theme: 'light',
+  theme: 'dark',
+  show_tabs_count: true,
+  show_tabs: true,
+  show_tab_context: true,
+  show_tab_icon_background: true,
 }
 
 export function createWindow( window_id, tab_groups ) {

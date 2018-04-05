@@ -17,10 +17,10 @@ import {
   getTabMoveData,
 } from '../../store/helpers.mjs'
 
-const LOCAL_CONFIG_KEY = 'config'
-const WINDOW_TAB_GROUPS_KEY = 'tab_groups'
-const TAB_GROUP_ID_KEY = 'group_id'
-const TAB_PREVIEW_IMAGE_KEY = 'preview_image'
+export const LOCAL_CONFIG_KEY = 'config'
+export const WINDOW_TAB_GROUPS_KEY = 'tab_groups'
+export const TAB_GROUP_ID_KEY = 'group_id'
+export const TAB_PREVIEW_IMAGE_KEY = 'preview_image'
 
 const EMPTY = {}
 
@@ -146,7 +146,7 @@ export function setWindowTabGroupsState( window_id, tab_groups_state ) {
  * Fetch the preview image for a tab from session storage
  * @param tab_id
  */
-export function getTabGroupId( tab_id ) {
+function getTabGroupId( tab_id ) {
   console.info(`browser.sessions.getTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY } )`)
   return browser.sessions.getTabValue( tab_id, TAB_GROUP_ID_KEY )
 }
@@ -156,7 +156,7 @@ export function getTabGroupId( tab_id ) {
  * @param tab_id
  * @param group_id
  */
-export function setTabGroupId( tab_id, group_id ) {
+function setTabGroupId( tab_id, group_id ) {
   console.info(`browser.sessions.setTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY }, ${ group_id } )`)
   return browser.sessions.setTabValue( tab_id, TAB_GROUP_ID_KEY, group_id )
 }
@@ -165,7 +165,7 @@ export function setTabGroupId( tab_id, group_id ) {
  * Fetch the preview image for a tab from session storage
  * @param tab_id
  */
-export function getTabPreviewState( tab_id ) {
+function getTabPreviewState( tab_id ) {
   return browser.sessions.getTabValue( tab_id, TAB_PREVIEW_IMAGE_KEY )
 }
 
@@ -174,14 +174,14 @@ export function getTabPreviewState( tab_id ) {
  * @param tab_id
  * @param preview_image
  */
-export function setTabPreviewState( tab_id, preview_image ) {
+function setTabPreviewState( tab_id, preview_image ) {
   return browser.sessions.setTabValue( tab_id, TAB_PREVIEW_IMAGE_KEY, preview_image )
 }
 
 /**
  * Load the config values
  */
-export function getConfig() {
+function getConfig() {
   return browser.storage.local.get( LOCAL_CONFIG_KEY )
     .then( local_storage => local_storage[ LOCAL_CONFIG_KEY ] || {} )
 }

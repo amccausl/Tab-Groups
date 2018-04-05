@@ -85,11 +85,6 @@
 
 <script>
 import {
-  resetBrowserState,
-  openSidebarPage,
-  setConfig,
-} from '../integrations/index.mjs'
-import {
   onStateChange,
 } from './helpers.mjs'
 
@@ -150,7 +145,7 @@ export default {
         return this.preferences.show_tabs
       },
       set( value ) {
-        setConfig( 'show_tabs', value )
+        window.background.setConfig( 'show_tabs', value )
       }
     },
     show_tabs_count: {
@@ -158,7 +153,7 @@ export default {
         return this.preferences.show_tabs_count
       },
       set( value ) {
-        setConfig( 'show_tabs_count', value )
+        window.background.setConfig( 'show_tabs_count', value )
       }
     },
     show_pinned_tabs: {
@@ -166,7 +161,7 @@ export default {
         return this.preferences.show_pinned_tabs
       },
       set( value ) {
-        setConfig( 'show_pinned_tabs', value )
+        window.background.setConfig( 'show_pinned_tabs', value )
       }
     },
     show_tab_context: {
@@ -174,7 +169,7 @@ export default {
         return this.preferences.show_tab_context
       },
       set( value ) {
-        setConfig( 'show_tab_context', value )
+        window.background.setConfig( 'show_tab_context', value )
       }
     },
     show_tab_icon_background: {
@@ -182,7 +177,7 @@ export default {
         return this.preferences.show_tab_icon_background
       },
       set( value ) {
-        setConfig( 'show_tab_icon_background', value )
+        window.background.setConfig( 'show_tab_icon_background', value )
       }
     }
   },
@@ -194,9 +189,11 @@ export default {
   },
   methods: {
     clearAllData() {
-      resetBrowserState( window.store )
+      window.background.resetBrowserState( window.store )
     },
-    openSidebarPage,
+    openSidebarPage() {
+      window.background.openSidebarPage()
+    },
     syncState() {
       window.background.syncState()
     },
@@ -204,7 +201,7 @@ export default {
       this.selected_section = section_id
     },
     selectTheme( theme_id ) {
-      setConfig( 'theme', theme_id )
+      window.background.setConfig( 'theme', theme_id )
     }
   }
 }

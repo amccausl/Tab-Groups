@@ -38,6 +38,7 @@ import {
 
 // @todo remove dependency
 import {
+  TAB_GROUP_ID_KEY,
   getTabState,
 } from '../integrations/index.mjs'
 
@@ -132,6 +133,8 @@ export function init( state, { browser_tabs, config, contextual_identities, them
     })
   }
 
+  // @todo scan map to get max window id in case things are in awkward state
+
   const windows = []
   for( let [ window_id, window_tabs ] of window_tabs_map.entries() ) {
     // @todo ensure tabs are in index sorted order, with the pinned tabs first
@@ -139,45 +142,60 @@ export function init( state, { browser_tabs, config, contextual_identities, them
 
     let active_tab_id = null
     let active_tab_group_id = null
+    const window_tab_groups_state = window_tab_groups_map.get( window_id )
+    const window_tab_group_map = new Map()
+    if( window_tab_groups_state ) {
+      for( let tab_group_state of window_tab_groups_state ) {
+        window_tab_group_map.set( tab_group_state.id, {
+          id: tab_group_state.id,
+          title: tab_group_state.title,
+          active_tab_id: null,
+          tabs: [],
+          tabs_count: tab_group_state.tabs_count
+        })
+      }
+    }
+
+    let pinned_tabs = []
+    let ungrouped_tabs = []
     for( let browser_tab of window_tabs ) {
       if( browser_tab.active ) {
         active_tab_id = browser_tab.id
       }
-    }
-
-    let pinned_tabs
-
-    // Find the first non-pinned tab
-    const tabs_start_index = window_tabs.findIndex( browser_tab => ! browser_tab.pinned )
-    if( tabs_start_index === -1 ) {
-      // All the tabs are pinned
-      pinned_tabs = window_tabs.map( getTabState )
-      window_tabs = []
-    } else {
-      pinned_tabs = window_tabs.slice( 0, tabs_start_index ).map( getTabState )
-      window_tabs = window_tabs.slice( tabs_start_index ).map( getTabState )
+      let tab = getTabState( browser_tab )
+      if( browser_tab.pinned ) {
+        pinned_tabs.push( tab )
+      } else if( browser_tab.session != null && browser_tab.session[ TAB_GROUP_ID_KEY ] != null && window_tab_group_map.has( browser_tab.session[ TAB_GROUP_ID_KEY ] ) ) {
+        window_tab_group_map.get( browser_tab.session[ TAB_GROUP_ID_KEY ] ).tabs.push( tab )
+      } else {
+        ungrouped_tabs.push( tab )
+      }
     }
 
     const window_tab_groups = [ createPinnedTabGroup( pinned_tabs ) ]
-    const window_tab_groups_state = window_tab_groups_map.get( window_id )
     if( window_tab_groups_state ) {
-      const last_tab_group_state = window_tab_groups_state[ window_tab_groups_state.length - 1 ]
-      for( let tab_group_state of window_tab_groups_state ) {
-        const tabs = ( last_tab_group_state === tab_group_state ? window_tabs : window_tabs.splice( 0, tab_group_state.tabs_count ) )
-        if( tabs.some( tab => tab.id === active_tab_id ) ) {
-          active_tab_group_id = tab_group_state.id
+      for( let tab_group of window_tab_group_map.values() ) {
+        if( tab_group.tabs.length < tab_group.tabs_count ) {
+          tab_group.tabs.push( ...ungrouped_tabs.splice( 0, tab_group.tabs_count - tab_group.tabs.length ) )
         }
-        window_tab_groups.push({
-          id: tab_group_state.id,
-          title: tab_group_state.title,
-          active_tab_id: null,
-          tabs,
-          tabs_count: tabs.length
-        })
+        if( tab_group.tabs.length > 0 ) {
+          if( tab_group.tabs.some( tab => tab.id === active_tab_id ) ) {
+            tab_group.active_tab_id = active_tab_id
+            active_tab_group_id = tab_group.id
+          } else {
+            tab_group.active_tab_id = tab_group.tabs[ 0 ].id
+          }
+        }
+        tab_group.tabs_count = tab_group.tabs.length
+        window_tab_groups.push( tab_group )
+      }
+      if( ungrouped_tabs.length > 0 ) {
+        window_tab_groups[ window_tab_groups.length - 1 ].tabs.push( ...ungrouped_tabs )
+        window_tab_groups[ window_tab_groups.length - 1 ].tabs_count = window_tab_groups[ window_tab_groups.length - 1 ].tabs.length
       }
     } else {
       // No state, assign all tabs to new groups
-      window_tab_groups.push( createTabGroup( new_tab_group_id, window_tabs ) )
+      window_tab_groups.push( createTabGroup( new_tab_group_id, ungrouped_tabs ) )
       new_tab_group_id++
     }
 
