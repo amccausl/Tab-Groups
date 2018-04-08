@@ -23,11 +23,11 @@
 <script>
 import {
   INK_90,
-} from './photon-colors'
+} from "./photon-colors"
 
 export default {
-  name: 'tab-icon',
-  props: [ 'theme', 'tab', 'size' ],
+  name: "tab-icon",
+  props: [ "theme", "tab", "size" ],
   data() {
     return {
       window_id: window.current_window_id,
@@ -36,20 +36,25 @@ export default {
   computed: {
     context_fill() {
       switch( this.theme ) {
-        case 'dark':
-          return 'rgb(255, 255, 255)'
+        case "dark":
+          return "rgb(255, 255, 255)"
         default:
           return INK_90
       }
     },
     icon_url() {
       switch( this.tab.icon_url ) {
-        case 'chrome://mozapps/skin/extensions/extensionGeneric-16.svg':
-          return '/icons/extensionGeneric.svg'
-        case 'chrome://branding/content/icon32.png':
-          if( this.theme === 'dark' ) {
+        case "chrome://mozapps/skin/extensions/extensionGeneric-16.svg":
+          return "/icons/extensionGeneric.svg"
+        case "chrome://branding/content/icon32.png":
+          if( this.theme === "dark" ) {
             return `/icons/firefox-logo-glyph.svg`
           }
+      }
+      if( this.tab.url.startsWith( "about:" ) ) {
+        if( this.theme === "dark" ) {
+          return `/icons/firefox-logo-glyph.svg`
+        }
       }
       return this.tab.icon_url
     },

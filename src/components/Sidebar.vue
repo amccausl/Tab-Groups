@@ -13,7 +13,9 @@
       <div v-for="pinned_tab in pinned_tabs" :key="pinned_tab.id"
           :class="[ `pinned-tab-list--${ theme }__item`, pinned_tab.active ? `pinned-tab-list--${ theme }__item--active` : '', isSelected( pinned_tab ) ? `pinned-tab-list--${ theme }__item--selected` : '' ]"
           :title="pinned_tab.title"
-          @click.ctrl="toggleTabSelection( pinned_tab )" @click.exact="openTab( pinned_tab.id )" @click.middle="closeTab( pinned_tab )"
+          @click.ctrl="toggleTabSelection( pinned_tab )"
+          @click.exact="openTab( pinned_tab.id )"
+          @click.middle="closeTab( pinned_tab )"
       >
         <span :class="[ `pinned-tab-list--${ theme }__ink` ]"></span>
         <div :class="[ `pinned-tab-list--${ theme }__tab` ]">
@@ -27,13 +29,17 @@
     </div>
     <div :class="[ `sidebar-tab-group-list--${ theme }` ]" @click.right.prevent>
       <div :class="[ `sidebar-tab-group-list--${ theme }__item`, `tab-group-item`, ! tab_group.open && active_tab_group_id === tab_group.id ? 'tab-group-item--active' : '' ]"
-          v-for="tab_group in tab_groups" :key="tab_group.id"
+          v-for="(tab_group, tab_group_index) in tab_groups" :key="tab_group.id"
       >
-        <div :class="[ `tab-group-list-item-header--${ theme }`, active_tab_group_id === tab_group.id ? `tab-group-list-item-header--${ theme }--active` : ``, target_tab_group_id === tab_group.id && target_tab_group_index == null ? `tab-group-list-item-header--${ theme }--target` : `` ]"
+        <div :class="[ `tab-group-list-item-header--${ theme }`, active_tab_group_id === tab_group.id ? `tab-group-list-item-header--${ theme }--active` : ``, drag_state.target != null && drag_state.target.tab_group_id === tab_group.id && drag_state.target.tab_group_index == null ? `tab-group-list-item-header--${ theme }--drag-${ drag_state.source.type }-target` : `` ]"
             @click="onTabGroupClick( tab_group )"
-            @dragenter="onTabGroupDragEnter( $event, tab_group )" @dragleave="onTabGroupDragLeave( $event, tab_group )"
-            @drop="onTabGroupDrop( $event, tab_group )" @dragend="onTabGroupDragEnd( $event, tab_group )"
+            @dragenter="onTabGroupDragEnter( $event, tab_group, tab_group_index + 1 )"
             @dragover.prevent
+            @dragleave="onTabGroupDragLeave( $event, tab_group, tab_group_index + 1 )"
+            @drop="onTabGroupDrop( $event, tab_group, tab_group_index + 1 )"
+            draggable="true"
+            @dragstart="onTabGroupDragStart( $event, tab_group )"
+            @dragend="onTabGroupDragEnd( $event, tab_group )"
         >
           <div :class="[ `tab-group-list-item-header--${ theme }__main` ]">
             <svg v-if="show_tabs" :class="[ `tab-group-list-item-header--${ theme }__carat-icon`, tab_group.open ? `tab-group-list-item-header--${ theme }__carat-icon--open` : `` ]" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
@@ -64,18 +70,33 @@
             </svg>
           </button>
         </div>
-        <div v-if="tab_group.open && show_tabs" class="sidebar-tab-group-tabs-list">
+        <div class="sidebar-tab-group-tabs-list"
+            :class="[ `sidebar-tab-group-tabs-list--${ $theme }` ]"
+            v-if="tab_group.open && show_tabs"
+        >
           <div class="sidebar-tab-group-tabs-list-item"
+              :class="[ `sidebar-tab-group-tabs-list--${ theme }__item-container`, drag_state.target.tab_id === tab.id ? `sidebar-tab-group-tabs-list--${ theme }__item-container--drag-target` : ``, isSelected( tab ) && is_dragging ? `sidebar-tab-group-tabs-list--${ theme }__item-container--drag-source` : `` ]"
               v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
               v-if="! search_text || ! search_resolved || tab.matched" :title="tab.title"
-              :class="{ active: tab.active, selected: isSelected( tab ), source: isSelected( tab ) && is_dragging, target: target_tab_id === tab.id && ! isSelected( tab ) }"
               @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab.id )" @click.middle="closeTab( tab )"
-              draggable="true" @dragstart="onTabDragStart( $event, tab )" @dragend="onTabDragEnd( $event )" @drop="onTabDrop( $event, tab )"
-              @dragover="onTabDragOver( $event, tab_group, tab )"
+              @dragenter="onTabDragEnter( $event, tab_group, tab )"
+              @dragover.prevent
+              @dragleave="onTabDragLeave( $event, tab_group, tab )"
+              @drop="onTabDrop( $event, tab_group, tab )"
+              draggable="true"
+              @dragstart="onTabDragStart( $event, tab )"
+              @dragend="onTabDragEnd( $event )"
           >
-            <div class="sidebar-tab-view-item" :class="{ active: tab.active }">
-              <div class="sidebar-tab-view-item-icon">
-                <div v-if="show_tab_icon_background" class="sidebar-tab-view-item-icon-background"></div>
+            <div class="sidebar-tab-view-item"
+                :class="[ `sidebar-tab-group-tabs-list--${ theme }__item`, tab.active ? `sidebar-tab-group-tabs-list--${ theme }__item--active` : `` ]"
+            >
+              <div class="sidebar-tab-view-item-icon"
+                  :class="[ `sidebar-tab-group-tabs-list--${ theme }__item-icon` ]"
+              >
+                <div class="sidebar-tab-view-item-icon-background"
+                    :class="[ `sidebar-tab-group-tabs-list--${ theme }__item-icon-background` ]"
+                    v-if="show_tab_icon_background"
+                ></div>
                 <tab-icon :theme="theme" :tab="tab" size="24"></tab-icon>
               </div>
               <div class="sidebar-tab-view-item-text">
@@ -89,7 +110,7 @@
         </div>
       </div>
     </div>
-    <div :class="[ `empty-dropzone--${ theme }`, target_tab_group_new ? `empty-dropzone--${ theme }--target` : `` ]"
+    <div :class="[ `empty-dropzone--${ theme }`, drag_state.target.tab_group_new ? `empty-dropzone--${ theme }--drag-target` : `` ]"
         @click.right.prevent
         @dragenter="onTabGroupDragEnter"
         @dragover.prevent
@@ -97,14 +118,14 @@
         @dragend="onTabDragEnd"
         @drop="onTabGroupDrop"
     >
-      <!-- @todo disabled because looks odd on drop for full scrolling size, will revisit -->
-      <!-- <svg :class="[ `empty-dropzone__icon`, `empty-dropzone--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
+      <svg :class="[ `empty-dropzone--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
         <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
-      </svg> -->
+      </svg>
     </div>
     <div :class="[ `action-strip--${ theme }` ]">
       <div :class="[ `action-strip--${ theme }__button`, target_tab_group_new ? `action-strip--${ theme }__button--active` : `` ]"
-          @click.left="createTabGroup()" @click.right.prevent
+          @click.left="createTabGroup()"
+          @click.right.prevent
           @dragenter="onTabGroupDragEnter"
           @dragover.prevent
           @dragleave="onTabGroupDragLeave"
@@ -151,15 +172,18 @@ import {
   getTransferData,
   isTabTransfer,
   onTabDragStart,
-  onTabDragOver,
   onTabDragEnd,
+  onTabDragEnter,
+  onTabDragLeave,
   onTabDrop,
+  onTabGroupDragStart,
+  onTabGroupDragEnd,
   onTabGroupDragEnter,
   onTabGroupDragLeave,
   onTabGroupDrop,
   resetDragState,
   setTabTransferData,
-} from './droppable.mjs'
+} from './draggable.mjs'
 import {
   debounce,
   getCountMessage,
@@ -204,10 +228,10 @@ export default {
       show_tab_icon_background: true,
       pinned_tabs: [],
       tab_groups: [],
-      target_tab_group_new: false,
-      target_tab_group_id: null,
-      target_tab_group_index: null,
-      target_tab_id: null,
+      drag_state: {
+        source: {},
+        target: {},
+      },
       theme: null
     }
   },
@@ -368,9 +392,10 @@ export default {
       return tab_group.muted
     },
     onTabDragStart,
-    onTabDragOver,
     onTabDragEnd,
     onTabDrop,
+    onTabDragEnter,
+    onTabDragLeave,
     onTabGroupClick( tab_group ) {
       if( ! this.show_tabs ) {
         if( tab_group.active_tab_id && tab_group.tabs.length ) {
@@ -381,23 +406,11 @@ export default {
         tab_group.open = ! tab_group.open
       }
     },
+    onTabGroupDragStart,
     onTabGroupDragEnter,
     onTabGroupDragLeave,
-    onTabGroupDrop( event, tab_group ) {
-      event.preventDefault()
-      const source_data = getTransferData( event.dataTransfer )
-      console.info('onTabGroupDrop', tab_group, event, source_data)
-      if( isTabTransfer( source_data ) ) {
-        if( tab_group == null ) {
-          console.info('detected tab drop', source_data)
-          this.resetDragState()
-          return window.background.createGroup( window.store, this.window_id, source_data )
-            .then( tab_group => this.renameTabGroup( tab_group.id ) )
-        } else {
-          onTabGroupDrop.call( this, event, tab_group )
-        }
-      }
-    },
+    onTabGroupDragEnd,
+    onTabGroupDrop,
     onTabGroupTitleInput( title, tab_group ) {
       console.info('onTabGroupTitleInput', title, tab_group)
       // Update interferes with the editable div if it happens too quickly
@@ -479,13 +492,13 @@ $__themes--dark: (
 $empty-dropzone__themes: (
   light: (
     --background-color: $white-100,
-    --target--background-color: map-get( $__themes--light, --drop-target--background-color ),
-    --target--color: $grey-90-a80,
+    --drag-target--background-color: map-get( $__themes--light, --drop-target--background-color ),
+    --drag-target--color: $grey-90-a80,
   ),
   dark: (
     --background-color: black,
-    --target--background-color: map-get( $__themes--dark, --drop-target--background-color ),
-    --target--color: #d0d0d0,
+    --drag-target--background-color: map-get( $__themes--dark, --drop-target--background-color ),
+    --drag-target--color: #d0d0d0,
   )
 );
 
@@ -500,9 +513,8 @@ $empty-dropzone__themes: (
     background-color: transparent;
     background-color: map-get( $colors, --background-color );
 
-    &--target {
-      background-color: map-get( $colors, --target--background-color );
-      fill: map-get( $colors, --target--color );
+    &--drag-target {
+      background-color: map-get( $colors, --drag-target--background-color );
     }
 
     &__icon {
@@ -510,9 +522,10 @@ $empty-dropzone__themes: (
       transition-property: opacity;
       display: none; // Remove the spacer when not required (list is full)
       opacity: 0;
+      fill: map-get( $colors, --drag-target--color );
     }
 
-    &--target &__icon {
+    &--drag-target:hover &__icon {
       display: block;
       opacity: 1;
     }
@@ -655,7 +668,7 @@ $pinned-tab-list__themes: (
       }
 
       &--active {
-        cursor: none;
+        cursor: default;
         border-top-color: map-get( $colors, __item--background-color );
         border-right-color: map-get( $colors, __ink--color );
         border-left-color: map-get( $colors, __ink--color );
@@ -726,6 +739,8 @@ $tab-group-list-item-header__themes: (
 
 @each $theme, $colors in $tab-group-list-item-header__themes {
   .tab-group-list-item-header--#{$theme} {
+    @extend %slow-transition;
+    transition-property: background-color padding-top;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -744,18 +759,23 @@ $tab-group-list-item-header__themes: (
     &--active::before {
       content: '';
       background-color: $blue-50;
-      height: 32px;
+      height: 33px;
       width: 4px;
     }
 
-    &--target {
+    &--drag-tab_group-target {
+      background-color: map-get( $colors, --drop-target--background-color );
+      padding-top: 34px;
+    }
+
+    &--drag-tab-target {
       background-color: map-get( $colors, --drop-target--background-color );
     }
 
     &__main {
       @extend %slow-transition;
       transition-property: background-color opacity;
-      padding: 7px 2px 8px;
+      padding: 8px 4px 8px 6px;
       flex: 1;
       display: flex;
       flex-direction: row;
@@ -791,6 +811,7 @@ $tab-group-list-item-header__themes: (
       text-align: right;
       flex-grow: 0;
       white-space: nowrap;
+      color: map-get( $colors, secodary-text--color );
     }
 
     &__icon {
@@ -815,7 +836,7 @@ $tab-group-list-item-header__themes: (
     &__more-button {
       @extend %slow-transition;
       transition-property: background-color;
-      padding: 8px 4px;
+      padding: 9px 4px 8px;
       display: flex;
       border: none;
       background-color: transparent;
@@ -825,10 +846,10 @@ $tab-group-list-item-header__themes: (
         background-color: map-get( $colors, --hover--background-color );
       }
     }
-  }
 
-  &--#{$theme} &__tabs-count {
-    color: map-get( $colors, secodary-text--color );
+    &:hover &__more-button {
+      background-color: map-get( $colors, --hover--background-color );
+    }
   }
 }
 
@@ -853,10 +874,65 @@ $sidebar-tab-group-list__themes: (
     justify-content: flex-start;
     align-items: stretch;
     overflow-y: auto;
-    border-top: solid 1px map-get( $colors, separator--color )
+    border-top: solid 1px map-get( $colors, separator--color );
 
     &__item {
       flex: 0;
+    }
+  }
+}
+
+// =============================================================================
+// Tab Group Tabs List
+// =============================================================================
+
+$sidebar-tab-group-tabs-list__themes: (
+  light: (
+    --background-color: $white-100,
+    --active--background-color: $light-header-active-background,
+    --drag-target--background-color: $white-100,
+  ),
+  dark: (
+    --background-color: $dark-header-background,
+    --active--background-color: $dark-header-active-background,
+    --drag-target--background-color: $dark-header-active-background,
+  )
+);
+
+@each $theme, $colors in $sidebar-tab-group-tabs-list__themes {
+  .sidebar-tab-group-tabs-list--#{$theme} {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    max-height: 80vh;
+    overflow-y: auto;
+
+    &__item-container {
+      @extend %slow-transition;
+      transition-property: height padding-top background-color;
+      width: 100%;
+      flex: 0;
+      overflow-x: hidden;
+      min-height: 52px;
+
+      &--drag-source {
+        display: none;
+      }
+
+      &--drag-target {
+        background-color: map-get( $colors, --drag-target--background-color );
+        min-height: 106px;
+        padding-top: 54px;
+      }
+    }
+
+    &__item {
+      background-color: map-get( $colors, --background-color );
+
+      &--active {
+        background-color: map-get( $colors, --active--background-color );
+      }
     }
   }
 }
@@ -931,36 +1007,6 @@ $sidebar-tab-group-list__themes: (
   align-items: stretch;
   max-height: 80vh;
   overflow-y: auto;
-}
-
-.sidebar-tab-group-tabs-list-item {
-  @extend %slow-transition;
-  transition-property: min-height;
-  width: 100%;
-  flex: 0;
-  overflow-x: hidden;
-  min-height: 52px;
-
-  &.selected {
-    /* @todo themed */
-    background-color: purple;
-  }
-
-  &.source {
-    display: none;
-  }
-
-  &.source .sidebar-tab-view-item {
-    margin-left: 8px;
-  }
-
-  &.target {
-    min-height: 106px;
-
-    & .sidebar-tab-view-item {
-      margin-top: 54px;
-    }
-  }
 }
 
 .sidebar-tab-view-item {

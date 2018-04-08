@@ -393,8 +393,41 @@ export function updateGroup( state, { tab_group_id, window_id, change_info } ) {
   )
 }
 
-export function moveGroup( state, { tab_group_id, window_id, index } ) {
-  return state
+export function moveGroup( state, { source_data, target_data } ) {
+  const windows = [ ...state.windows ]
+
+  const source_window_index = windows.findIndex( window => window.id === source_data.window_id )
+  const target_window_index = windows.findIndex( window => window.id === target_data.window_id )
+
+  let source_tab_group = null
+  let source_tab_group_index = null
+  windows[ source_window_index ] = Object.assign( {}, windows[ source_window_index ], {
+    tab_groups: windows[ source_window_index ].tab_groups.filter( ( tab_group, index ) => {
+      if( tab_group.id === source_data.tab_group_id ) {
+        source_tab_group = tab_group
+        source_tab_group_index = index
+        return false
+      }
+      return true
+    })
+  })
+  if( ! source_tab_group ) {
+    // @todo error
+    return state
+  }
+  const target_tab_groups = [ ...windows[ target_window_index ].tab_groups ]
+  let target_tab_group_index = target_data.tab_group_index
+  if( target_tab_group_index == null ) {
+    target_tab_group_index = target_tab_groups.length
+  } else if( source_window_index === target_window_index && source_tab_group_index < target_tab_group_index ) {
+    target_tab_group_index--
+  }
+  target_tab_groups.splice( target_tab_group_index, 0, source_tab_group )
+  windows[ target_window_index ] = Object.assign( {}, windows[ target_window_index ], {
+    tab_groups: target_tab_groups
+  })
+
+  return Object.assign( {}, state, { windows } )
 }
 
 // @todo consider merging these with updateGroup

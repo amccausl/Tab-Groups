@@ -19,7 +19,6 @@ import {
 
 import {
   moveTabsToGroup,
-  setTabGroupId,
 } from "./index.mjs"
 
 // @todo pull to shared file
@@ -113,6 +112,7 @@ export function bindBrowserEvents( store ) {
     })
   }
 
+  // @todo this should be moved somewhere else
   store.subscribe( () => {
     const state = store.getState()
     if( browser.tabs.show && browser.tabs.hide ) {

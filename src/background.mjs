@@ -15,6 +15,7 @@ import {
   getMessage,
   loadBrowserState,
   moveTabsToGroup,
+  moveTabGroup,
   openOptionsPage,
   openSidebarPage,
   resetBrowserState,
@@ -61,6 +62,7 @@ const store_promise = loadBrowserState()
 window.syncState = () => {
   return Promise.all( [ window.getStore(), loadBrowserState() ] )
     .then( ( [ store, browser_state ] ) => {
+      console.info('browser_state', JSON.stringify( browser_state ))
       store.dispatch( initAction( browser_state ) )
     })
 }
@@ -72,6 +74,7 @@ window.getStore = function() {
 // Proxy public methods from integrations to reduce duplication in app js
 // @todo standardize naming
 window.moveTabsToGroup = moveTabsToGroup
+window.moveTabGroup = moveTabGroup
 window.closeTab = closeTab
 window.muteTab = muteTab
 window.unmuteTab = unmuteTab

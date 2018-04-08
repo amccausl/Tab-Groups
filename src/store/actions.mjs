@@ -81,12 +81,11 @@ export function updateGroupAction( tab_group_id, window_id, change_info ) {
   }
 }
 
-export function moveGroupAction( tab_group_id, window_id, index ) {
+export function moveGroupAction( source_data, target_data ) {
   return {
     type: GROUP_MOVE,
-    tab_group_id,
-    window_id,
-    index
+    source_data,
+    target_data
   }
 }
 

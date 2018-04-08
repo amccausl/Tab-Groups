@@ -2,6 +2,7 @@ import {
   moveTabsAction,
   createGroupAction,
   removeGroupAction,
+  moveGroupAction,
   muteGroupAction,
   unmuteGroupAction,
   startSearchAction,
@@ -451,6 +452,65 @@ export function moveTabsToGroup( store, source_data, target_data ) {
   }
 
   return Promise.all( updates )
+}
+
+export function moveTabGroup( store, source_data, target_data ) {
+  console.info('moveTabGroup', source_data, target_data)
+
+  const state0 = store.getState()
+  const source_window = state0.windows.find( window => window.id === source_data.window_id )
+  if( ! source_window ) {
+    // @todo error
+    return Promise.reject()
+  }
+  const source_tab_group_index = source_window.tab_groups.findIndex( tab_group => tab_group.id === source_data.tab_group_id )
+  const source_tab_group = source_window.tab_groups[ source_tab_group_index ]
+
+  // Dispatch the update first to prevent move event handlers from getting confused
+  store.dispatch( moveGroupAction( source_data, target_data ) )
+
+  const tab_ids = source_tab_group.tabs.map( tab => tab.id )
+
+  if( tab_ids.length === 0 ) {
+    return Promise.resolve()
+  }
+
+  const state1 = store.getState()
+
+  const target_window = state1.windows.find( window => window.id === target_data.window_id )
+  if( ! target_window ) {
+    // @todo error
+    return Promise.reject()
+  }
+
+  let move_properties
+
+  let index_offset = 0
+  for( let tab_group of target_window.tab_groups ) {
+    if( tab_group.id === source_data.tab_group_id ) {
+      if( source_data.window_id === target_data.window_id ) {
+        // let target_tab_group_index = target_window.tab_groups.indexOf( tab_group )
+        // let index = index_offset
+        // if( target_tab_group_index > source_tab_group_index ) {
+        //   index += source_tab_group.tabs.length
+        // }
+        move_properties = { index: index_offset }
+      } else {
+        move_properties = {
+          index: index_offset,
+          windowId: target_window.id
+        }
+      }
+      break
+    }
+    index_offset += tab_group.tabs_count
+  }
+
+  if( ! move_properties ) {
+    return Promise.resolve()
+  }
+  console.info(`tabs.move( ${ JSON.stringify( tab_ids ) } )`, move_properties)
+  return browser.tabs.move( tab_ids, move_properties )
 }
 
 /**

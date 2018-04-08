@@ -1,5 +1,6 @@
 
 import testGroupCreate from './group-create.mjs'
+import testGroupMove from './reducers/group-move.mjs'
 import testHelper from './helpers.mjs'
 import testInit from './reducers/init.mjs'
 import testTabActivate from './tab-activate.mjs'
@@ -14,6 +15,7 @@ import testPinnedTabs from './pinned-tabs.mjs'
 
 export default function testStore( tap ) {
   tap.test( './store/group-create.mjs', testGroupCreate )
+  tap.test( './store/reducers/group-move.mjs', testGroupMove )
   tap.test( './store/helpers.mjs', testHelper )
   tap.test( './store/reducers/init.mjs', testInit )
   tap.test( './store/tab-activate.mjs', testTabActivate )
