@@ -153,6 +153,12 @@ export function bindBrowserEvents( store ) {
 
 export function onStorageChanged( store, changes, area ) {
   if( area === 'local' && changes[ LOCAL_CONFIG_KEY ] ) {
+    const config = changes[ LOCAL_CONFIG_KEY ].newValue || {}
+    for( let key of Object.keys( default_config ) ) {
+      if( ! config.hasOwnProperty( key ) ) {
+        config[ key ] = default_config[ key ]
+      }
+    }
     store.dispatch( updateConfigAction( changes[ LOCAL_CONFIG_KEY ].newValue || default_config ) )
   }
 }

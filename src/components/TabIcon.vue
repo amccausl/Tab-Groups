@@ -52,8 +52,10 @@ export default {
           }
       }
       if( this.tab.url.startsWith( "about:" ) ) {
-        if( this.theme === "dark" ) {
-          return `/icons/firefox-logo-glyph.svg`
+        if( this.tab.url === 'about:debugging' || this.tab.url === 'about:config' || this.tab.url === 'about:newtab' ) {
+          if( this.theme === "dark" ) {
+            return `/icons/firefox-logo-glyph.svg`
+          }
         }
       }
       return this.tab.icon_url

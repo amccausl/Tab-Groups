@@ -1,7 +1,7 @@
 
 let drag_target = null
 
-export function setTabTransferData( data_transfer, window_id, tab_ids ) {
+function setTabTransferData( data_transfer, window_id, tab_ids ) {
   const event_data = { window_id, tab_ids }
   console.info('setTabTransferData', event_data)
   // data_transfer.dropEffect = 'move'
@@ -9,8 +9,18 @@ export function setTabTransferData( data_transfer, window_id, tab_ids ) {
   data_transfer.setData( 'application/json', JSON.stringify( event_data ) )
 }
 
-export function getTransferType( event_data ) {
+function setTabGroupTransferData( data_transfer, window_id, tab_group ) {
+  const event_data = { window_id, tab_group_id: tab_group.id }
+  console.info('setTabGroupTransferData', event_data)
+  data_transfer.effectAllowed = 'move'
+  data_transfer.setData( 'application/json', JSON.stringify( event_data ) )
+}
+
+function getTransferType( event_data ) {
   if( event_data ) {
+    if( event_data.type === 'moz-tab' ) {
+      return 'tab'
+    }
     if( event_data.tab_ids != null ) {
       return 'tab'
     }
@@ -24,34 +34,7 @@ export function getTransferType( event_data ) {
   return null
 }
 
-// @todo extract helper to pull data transfer type
-export function isTabTransfer( event_data ) {
-  if( event_data ) {
-    if( event_data.tab_ids != null ) {
-      return true
-    }
-    if( event_data.type === 'moz-tab' ) {
-      return true
-    }
-  }
-  return false
-}
-
-export function setTabGroupTransferData( data_transfer, window_id, tab_group ) {
-  const event_data = { window_id, tab_group_id: tab_group.id }
-  console.info('setTabGroupTransferData', event_data)
-  data_transfer.effectAllowed = 'move'
-  data_transfer.setData( 'application/json', JSON.stringify( event_data ) )
-}
-
-export function isTabGroupTransfer( event_data ) {
-  if( event_data && event_data.hasOwnProperty( 'tab_group_id' ) ) {
-    return true
-  }
-  return false
-}
-
-export function getTransferData( data_transfer ) {
+function getTransferData( data_transfer ) {
   let event_data = null
   const count = data_transfer.mozItemCount
 
@@ -97,7 +80,27 @@ export function getTransferData( data_transfer ) {
   return event_data
 }
 
-export function resetDragState() {
+function getTabDragProperties( event, tab_group, tab ) {
+  return {
+    target: {
+      tab_group_id: tab_group.id,
+      tab_group_index: tab_group.tabs.indexOf( tab ),
+      tab_id: tab.id,
+    }
+  }
+}
+
+function getTabGroupDragProperties( event, tab_group ) {
+  return {
+    target: {
+      tab_group_new: ( tab_group == null ),
+      tab_group_id: ( tab_group != null ? tab_group.id : null ),
+      tab_group_index: null,
+    }
+  }
+}
+
+function resetDragState() {
   this.is_dragging = false
   Object.assign( this.drag_state, { source: {}, target: {} } )
   this.selected_tab_ids.splice( 0, this.selected_tab_ids.length )
@@ -122,11 +125,13 @@ export function onTabDragStart( event, tab ) {
     window_id: this.window_id,
     tab_ids
   }
+  console.info('drag_state', JSON.stringify(this.drag_state))
 }
 
 export function onTabDragEnd( event ) {
   console.info('onTabDragEnd')
-  this.resetDragState()
+  resetDragState.call( this )
+  console.info('drag_state', JSON.stringify(this.drag_state))
 }
 
 export function onTabDragEnter( event, tab_group, tab ) {
@@ -141,6 +146,7 @@ export function onTabDragEnter( event, tab_group, tab ) {
   } else {
     event.dataTransfer.dropEffect = "none"
   }
+  console.info('drag_state', JSON.stringify(this.drag_state))
 }
 
 export function onTabDragLeave( event, tab_group, tab ) {
@@ -148,8 +154,9 @@ export function onTabDragLeave( event, tab_group, tab ) {
 
   // Leave is fired after the new enter, so detect if this is still the active group
   if( drag_target === event.target ) {
-    Object.assign( this, tab_group_drag_properties_reset )
+    this.drag_state.target = {}
   }
+  console.info('drag_state', JSON.stringify(this.drag_state))
 }
 
 export function onTabDrop( event, tab_group, tab ) {
@@ -166,42 +173,25 @@ export function onTabDrop( event, tab_group, tab ) {
     window.background.moveTabsToGroup( window.store, event_data, target_data )
     this.selected_tab_ids.splice( 0, this.selected_tab_ids.length )
   }
-}
-
-function getTabDragProperties( event, tab_group, tab ) {
-  return {
-    target: {
-      tab_group_id: tab_group.id,
-      tab_group_index: tab_group.tabs.indexOf( tab ),
-      tab_id: tab.id,
-    }
-  }
-}
-
-function getTabGroupDragProperties( event, tab_group ) {
-  return {
-    target: {
-      tab_group_new: ( tab_group == null ),
-      tab_group_id: ( tab_group != null ? tab_group.id : null ),
-      tab_group_index: null,
-    }
-  }
-}
-
-const tab_group_drag_properties_reset = {
-  source: {},
-  target: {},
+  resetDragState.call( this )
+  console.info('drag_state', JSON.stringify(this.drag_state))
 }
 
 export function onTabGroupDragStart( event, tab_group ) {
   console.info(`onTabGroupDragStart( window_id=${ this.window_id }, tab_group_id=${ tab_group.id })`)
   this.is_dragging = true
+  this.drag_state.source = {
+    type: 'tab_group',
+    tab_group_id: tab_group.id
+  }
   setTabGroupTransferData( event.dataTransfer, this.window_id, tab_group )
+  console.info('drag_state', JSON.stringify(this.drag_state))
 }
 
 export function onTabGroupDragEnd( event, tab_group ) {
   console.info(`onTabGroupDragEnd( window_id=${ this.window_id }, tab_group_id=${ tab_group.id } )`)
-  this.resetDragState()
+  resetDragState.call( this )
+  console.info('drag_state', JSON.stringify(this.drag_state))
 }
 
 export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
@@ -223,14 +213,16 @@ export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
     }
     event.preventDefault()
   }
+  console.info('drag_state', JSON.stringify(this.drag_state))
 }
 
 export function onTabGroupDragLeave( event, tab_group, tab_group_index ) {
   // Leave is fired after the new enter, so detect if this is still the active group
   if( drag_target === event.target ) {
     console.info(`onTabGroupDragLeave( tab_group_id=${ tab_group ? tab_group.id : null }, tab_group_index=${ tab_group_index } )`)
-    Object.assign( this, tab_group_drag_properties_reset )
+    Object.assign( this, { source: {}, target: {} } )
   }
+  console.info('drag_state', JSON.stringify(this.drag_state))
 }
 
 export function onTabGroupDrop( event, tab_group, tab_group_index ) {
@@ -239,7 +231,7 @@ export function onTabGroupDrop( event, tab_group, tab_group_index ) {
   console.info(`onTabGroupDrop( tab_group_id=${ tab_group ? tab_group.id : null }, tab_group_index=${ tab_group_index } )`, transfer_type, event_data)
   if( transfer_type != null ) {
     event.preventDefault()
-    this.resetDragState()
+    resetDragState.call( this )
     switch( transfer_type ) {
       case "tab_group":
         console.info('detected tab group drop', event_data)
@@ -262,4 +254,5 @@ export function onTabGroupDrop( event, tab_group, tab_group_index ) {
         }
     }
   }
+  console.info('drag_state', JSON.stringify(this.drag_state))
 }
