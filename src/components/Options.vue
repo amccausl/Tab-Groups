@@ -208,7 +208,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import 'photon-colors';
+@import "../styles/photon-colors";
 
 .options {
   display: flex;

@@ -1,7 +1,21 @@
 
 import {
   getMessage
-} from '../integrations/index.mjs'
+} from "../integrations/index.mjs"
+
+export function bem( base, modifiers ) {
+  const classes = [ base ]
+
+  for( let [ modifier, value ] of Object.entries( modifiers ) ) {
+    if( typeof value === "string" ) {
+      classes.push( `${ base }--${ modifier }-${ value }` )
+    } else if( value ) {
+      classes.push( `${ base }--${ modifier }` )
+    }
+  }
+
+  return classes
+}
 
 /**
  * Delay execution of function, use only most recent args.  Works to wrap method on component
@@ -26,7 +40,7 @@ export function debounce( fn, delay ) {
  * @param count The count for the property
  */
 export function getCountMessage( key, count ) {
-  return getMessage( `${ key }_count_${ count === 1 ? 'singular' : 'plural' }`, [ count ] )
+  return getMessage( `${ key }_count_${ count === 1 ? "singular" : "plural" }`, [ count ] )
 }
 
 /**
@@ -36,29 +50,29 @@ export function getCountMessage( key, count ) {
 export function getFriendlyUrlText( uri_string ) {
   try {
     const url = new URL( uri_string )
-    let url_text = ''
+    let url_text = ""
 
     // Return full path for about pages
-    if( url.protocol === 'about:' ) {
+    if( url.protocol === "about:" ) {
       return url.href
     }
 
     // Ignore common protocols
-    if( ! [ 'https:', 'http:' ].includes( url.protocol ) ) {
-      url_text += url.protocol + '//'
+    if( ! [ "https:", "http:" ].includes( url.protocol ) ) {
+      url_text += url.protocol + "//"
     }
 
     // Strip leading www. (not really helpful)
-    url_text += url.host.startsWith( 'www.' ) ? url.host.substr( 4 ) : url.host
+    url_text += url.host.startsWith( "www." ) ? url.host.substr( 4 ) : url.host
 
     // @todo add as much of url and args as makes sense
-    if( url.pathname !== '/' ) {
-      url_text += '/…'
+    if( url.pathname !== "/" ) {
+      url_text += "/…"
     }
     return url_text
   } catch( ex ) {
     // @todo error handling
-    console.error( 'getFriendlyUrlText exception', ex )
+    console.error( "getFriendlyUrlText exception", ex )
     return null
   }
 }
@@ -86,7 +100,7 @@ export function onStateChange( fn ) {
   const unsubscribe = window.store.subscribe( () => {
     fn( window.store.getState() )
   })
-  window.addEventListener( 'unload', ( event ) => {
+  window.addEventListener( "unload", ( event ) => {
     unsubscribe()
   })
 }

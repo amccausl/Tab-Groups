@@ -1,0 +1,18 @@
+{
+  "name": "sidebar-tab-groups",
+  "description": "A web-extensions port for Tab Groups",
+  "main": "",
+  "authors": [
+    "Alex McCausland <alex.mccausland@gmail.com>"
+  ],
+  "license": "MPL-2.0",
+  "homepage": "https://github.com/amccausl/Tab-Groups",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -3,79 +3,80 @@
     <div :class="[ `action-strip--${ theme }` ]" @click.right.prevent>
       <input v-if="is_search_enabled" :class="[ `action-strip--${ theme }__search` ]" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/>
       <div v-else :class="[ `action-strip--${ theme }__spacer` ]"></div>
-      <div :class="[ `action-strip--${ theme }__button`, `action-strip--${ theme }__button--no-grow` ]" @click="openOptionsPage()">
+      <div :class="bem( `action-strip--${ theme }__button`, { 'no-grow': true } )" @click="openOptionsPage()">
         <svg :class="[ `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
         </svg>
       </div>
     </div>
-    <div v-if="show_pinned_tabs" :class="[ `pinned-tab-list--${ theme }` ]" @click.right.prevent>
+    <div v-if="show_pinned_tabs" :class="[ `pinned-tabs-list--${ theme }` ]" @click.right.prevent>
       <div v-for="pinned_tab in pinned_tabs" :key="pinned_tab.id"
-          :class="[ `pinned-tab-list--${ theme }__item`, pinned_tab.active ? `pinned-tab-list--${ theme }__item--active` : '', isSelected( pinned_tab ) ? `pinned-tab-list--${ theme }__item--selected` : '' ]"
+          :class="bem( `pinned-tabs-list--${ theme }__item`, { 'active': pinned_tab.active, 'selected': isSelected( pinned_tab ) } )"
           :title="pinned_tab.title"
           @click.ctrl="toggleTabSelection( pinned_tab )"
           @click.exact="openTab( pinned_tab.id )"
           @click.middle="closeTab( pinned_tab )"
       >
-        <span :class="[ `pinned-tab-list--${ theme }__ink` ]"></span>
-        <div :class="[ `pinned-tab-list--${ theme }__tab` ]">
+        <span :class="[ `pinned-tabs-list--${ theme }__ink` ]"></span>
+        <div :class="[ `pinned-tabs-list--${ theme }__tab` ]">
           <tab-icon :theme="theme" :tab="pinned_tab" size="16"></tab-icon>
           <!-- @todo fade styling for pinned tabs if search -->
           <!-- https://design.firefox.com/favicon.ico -->
-          <div v-if="pinned_tab.context_id" :class="[ `pinned-tab-list--${ theme }__tab-context` ]" :style="context_styles[ pinned_tab.context_id ]"></div>
+          <div v-if="pinned_tab.context_id" :class="[ `pinned-tabs-list--${ theme }__tab-context` ]" :style="context_styles[ pinned_tab.context_id ]"></div>
         </div>
         <!-- Add a span to fix centering for tab content -->
       </div>
     </div>
-    <!-- <transition-group :class="[ `sidebar-tab-group-list--${ theme }` ]" tag="div" :name="`sidebar-tab-group-list--${ theme }__item--transition`" @click.right.prevent> -->
-    <div :class="[ `sidebar-tab-group-list--${ theme }` ]" @click.right.prevent>
-      <div :class="bem( `sidebar-tab-group-list--${ theme }__item`, { 'drag-source': isTabGroupDragSource( tab_group ), [`drag-${ drag_state.source.type }-target`]: ! isTabGroupDragSource( tab_group ) && isTabGroupDragTarget( tab_group ) } )"
+    <!-- <transition-group :class="[ `sidebar-tab_groups-list--${ theme }` ]" tag="div" :name="`sidebar-tab_groups-list--${ theme }__item--transition`" @click.right.prevent> -->
+    <div :class="[ `sidebar-tab_groups-list--${ theme }` ]" @click.right.prevent>
+      <div :class="bem( `sidebar-tab_groups-list--${ theme }__item-container`, { 'drag-source': isTabGroupDragSource( tab_group ), [`drag-${ drag_state.source.type }-target`]: ! isTabGroupDragSource( tab_group ) && isTabGroupDragTarget( tab_group ) } )"
           v-for="(tab_group, tab_group_index) in tab_groups" :key="tab_group.id"
       >
-        <div :class="bem( `tab-group-list-item-header--${ theme }`, { 'active': active_tab_group_id === tab_group.id } )"
-            @click="onTabGroupClick( tab_group )"
-            @dragenter="onTabGroupDragEnter( $event, tab_group, tab_group_index + 1 )"
-            @dragover.prevent
-            @dragleave="onTabGroupDragLeave( $event, tab_group, tab_group_index + 1 )"
-            @drop="onTabGroupDrop( $event, tab_group, tab_group_index + 1 )"
-            draggable="true"
-            @dragstart="onTabGroupDragStart( $event, tab_group )"
-            @dragend="onTabGroupDragEnd( $event, tab_group )"
-        >
-          <div :class="[ `tab-group-list-item-header--${ theme }__main` ]">
-            <svg v-if="show_tabs" :class="[ `tab-group-list-item-header--${ theme }__carat-icon`, tab_group.open ? `tab-group-list-item-header--${ theme }__carat-icon--open` : `` ]" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
-              <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
-            </svg>
-            <div :class="[ `tab-group-list-item-header--${ theme }__title`, rename_tab_group_id === tab_group.id ? `tab-group-list-item-header--${ theme }__title--editing` : `` ]">
-              <editable :class="[ `tab-group-list-item-header--${ theme }__title-editable` ]" v-model="tab_group.title" @input="onTabGroupTitleInput( $event, tab_group )" :active="rename_tab_group_id === tab_group.id"></editable>
+        <div :class="[ `sidebar-tab_groups-list--${ theme }__item` ]">
+          <div :class="bem( `tab-groups-list-item-header--${ theme }`, { 'active': active_tab_group_id === tab_group.id, 'open': show_tabs && tab_group.open, 'drag-source': isTabGroupDragSource( tab_group ), [`drag-${ drag_state.source.type }-target`]: ! isTabGroupDragSource( tab_group ) && isTabGroupDragTarget( tab_group ) } )"
+              @dragenter="onTabGroupDragEnter( $event, tab_group, tab_group_index + 1 )"
+              @dragover.prevent
+              @dragleave="onTabGroupDragLeave( $event, tab_group, tab_group_index + 1 )"
+              @drop="onTabGroupDrop( $event, tab_group, tab_group_index + 1 )"
+              @click="onTabGroupClick( tab_group )"
+              draggable="true"
+              @dragstart="onTabGroupDragStart( $event, tab_group )"
+              @dragend="onTabGroupDragEnd( $event, tab_group )"
+          >
+            <div :class="[ `tab-groups-list-item-header--${ theme }__container` ]">
+              <div :class="[ `tab-groups-list-item-header--${ theme }__main` ]">
+                <svg v-if="show_tabs" :class="bem( `tab-groups-list-item-header--${ theme }__carat-icon`, { 'open': tab_group.open } )" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
+                  <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
+                </svg>
+                <div :class="bem( `tab-groups-list-item-header--${ theme }__title`, { 'editing': rename_tab_group_id === tab_group.id } )">
+                  <editable :class="[ `tab-groups-list-item-header--${ theme }__title-editable` ]" v-model="tab_group.title" @input="onTabGroupTitleInput( $event, tab_group )" :active="rename_tab_group_id === tab_group.id"></editable>
+                </div>
+
+                <svg v-if="tab_group.muted" :class="bem( `tab-groups-list-item-header--${ theme }__icon`, { 'audio-mute': true } )" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <g :fill="context_fill">
+                    <path d="M13 8a2.813 2.813 0 0 0-.465-1.535l-.744.744A1.785 1.785 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
+                    <path d="M13.273 5.727A3.934 3.934 0 0 1 14 8a3.984 3.984 0 0 1-2.742 3.775.5.5 0 0 0 .316.949A4.985 4.985 0 0 0 15 8a4.93 4.93 0 0 0-1.012-2.988zm-4.603 7.99a.2.2 0 0 0 .33-.152V10l-2.154 2.154zm6.037-12.424a1 1 0 0 0-1.414 0L9 5.586V2.544a.25.25 0 0 0-.413-.19L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618a2.186 2.186 0 0 0 1.659 2.118l-2.366 2.366a1 1 0 1 0 1.414 1.414l12-12a1 1 0 0 0 0-1.414z"></path>
+                  </g>
+                </svg>
+                <svg v-else-if="tab_group.audible" :class="bem( `tab-groups-list-item-header--${ theme }__icon`, { 'audio': true } )" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <g :fill="context_fill">
+                    <path d="M8.587 2.354L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618A2.191 2.191 0 0 0 4.191 11H5.5l3.17 2.717a.2.2 0 0 0 .33-.152V2.544a.25.25 0 0 0-.413-.19zm2.988.921a.5.5 0 0 0-.316.949 3.97 3.97 0 0 1 0 7.551.5.5 0 0 0 .316.949 4.971 4.971 0 0 0 0-9.449z"></path>
+                    <path d="M13 8a3 3 0 0 0-2.056-2.787.5.5 0 1 0-.343.939A2.008 2.008 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
+                  </g>
+                </svg>
+
+                <span v-if="show_tabs_count" :class="[ `tab-groups-list-item-header--${ theme }__tabs-count` ]">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
+              </div>
+              <button :class="[ `tab-groups-list-item-header--${ theme }__more-button` ]" @click.stop="openTabGroupMore( $event, tab_group )">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <path :fill="context_fill" d="M2 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"></path>
+                </svg>
+              </button>
             </div>
-
-            <svg v-if="tab_group.muted" :class="[ `tab-group-list-item-header--${ theme }__icon`, `tab-group-list-item-header--${ theme }__icon--audio-mute` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-              <g :fill="context_fill">
-                <path d="M13 8a2.813 2.813 0 0 0-.465-1.535l-.744.744A1.785 1.785 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
-                <path d="M13.273 5.727A3.934 3.934 0 0 1 14 8a3.984 3.984 0 0 1-2.742 3.775.5.5 0 0 0 .316.949A4.985 4.985 0 0 0 15 8a4.93 4.93 0 0 0-1.012-2.988zm-4.603 7.99a.2.2 0 0 0 .33-.152V10l-2.154 2.154zm6.037-12.424a1 1 0 0 0-1.414 0L9 5.586V2.544a.25.25 0 0 0-.413-.19L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618a2.186 2.186 0 0 0 1.659 2.118l-2.366 2.366a1 1 0 1 0 1.414 1.414l12-12a1 1 0 0 0 0-1.414z"></path>
-              </g>
-            </svg>
-            <svg v-else-if="tab_group.audible" :class="[ `tab-group-list-item-header--${ theme }__icon`, `tab-group-list-item-header--${ theme }__icon--audio` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-              <g :fill="context_fill">
-                <path d="M8.587 2.354L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618A2.191 2.191 0 0 0 4.191 11H5.5l3.17 2.717a.2.2 0 0 0 .33-.152V2.544a.25.25 0 0 0-.413-.19zm2.988.921a.5.5 0 0 0-.316.949 3.97 3.97 0 0 1 0 7.551.5.5 0 0 0 .316.949 4.971 4.971 0 0 0 0-9.449z"></path>
-                <path d="M13 8a3 3 0 0 0-2.056-2.787.5.5 0 1 0-.343.939A2.008 2.008 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
-              </g>
-            </svg>
-
-            <span v-if="show_tabs_count" :class="[ `tab-group-list-item-header--${ theme }__tabs-count` ]">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
           </div>
-          <button :class="[ `tab-group-list-item-header--${ theme }__more-button` ]" @click.stop="openTabGroupMore( $event, tab_group )">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-              <path :fill="context_fill" d="M2 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"></path>
-            </svg>
-          </button>
-        </div>
-        <!-- <transition> -->
           <!-- <transition-group v-if="tab_group.open && show_tabs && ! isTabGroupDragSource( tab_group )" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]" tag="div" :name="`sidebar-tab-group-tabs-list--${ theme }__item--transition`"> -->
           <div v-if="tab_group.open && show_tabs && ! isTabGroupDragSource( tab_group )" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]">
-            <div class="sidebar-tab-group-tabs-list-item"
-                :class="bem( `sidebar-tab-group-tabs-list--${ theme }__item-container`, { 'drag-target':  ! isSelected( tab ) && drag_state.target.tab_id === tab.id, 'drag-source': isSelected( tab ) && is_dragging } )"
+            <div :class="bem( `sidebar-tab-group-tabs-list--${ theme }__item-container`, { 'drag-target':  ! isSelected( tab ) && drag_state.target.tab_id === tab.id, 'drag-source': isSelected( tab ) && is_dragging } )"
                 v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
                 v-if="! search_text || ! search_resolved || tab.matched" :title="tab.title"
                 @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab.id )" @click.middle="closeTab( tab )"
@@ -109,7 +110,7 @@
             </div>
           </div>
           <!-- </transition-group> -->
-        <!-- </transition> -->
+        </div>
       </div>
     </div>
     <!-- </transition-group> -->
@@ -185,6 +186,7 @@ import {
   onTabGroupDrop,
 } from './draggable.mjs'
 import {
+  bem,
   debounce,
   getCountMessage,
   getFriendlyUrlText,
@@ -321,17 +323,7 @@ export default {
     url: getFriendlyUrlText
   },
   methods: {
-    bem( base, modifiers ) {
-      const classes = [ base ]
-
-      for( let [ modifier, value ] of Object.entries( modifiers ) ) {
-        if( value ) {
-          classes.push( `${ base }--${ modifier }` )
-        }
-      }
-
-      return classes
-    },
+    bem,
     getCountMessage,
     createTabGroup() {
       // Create new group with default properties in the store
@@ -436,6 +428,7 @@ export default {
       // Update interferes with the editable div if it happens too quickly
       this.rename_tab_group_id = null
       // @todo skip if empty, reset
+      // @todo should be moved to background
       window.store.dispatch( updateGroupAction( tab_group.id, this.window_id, { title } ) )
     },
     onUpdateSearchText: debounce( function( search_text ) {
@@ -460,7 +453,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import 'photon-colors';
+@import "../styles/photon-colors";
 
 $photon-border-radius: 2px;
 
@@ -671,13 +664,13 @@ $action-strip__themes: (
 }
 
 // =============================================================================
-// Pinned Tab List
+// Pinned Tabs List
 // =============================================================================
 
-$pinned-tab-list__item--width: 40px;
+$pinned-tabs-list__item--width: 40px;
 
 // @todo use photon colors
-$pinned-tab-list__themes: (
+$pinned-tabs-list__themes: (
   light: (
     __item--background-color: #e3e4e6,
     __item--active--background-color: #f5f6f7,
@@ -696,10 +689,10 @@ $pinned-tab-list__themes: (
 
 // @todo may be tab-list--pinned or plural tabs
 
-@each $theme, $colors in $pinned-tab-list__themes {
-  .pinned-tab-list--#{$theme} {
+@each $theme, $colors in $pinned-tabs-list__themes {
+  .pinned-tabs-list--#{$theme} {
     display: grid;
-    grid-template-columns: repeat(auto-fill, $pinned-tab-list__item--width);
+    grid-template-columns: repeat(auto-fill, $pinned-tabs-list__item--width);
     grid-auto-columns: min-content;
     grid-auto-rows: max-content;
     background-color: map-get( $colors, __item--background-color );
@@ -712,26 +705,19 @@ $pinned-tab-list__themes: (
       border-right: solid 1px transparent;
       border-left: solid 1px transparent;
       border-top: solid 1px transparent;
-      cursor: pointer;
 
-      &:hover {
+      &:not(#{&}--active):hover {
+        cursor: pointer;
         border-right-color: map-get( $colors, __ink--color );
         border-left-color: map-get( $colors, __ink--color );
         background-color: map-get( $colors, __ink--hover--color );
       }
 
       &--active {
-        cursor: default;
         border-top-color: map-get( $colors, __item--background-color );
         border-right-color: map-get( $colors, __ink--color );
         border-left-color: map-get( $colors, __ink--color );
         background-color: map-get( $colors, __item--active--background-color );
-
-        &:hover {
-          border-top-color: map-get( $colors, __item--background-color );
-          border-left-color: map-get( $colors, __ink--color );
-          background-color: map-get( $colors, __item--active--background-color );
-        }
       }
     }
 
@@ -747,7 +733,7 @@ $pinned-tab-list__themes: (
       flex-direction: row;
       justify-content: center;
       align-items: center;
-      width: $pinned-tab-list__item--width;
+      width: $pinned-tabs-list__item--width;
       padding: 6px 0;
       border-top: solid 2px transparent;
       border-top-color: map-get( $colors, __item--background-color );
@@ -758,13 +744,89 @@ $pinned-tab-list__themes: (
       border-top-color: map-get( $colors, __ink--active--color );
     }
 
-    &__item:hover &__tab {
+    &__item:not(#{&}__item--active):hover &__tab {
       z-index: 10;
       border-top-color: map-get( $colors, __ink--color );
     }
+  }
+}
 
-    &__item--active:hover &__tab {
-      border-top-color: map-get( $colors, __ink--active--color );
+// =============================================================================
+// Tab Groups List
+// =============================================================================
+
+$sidebar-tab_groups-list__themes: (
+  light: (
+    separator--color: #e0e0e1,
+  ),
+  dark: (
+    separator--color: #545455,
+  )
+);
+
+@each $theme, $colors in $sidebar-tab_groups-list__themes {
+  .sidebar-tab_groups-list--#{$theme} {
+    @extend %slow-transition;
+    transition-property: height;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    overflow-y: auto;
+    border-top: solid 1px map-get( $colors, separator--color );
+
+    &__item-container {
+      @extend %slow-transition;
+      transition-property: padding-top, padding-bottom, transform;
+      flex: 0;
+
+      &--transition-enter {
+        // max-height: 0;
+        transform: translate3d(0,-100%,0);
+        opacity: 0;
+        z-index: -1000;
+      }
+
+      &--transition-enter-to {
+        transform: none;
+        opacity: 1;
+        z-index: 0;
+      }
+
+      &--transition-leave {
+        opacity: 1;
+      }
+
+      &--transition-leave-to {
+        max-height: 0;
+        opacity: 0;
+      }
+
+      &--drag-tab_group-target {
+        padding-top: 32px;
+      }
+
+      &--drag-tab-target {
+        padding-bottom: 54px;
+      }
+
+      &--drag-source {
+        transform: translate3d(0,-100%,0);
+
+        // Adjusting the height on the last child with transition, causes the sidebar to scroll
+        &:not(:last-child) {
+          max-height: 0;
+        }
+      }
+    }
+
+    &__item {
+      @extend %slow-transition;
+      transition-property: padding-top, padding-bottom, transform;
+
+      &--active {
+      }
     }
   }
 }
@@ -773,7 +835,7 @@ $pinned-tab-list__themes: (
 // Tab Group List Item Header
 // =============================================================================
 
-$tab-group-list-item-header__themes: (
+$tab-groups-list-item-header__themes: (
   light: (
     --background-color: $white-100,
     --drag-target--background-color: map-get( $--theme-light, --drag-target--background-color ),
@@ -790,8 +852,8 @@ $tab-group-list-item-header__themes: (
   )
 );
 
-@each $theme, $colors in $tab-group-list-item-header__themes {
-  .tab-group-list-item-header--#{$theme} {
+@each $theme, $colors in $tab-groups-list-item-header__themes {
+  .tab-groups-list-item-header--#{$theme} {
     @extend %slow-transition;
     transition-property: background-color, padding-top;
     display: flex;
@@ -801,7 +863,6 @@ $tab-group-list-item-header__themes: (
     position: sticky;
     top: 0;
     z-index: 1;
-    position: sticky;
     border-bottom: $light-border-color 1px solid;
     background-color: map-get( $colors, --background-color );
     cursor: pointer;
@@ -809,15 +870,25 @@ $tab-group-list-item-header__themes: (
     &--active::before {
       content: '';
       background-color: $light-border-color;
+      border-left: 1px solid map-get( $colors, --background-color );
       height: 34px;
-      width: 4px;
+      min-width: 4px;
       margin-top: -1px;
       margin-bottom: -1px;
+    }
+
+    &--active:not(#{&}--open)::before {
+      background-color: $blue-50;
     }
 
     &__container {
       @extend %slow-transition;
       transition-property: background-color, padding-top;
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
 
       &--drag-tab_group-target {
         // background-color: map-get( $colors, --drag-target--background-color );
@@ -827,6 +898,10 @@ $tab-group-list-item-header__themes: (
       &--drag-tab-target {
         background-color: map-get( $colors, --drag-target--background-color );
       }
+    }
+
+    &--drag-tab_group_target &__container {
+      padding-top: 34px;
     }
 
     &__main {
@@ -892,92 +967,53 @@ $tab-group-list-item-header__themes: (
       display: flex;
       border: none;
       background-color: transparent;
+      cursor: pointer;
+
+      // Remove the dotted outline inside the button on focus
+      &::-moz-focus-inner {
+        border: 0;
+      }
     }
 
     // Separate hover effect for doorhanger
     &__main:hover,
     &__main:hover + &__more-button,
     &__more-button:hover {
-      cursor: pointer;
       background-color: map-get( $colors, --hover--background-color );
     }
   }
 }
 
 // =============================================================================
-// Tab Group List
+// Tabs List
 // =============================================================================
 
-$sidebar-tab-group-list__themes: (
+$sidebar-tabs-list__themes: (
   light: (
-    separator--color: #e0e0e1,
+    __item--background-color: #e3e4e6,
+    __item--active--background-color: #f5f6f7,
+    __ink--color: #a5a6a7,
+    __ink--hover--color: #cccdcf,
+    __ink--active--color: $blue-50,
   ),
   dark: (
-    separator--color: #545455,
+    __item--background-color: #0c0c0d,
+    __item--active--background-color: #323234,
+    __ink--color: #545455,
+    __ink--hover--color: #252526,
+    __ink--active--color: $blue-50,
   )
 );
 
-@each $theme, $colors in $sidebar-tab-group-list__themes {
-  .sidebar-tab-group-list--#{$theme} {
-    @extend %slow-transition;
-    transition-property: height;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    overflow-y: auto;
-    border-top: solid 1px map-get( $colors, separator--color );
-
+@each $theme, $colors in $sidebar-tabs-list__themes {
+  .sidebar-tabs-list--#{$theme} {
     &__item {
-      @extend %slow-transition;
-      transition-property: padding-top, padding-bottom, transform;
-      flex: 0;
-
-      &--active {
-      }
-
-      &--transition-enter {
-        // max-height: 0;
-        transform: translate3d(0,-100%,0);
-        opacity: 0;
-        z-index: -1000;
-      }
-
-      &--transition-enter-to {
-        transform: none;
-        opacity: 1;
-        z-index: 0;
-      }
-
-      &--transition-leave {
-        opacity: 1;
-      }
-
-      &--transition-leave-to {
-        max-height: 0;
-        opacity: 0;
-      }
-
-      &--drag-tab_group-target {
-        padding-top: 32px;
-      }
-
-      &--drag-tab-target {
-        padding-bottom: 54px;
-      }
-
-      &--drag-source {
-        max-height: 0;
-        transform: translate3d(0,-100%,0);
-      }
+      cursor: pointer;
     }
   }
 }
 
-// =============================================================================
-// Tab Group Tabs List
-// =============================================================================
+// @todo clean up
 
 $sidebar-tab-group-tabs-list__themes: (
   light: (
@@ -1036,12 +1072,13 @@ $sidebar-tab-group-tabs-list__themes: (
         &::before {
           content: '';
           background-color: $blue-50;
+          border-left: 1px solid map-get( $colors, --background-color );
           height: 52px;
-          width: 4px;
+          min-width: 4px;
         }
       }
 
-      &:hover:not(#{&}--active) {
+      &:not(#{&}--active):hover {
         background-color: map-get( $colors, --hover--background-color );
       }
     }
@@ -1119,8 +1156,8 @@ $sidebar-tab-group-tabs-list__themes: (
   width: 100%;
   white-space: nowrap;
   text-overflow: clip;
-  cursor: pointer;
   position: relative;
+  cursor: pointer;
 
   &::after {
     content: "";

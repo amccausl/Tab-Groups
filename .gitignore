@@ -152,6 +152,7 @@ ClientBin/
 *.pfx
 *.publishsettings
 
+bower_components/
 node_modules/
 web-ext-artifacts/
 
