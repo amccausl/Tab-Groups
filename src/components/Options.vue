@@ -1,9 +1,14 @@
 <template>
-  <body>
-    <p>
+  <body class="page page--options">
+    <div v-if="! features.tabhide_enabled" :class="bem( 'message-bar', { 'is-warning': true } )">
       <!-- @todo localize -->
-      Changing the visibility of tabs in the header bar is currently experimental, but can be enabled by updating <pre>extensions.webextensions.tabhide.enabled</pre> on <a href="about:config">about:config</a>
-    </p>
+      <div class="message-bar__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+          <path fill="rgba(12, 12, 13, .8)" d="M14.742 12.106L9.789 2.2a2 2 0 0 0-3.578 0l-4.953 9.91A2 2 0 0 0 3.047 15h9.905a2 2 0 0 0 1.79-2.894zM7 5a1 1 0 0 1 2 0v4a1 1 0 0 1-2 0zm1 8.25A1.25 1.25 0 1 1 9.25 12 1.25 1.25 0 0 1 8 13.25z"></path>
+        </svg>
+      </div>
+      <span class="message-bar__text">Visit <span class="text--code">about:config</span> and set <span class="text--code">tabhide.enabled</span> to <span class="text--code">true</span> for a better experience</span>
+    </div>
     <div class="options">
       <nav class="sidenav">
         <ul>
@@ -85,6 +90,7 @@
 
 <script>
 import {
+  bem,
   onStateChange,
 } from './helpers.mjs'
 
@@ -92,6 +98,9 @@ export default {
   name: 'options',
   data() {
     return {
+      features: {
+        tabhide_enabled: false
+      },
       preferences: {
         theme: 'dark',
         show_tabs_count: false,
@@ -185,9 +194,11 @@ export default {
     onStateChange( state => {
       console.info('loadState', state)
       Object.assign( this.preferences, state.config )
+      this.features.tabhide_enabled = state.features.tabhide.enabled
     })
   },
   methods: {
+    bem,
     clearAllData() {
       window.background.resetBrowserState( window.store )
     },
@@ -209,6 +220,11 @@ export default {
 
 <style lang="scss">
 @import "../styles/photon-colors";
+
+.page {
+  display: flex;
+  flex-direction: column;
+}
 
 .options {
   display: flex;

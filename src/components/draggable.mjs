@@ -208,6 +208,7 @@ export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
         this.drag_state.tab_group_index = tab_group_index
         break
       case 'tab':
+        this.drag_state.source.type = 'tab'
         Object.assign( this.drag_state, getTabGroupDragProperties( event, tab_group ) )
         break
     }
@@ -220,7 +221,7 @@ export function onTabGroupDragLeave( event, tab_group, tab_group_index ) {
   // Leave is fired after the new enter, so detect if this is still the active group
   if( drag_target === event.target ) {
     console.info(`onTabGroupDragLeave( tab_group_id=${ tab_group ? tab_group.id : null }, tab_group_index=${ tab_group_index } )`)
-    Object.assign( this, { source: {}, target: {} } )
+    Object.assign( this.drag_state, { source: {}, target: {} } )
   }
   console.info('drag_state', JSON.stringify(this.drag_state))
 }

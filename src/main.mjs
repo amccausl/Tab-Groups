@@ -1,6 +1,7 @@
 import Vue from 'vue'
 
 // import Action from './components/Action.vue'
+import Onboarding from './components/Onboarding.vue'
 import Options from './components/Options.vue'
 // import TabGroups from './components/TabGroups.vue'
 import Sidebar from './components/Sidebar.vue'
@@ -24,6 +25,13 @@ Promise.all([
   //     render: ( h ) => h( Action )
   //   })
   // }
+
+  if( window.document.getElementById( 'onboarding' ) ) {
+    new Vue({
+      el: '#onboarding',
+      render: ( h ) => h( Onboarding )
+    })
+  }
 
   if( window.document.getElementById( 'options' ) ) {
     new Vue({

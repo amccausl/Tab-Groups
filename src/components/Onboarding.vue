@@ -4,16 +4,19 @@
       <h3 class="onboarding-tasks-list__header">Let’s get started</h3>
       <div class="onboarding-tasks-list__items-container">
         <div class="onboarding-tasks-list__item">
-          <span class="onboarding-tasks-list__item-text">The Introduction</span>
+          <a class="onboarding-tasks-list__item-text" href="javascript:void(0)">The Introduction</a>
         </div>
         <div class="onboarding-tasks-list__item">
-          <span class="onboarding-tasks-list__item-text">The Presenter</span>
+          <a class="onboarding-tasks-list__item-text" href="javascript:void(0)">The Researcher</a>
         </div>
         <div class="onboarding-tasks-list__item">
-          <span class="onboarding-tasks-list__item-text">The Researcher</span>
+          <a class="onboarding-tasks-list__item-text" href="javascript:void(0)">The Presenter</a>
         </div>
         <div class="onboarding-tasks-list__item">
-          <span class="onboarding-tasks-list__item-text">FAQ</span>
+          <a class="onboarding-tasks-list__item-text" href="javascript:void(0)">The Power User</a>
+        </div>
+        <div class="onboarding-tasks-list__item">
+          <a class="onboarding-tasks-list__item-text" href="javascript:void(0)">The Curious</a>
         </div>
       </div>
     </div>
@@ -107,6 +110,7 @@ export default {
   }
 
   &__item-text {
+    @extend %text-title-20;
   }
 }
 

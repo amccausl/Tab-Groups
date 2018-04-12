@@ -1,0 +1,79 @@
+
+.message-bar {
+  margin-top: 4px;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  min-height: 32px;
+  width: auto;
+
+  &--is-success {
+    background-color: $green-50;
+    color: $green-90;
+  }
+
+  &--is-warning {
+    background-color: $yellow-50;
+    color: $yellow-90;
+  }
+
+  &--is-error {
+    background-color: $red-50;
+    color: $red-90;
+  }
+
+  &__icon {
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+  }
+
+  &__text {
+    @extend %text-body-10;
+    padding-right: 4px;
+    padding-left: 4px;
+  }
+
+  &__action {
+    @extend %text-body-10;
+  }
+
+  &--is-success &__action {
+    background-color: $green-60;
+
+    &:hover {
+      background-color: $green-70;
+    }
+
+    &:active {
+      background-color: $green-80;
+    }
+  }
+
+  &--is-warning &__action {
+    background-color: $yellow-60;
+
+    &:hover {
+      background-color: $yellow-70;
+    }
+
+    &:active {
+      background-color: $yellow-80;
+    }
+  }
+
+  &--is-error &__action {
+    background-color: $red-60;
+
+    &:hover {
+      background-color: $red-70;
+    }
+
+    &:active {
+      background-color: $red-80;
+    }
+  }
+}

@@ -1,7 +1,9 @@
 
-import testDroppable from './droppable.mjs'
+import testDraggable from './draggable.mjs'
+import testHelpers from './helpers.mjs'
 
 export default function testComponents( tap ) {
-  tap.test( './components/droppable.mjs', testDroppable )
+  tap.test( './components/draggable.mjs', testDraggable )
+  // tap.test( './components/helpers.mjs', testHelpers )
   tap.end()
 }

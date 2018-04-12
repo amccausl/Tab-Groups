@@ -115,7 +115,7 @@ export function bindBrowserEvents( store ) {
   // @todo this should be moved somewhere else
   store.subscribe( () => {
     const state = store.getState()
-    if( browser.tabs.show && browser.tabs.hide ) {
+    if( state.features.tabhide.enabled ) {
       console.info('updating tab show state')
       const show_ids = []
       const hide_ids = []
@@ -150,7 +150,6 @@ export function bindBrowserEvents( store ) {
   })
 }
 
-
 export function onStorageChanged( store, changes, area ) {
   if( area === 'local' && changes[ LOCAL_CONFIG_KEY ] ) {
     const config = changes[ LOCAL_CONFIG_KEY ].newValue || {}
@@ -172,6 +171,8 @@ export function onWindowRemoved( store, window_id ) {
 }
 
 export function onTabActivated( store, tab_id, window_id ) {
+  // @todo if previous tab.url == about:config, check features
+
   store.dispatch( activateTabAction( tab_id, window_id ) )
 
   // Start background task to get preview image

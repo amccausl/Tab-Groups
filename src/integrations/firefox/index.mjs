@@ -64,19 +64,23 @@ export function loadBrowserState() {
       const browser_tab_preview_images = []
 
       let window_tab_groups = []
-      browser_tabs.forEach( tab => {
-        browser_tab_group_ids.push( getTabGroupId( tab.id ) )
-        browser_tab_preview_images.push( getTabPreviewState( tab.id ) )
-        if( window_ids.indexOf( tab.windowId ) === -1 ) {
-          window_ids.push( tab.windowId )
-          window_tab_groups.push( browser.sessions.getWindowValue( tab.windowId, WINDOW_TAB_GROUPS_KEY ) )
+      let active_browser_tab;
+      browser_tabs.forEach( browser_tab => {
+        if( browser_tab.active ) {
+          active_browser_tab = browser_tab
+        }
+        browser_tab_group_ids.push( getTabGroupId( browser_tab.id ) )
+        browser_tab_preview_images.push( getTabPreviewState( browser_tab.id ) )
+        if( window_ids.indexOf( browser_tab.windowId ) === -1 ) {
+          window_ids.push( browser_tab.windowId )
+          window_tab_groups.push( browser.sessions.getWindowValue( browser_tab.windowId, WINDOW_TAB_GROUPS_KEY ) )
         }
       })
 
-      return Promise.all( [ Promise.all( browser_tab_group_ids ), Promise.all( browser_tab_preview_images ), Promise.all( window_tab_groups ) ] )
+      return Promise.all( [ Promise.all( browser_tab_group_ids ), Promise.all( browser_tab_preview_images ), Promise.all( window_tab_groups ), isTabHideEnabled( browser_tabs ) ] )
     }
   ).then(
-    ( [ tab_group_ids, tab_preview_images, window_tab_groups ] ) => {
+    ( [ tab_group_ids, tab_preview_images, window_tab_groups, tabhide_enabled ] ) => {
       const window_tab_groups_map = new Map()
       for( let i = 0; i < window_ids.length; i++ ) {
         window_tab_groups_map.set( window_ids[ i ], window_tab_groups[ i ] )
@@ -87,10 +91,35 @@ export function loadBrowserState() {
           preview_image: tab_preview_images[ i ],
         }
       }
+
+      const features = {
+        tabhide: {
+          enabled: tabhide_enabled
+        }
+      }
+
       // This is the same structure from reducers.init
-      return { browser_tabs, config, contextual_identities, theme, window_tab_groups_map }
+      return { browser_tabs, config, contextual_identities, features, theme, window_tab_groups_map }
     }
   )
+}
+
+export function isTabHideEnabled( browser_tabs ) {
+  const browser_tab = browser_tabs.find( browser_tab => browser_tab.active )
+  return browser.tabs.hide( [ browser_tab.id ] )
+    .then(
+      () => {
+        // @todo show again
+        return true
+      },
+      ( error ) => {
+        if( error.fileName === "chrome://browser/content/ext-tabs.js" && error.lineNumber === 0 ) {
+          console.info('detected tabhide disabled', error)
+          return false
+        }
+        return true
+      }
+    )
 }
 
 /**

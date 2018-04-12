@@ -8,7 +8,7 @@ import {
   createTabGroup,
   createPinnedTabGroup,
   createWindow,
-  default_config
+  default_config,
 } from "../../../src/store/helpers.mjs"
 import {
   createTestTab

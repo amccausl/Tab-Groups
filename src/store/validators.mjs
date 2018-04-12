@@ -6,7 +6,36 @@ export function validateState( state ) {
   // @todo ensure tab_group_ids are unique
   const errors = []
 
+  // @todo ensure window active tab is in pinned or active group
+
   for( let window of state.windows ) {
+    // Ensure that the active tab is in active group or pinned
+    if( window.hasOwnProperty( 'active_tab_id' ) && window.active_tab_id != null ) {
+      let is_window_active_tab_valid = false
+      for( let tab_group of window.tab_groups ) {
+        for( let tab of tab_group.tabs ) {
+          if( tab.id === window.active_tab_id ) {
+            is_window_active_tab_valid = true
+            if( tab_group.id !== 0 && window.active_tab_group_id !== tab_group.id ) {
+              errors.push({
+                keyword: 'link',
+                dataPath: `window[${ state.windows.indexOf( window ) }].active_tab_group_id`,
+                message: `Active tab "${ window.active_tab_id }" isn't in the active tab group`
+              })
+            }
+          }
+        }
+      }
+
+      if( ! is_window_active_tab_valid ) {
+        errors.push({
+          keyword: 'link',
+          dataPath: `window[${ state.windows.indexOf( window ) }].active_tab_id`,
+          message: `Active tab "${ window.active_tab_id }" isn't in tabs array`
+        })
+      }
+    }
+
     for( let tab_group of window.tab_groups ) {
       // Validate first group against pinned, rest as normal
       if( tab_group === window.tab_groups[ 0 ] ) {
@@ -21,7 +50,7 @@ export function validateState( state ) {
         // }
       }
 
-      if( tab_group.hasOwnProperty( 'active_tab_id' ) && tab_group.active_tab_id) {
+      if( tab_group.hasOwnProperty( 'active_tab_id' ) && tab_group.active_tab_id ) {
         if( ! tab_group.tabs.some( tab => tab.id === tab_group.active_tab_id ) ) {
           errors.push({
             keyword: 'link',

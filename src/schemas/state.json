@@ -92,6 +92,9 @@
     "contexts": {
       "type": "object"
     },
+    "features": {
+      "type": "object"
+    },
     "windows": {
       "type": "array",
       "items": {

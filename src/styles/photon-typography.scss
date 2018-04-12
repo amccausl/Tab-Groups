@@ -1,0 +1,164 @@
+// @todo these styles are different in every OS :(
+
+// Fira Sans
+
+@font-face{
+  font-family: 'Fira Sans';
+  src: local("Fira Sans Light"),
+       url("woff/FiraSans-Light.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'Fira Sans';
+  src: local("Fira Sans Light Italic"),
+       url("woff/FiraSans-LightItalic.woff") format("woff");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face{
+  font-family: 'Fira Sans';
+  src: local("Fira Sans Regular"),
+       url("woff/FiraSans-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'Fira Sans';
+  src: local("Fira Sans Regular Italic"),
+       url("woff/FiraSans-RegularItalic.woff") format("woff");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face{
+  font-family: 'Fira Sans';
+  src: local("Fira Sans Medium"),
+       url("woff/FiraSans-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'Fira Sans';
+  src: local("Fira Sans Medium Italic"),
+       url("woff/FiraSans-MediumItalic.woff") format("woff");
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face{
+  font-family: 'Fira Sans';
+  src: local("Fira Sans Bold"),
+       url("woff/FiraSans-Bold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'Fira Sans';
+  src: local("Fira Sans Bold Italic"),
+       url("woff/FiraSans-BoldItalic.woff") format("woff");
+  font-weight: 600;
+  font-style: italic;
+}
+
+
+// Fira Mono
+
+@font-face{
+  font-family: 'Fira Mono';
+  src: local("Fira Mono"),
+       url("woff/FiraMono-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'Fira Mono';
+  src: local("Fira Mono Bold"),
+       url("woff/FiraMono-Bold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
+
+
+%text-display-20 {
+  font-family: "Fira Sans";
+  font-weight: 300;
+  font-size: 36px;
+}
+
+%text-title-30 {
+  font-family: "Fira Sans";
+  font-weight: 300;
+  font-size: 22px;
+}
+
+%text-title-20 {
+  font-family: "Fira Sans";
+  font-weight: 500;
+  font-size: 17px;
+}
+
+%text-title-10 {
+  font-family: "Fira Sans";
+  font-weight: 500;
+  font-size: 13px;
+}
+
+%text-body-20 {
+  font-family: "Fira Sans";
+  font-weight: 400;
+  font-size: 15px;
+}
+
+%text-body-20--bold {
+  font-family: "Fira Sans";
+  font-size: 15px;
+  font-weight: 700;
+}
+
+%text-body-10 {
+  font-family: "Fira Sans";
+  font-weight: 400;
+  font-size: 13px;
+}
+
+%text-body-10--bold {
+  font-family: "Fira Sans";
+  font-weight: 700;
+  font-size: 13px;
+}
+
+%text-caption-20 {
+  font-family: "Fira Sans";
+  font-weight: 400;
+  font-size: 13px;
+}
+
+%text-caption-20--bold {
+  font-family: "Fira Sans";
+  font-weight: 700;
+  font-size: 13px;
+}
+
+%text-caption-10 {
+  font-family: "Fira Sans";
+  font-weight: 400;
+  font-size: 13px;
+}
+
+%text-caption-10--bold {
+  font-family: "Fira Sans";
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.text--code {
+  font-family: "Fira Mono";
+  font-weight: 400;
+}

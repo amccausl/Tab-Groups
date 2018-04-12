@@ -105,7 +105,7 @@ function _removeTab( state, { tab_id, window_id, index } ) {
   return new_state
 }
 
-export function init( state, { browser_tabs, config, contextual_identities, theme, window_tab_groups_map } ) {
+export function init( state, { browser_tabs, config, contextual_identities, features, theme, window_tab_groups_map } ) {
   const window_tabs_map = new Map()
 
   // @todo use persist state from window_tab_groups_map
@@ -210,6 +210,7 @@ export function init( state, { browser_tabs, config, contextual_identities, them
   const init_state = {
     config,
     contexts,
+    features,
     windows
   }
 
@@ -362,8 +363,7 @@ export function createGroup( state, { window_id, new_tab_group } ) {
         return window
       }
       return Object.assign( {}, window, {
-        tab_groups: [ ...window.tab_groups, new_tab_group ],
-        active_tab_group_id: new_tab_group.id
+        tab_groups: [ ...window.tab_groups, new_tab_group ]
       })
     })
   })
@@ -645,6 +645,7 @@ export function moveTabs( state, { source_data, target_data } ) {
   }
 
   // @todo If source is same as target, noop
+  // @todo if active tab is moved, switch to next one
   return Object.assign( {}, state, {
     windows: windows.map( window => {
       if( window.id !== source_data.window_id && window.id !== target_data.window_id ) {
@@ -652,6 +653,7 @@ export function moveTabs( state, { source_data, target_data } ) {
       }
 
       let active_tab_group_id = window.active_tab_group_id
+      let window_active_tab_id = window.active_tab_id || null
       let tab_groups = window.tab_groups.map( tab_group => {
         let { tabs, active_tab_id } = tab_group
 
@@ -663,18 +665,31 @@ export function moveTabs( state, { source_data, target_data } ) {
               filtered_tabs.push( tab )
               if( active_tab_id == null ) {
                 active_tab_id = tab.id
+                if( window_active_tab_id == null ) {
+                  window_active_tab_id = tab.id
+                }
               }
-            } else if( tab.id === active_tab_id && tab_group.id !== target_data.tab_group_id ) {
-              active_tab_id = null
-              // If the active tab in the active group is moving, activate new group
-              if( active_tab_group_id === tab_group.id && target_data.tab_group_id !== 0 ) {
-                active_tab_group_id = target_data.tab_group_id
+            } else {
+              if( tab.id === active_tab_id && tab_group.id !== target_data.tab_group_id ) {
+                active_tab_id = null
+                // If the active tab in the active group is moving, activate new group
+                if( active_tab_group_id === tab_group.id && target_data.tab_group_id !== 0 ) {
+                  active_tab_group_id = target_data.tab_group_id
+                }
+              }
+
+              if( tab.id === window_active_tab_id && source_data.window_id !== target_data.window_id ) {
+                window_active_tab_id = null
               }
             }
           }
 
           if( active_tab_id == null && filtered_tabs.length ) {
             active_tab_id = filtered_tabs[ filtered_tabs.length - 1 ].id
+          }
+
+          if( window_active_tab_id == null && filtered_tabs.length ) {
+            window_active_tab_id = filtered_tabs[ filtered_tabs.length - 1 ].id
           }
 
           tabs = filtered_tabs
@@ -705,7 +720,7 @@ export function moveTabs( state, { source_data, target_data } ) {
         tab_groups.push( target_data.tab_group )
       }
 
-      return Object.assign( {}, window, { tab_groups, active_tab_group_id } )
+      return Object.assign( {}, window, { tab_groups, active_tab_group_id, active_tab_id: window_active_tab_id } )
     })
   })
 }

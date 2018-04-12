@@ -1,9 +1,9 @@
 import {
   getInitialState,
-} from './helpers.mjs'
+} from '../helpers.mjs'
 
-import { createGroup } from '../../src/store/reducers.mjs'
-import { validateState } from '../../src/store/validators.mjs'
+import { createGroup } from '../../../src/store/reducers.mjs'
+import { validateState } from '../../../src/store/validators.mjs'
 
 function testNormalCreate( t ) {
   let state = getInitialState()
