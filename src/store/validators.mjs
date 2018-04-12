@@ -84,5 +84,6 @@ export function validateState( state ) {
     validateState.errors = errors
     return false
   }
+  validateState.errors = null
   return true
 }

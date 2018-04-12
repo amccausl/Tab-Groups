@@ -74,25 +74,32 @@ function _removeTab( state, { tab_id, window_id, index } ) {
 
   const windows = state.windows.map( window => {
     if( window.id === window_id ) {
-      window = Object.assign( {}, window, {
-        tab_groups: window.tab_groups.map( tab_group => {
-          const tab_index = tab_group.tabs.findIndex( tab => tab.id === tab_id )
-          if( tab_index > -1 ) {
-            tab_group = Object.assign( {}, tab_group, {
-              tabs: [ ...tab_group.tabs ],
-              tabs_count: tab_group.tabs_count - 1
-            })
-            tab_group.tabs.splice( tab_index, 1 )[ 0 ]
-            if( tab_group.active_tab_id === tab_id ) {
-              if( tab_group.tabs_count > 0 ) {
-                tab_group.active_tab_id = tab_group.tabs[ Math.min( tab_index, tab_group.tabs_count - 1 ) ].id
-              } else {
-                tab_group.active_tab_id = null
-              }
+      let active_tab_id = window.active_tab_id
+      let tab_groups = window.tab_groups.map( tab_group => {
+        const tab_index = tab_group.tabs.findIndex( tab => tab.id === tab_id )
+        if( tab_index > -1 ) {
+          tab_group = Object.assign( {}, tab_group, {
+            tabs: [ ...tab_group.tabs ],
+            tabs_count: tab_group.tabs_count - 1
+          })
+          tab_group.tabs.splice( tab_index, 1 )[ 0 ]
+          if( tab_group.active_tab_id === tab_id ) {
+            if( tab_group.tabs_count > 0 ) {
+              tab_group.active_tab_id = tab_group.tabs[ Math.min( tab_index, tab_group.tabs_count - 1 ) ].id
+            } else {
+              tab_group.active_tab_id = null
+            }
+            if( active_tab_id === tab_id ) {
+              active_tab_id = tab_group.active_tab_id
             }
           }
-          return tab_group
-        })
+        }
+        return tab_group
+      })
+
+      window = Object.assign( {}, window, {
+        active_tab_id,
+        tab_groups,
       })
     }
     return window
@@ -716,8 +723,11 @@ export function moveTabs( state, { source_data, target_data } ) {
       })
 
       if( window.id === target_data.window_id && target_data.tab_group ) {
-        active_tab_group_id = target_data.tab_group.id
         tab_groups.push( target_data.tab_group )
+
+        if( target_data.tab_group.tabs.some( tab => tab.id === window_active_tab_id ) ) {
+          active_tab_group_id = target_data.tab_group.id
+        }
       }
 
       return Object.assign( {}, window, { tab_groups, active_tab_group_id, active_tab_id: window_active_tab_id } )

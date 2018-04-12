@@ -115,7 +115,7 @@ export function bindBrowserEvents( store ) {
   // @todo this should be moved somewhere else
   store.subscribe( () => {
     const state = store.getState()
-    if( state.features.tabhide.enabled ) {
+    if( browser.tabs.hide && browser.tabs.show ) {
       console.info('updating tab show state')
       const show_ids = []
       const hide_ids = []

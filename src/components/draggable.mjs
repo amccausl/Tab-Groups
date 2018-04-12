@@ -194,7 +194,7 @@ export function onTabGroupDragEnd( event, tab_group ) {
   console.info('drag_state', JSON.stringify(this.drag_state))
 }
 
-export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
+export function onTabGroupDragEnter( event, tab_group, tab_group_index, handler_id ) {
   console.info(`onTabGroupDragEnter( tab_group_id=${ tab_group ? tab_group.id : null }, tab_group_index=${ tab_group_index } )`)
   const event_data = getTransferData( event.dataTransfer )
   const transfer_type = getTransferType( event_data )
@@ -212,6 +212,7 @@ export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
         Object.assign( this.drag_state, getTabGroupDragProperties( event, tab_group ) )
         break
     }
+    this.drag_state.target.handler_id = handler_id
     event.preventDefault()
   }
   console.info('drag_state', JSON.stringify(this.drag_state))

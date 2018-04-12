@@ -16,22 +16,40 @@ import {
 } from '../../src/store/validators.mjs'
 
 function testRemoveFirstTab( t ) {
-  let state = getInitialState()
+  const window_id = 1
+  const tab_id = 3
+  const state0 = {
+    config: {},
+    windows: [
+      createWindow( window_id, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( 2, [
+          createTestTab({
+            id: tab_id
+          }),
+          createTestTab({
+            id: 4
+          }),
+          createTestTab({
+            id: 5
+          })
+        ])
+      ])
+    ]
+  }
 
-  let tab_id = state.windows[ 0 ].tab_groups[ 1 ].tabs[ 0 ].id
+  const state1 = removeTab( state0, { tab_id, window_id } )
+  t.ok( validateState( state1 ), "state validates", validateState.errors )
 
-  state = removeTab( state, { tab_id, window_id: state.windows[ 0 ].id } )
-  t.ok( validateState( state ), "state validates", validateState.errors )
-
-  t.equal( state.windows[ 0 ].tab_groups.length, 2 )
-  t.equal( state.windows[ 0 ].tab_groups[ 1 ].tabs.length, 1 )
-  t.equal( state.windows[ 0 ].tab_groups[ 1 ].tabs_count, state.windows[ 0 ].tab_groups[ 1 ].tabs.length )
+  t.equal( state1.windows[ 0 ].tab_groups.length, 2 )
+  t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
+  t.equal( state1.windows[ 0 ].active_tab_id, 4 )
   t.end()
 }
 
 function testRemoveMiddleTab( t ) {
   const window_id = 1
-  let state = {
+  const state0 = {
     config: {},
     windows: [
       createWindow( window_id, [
@@ -51,47 +69,44 @@ function testRemoveMiddleTab( t ) {
     ]
   }
 
-  let tab_id = state.windows[ 0 ].tab_groups[ 1 ].tabs[ 1 ].id
+  let tab_id = state0.windows[ 0 ].tab_groups[ 1 ].tabs[ 1 ].id
 
-  state = removeTab( state, { tab_id, window_id } )
-  t.ok( validateState( state ), "state validates", validateState.errors )
+  const state1 = removeTab( state0, { tab_id, window_id } )
+  t.ok( validateState( state1 ), "state validates", validateState.errors )
 
-  t.equal( state.windows[ 0 ].tab_groups.length, 2 )
-  t.equal( state.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
-  t.equal( state.windows[ 0 ].tab_groups[ 1 ].tabs_count, state.windows[ 0 ].tab_groups[ 1 ].tabs.length )
+  t.equal( state1.windows[ 0 ].tab_groups.length, 2 )
+  t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
   t.end()
 }
 
 function testRemoveLastTab( t ) {
   let window_id = 1
-  let state = {
+  let tab_id = 5
+  const state0 = {
     config: {},
     windows: [
       createWindow( window_id, [
         createPinnedTabGroup( [] ),
-        createTabGroup( 1, [
-          createTestTab({
-            id: 1
-          }),
-          createTestTab({
-            id: 2
-          }),
+        createTabGroup( 2, [
           createTestTab({
             id: 3
+          }),
+          createTestTab({
+            id: 4
+          }),
+          createTestTab({
+            id: tab_id
           })
         ])
       ])
     ]
   }
 
-  let tab_id = state.windows[ 0 ].tab_groups[ 1 ].tabs[ state.windows[ 0 ].tab_groups[ 1 ].tabs.length - 1 ].id
+  const state1 = removeTab( state0, { tab_id, window_id } )
+  t.ok( validateState( state1 ), "state validates", validateState.errors )
 
-  state = removeTab( state, { tab_id, window_id } )
-  t.ok( validateState( state ), "state validates", validateState.errors )
-
-  t.equal( state.windows[ 0 ].tab_groups.length, 2 )
-  t.equal( state.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
-  t.equal( state.windows[ 0 ].tab_groups[ 1 ].tabs_count, state.windows[ 0 ].tab_groups[ 1 ].tabs.length )
+  t.equal( state1.windows[ 0 ].tab_groups.length, 2 )
+  t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
   t.end()
 }
 
