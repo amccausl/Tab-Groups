@@ -22,6 +22,12 @@ export function validateState( state ) {
                 dataPath: `window[${ state.windows.indexOf( window ) }].active_tab_group_id`,
                 message: `Active tab "${ window.active_tab_id }" isn't in the active tab group`
               })
+            } else if( tab.id !== tab_group.active_tab_id ) {
+              errors.push({
+                keyword: 'link',
+                dataPath: `window[${ state.windows.indexOf( window ) }].tab_groups[${ window.tab_groups.indexOf( tab_group ) }].active_tab_id`,
+                message: `Window active tab "${ window.active_tab_id }" isn't active in tab group`
+              })
             }
           }
         }

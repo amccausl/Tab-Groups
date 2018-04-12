@@ -76,7 +76,7 @@
             </div>
           </div>
           <!-- <transition-group v-if="tab_group.open && show_tabs && ! isTabGroupDragSource( tab_group )" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]" tag="div" :name="`sidebar-tab-group-tabs-list--${ theme }__item--transition`"> -->
-          <div v-if="tab_group.open && show_tabs" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]">
+          <div v-if="tab_group.open && show_tabs && tab_group.tabs.length" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]">
             <div :class="bem( `sidebar-tab-group-tabs-list--${ theme }__item-container`, { 'drag-target':  ! isSelected( tab ) && drag_state.target.tab_id === tab.id, 'drag-source': isSelected( tab ) && is_dragging } )"
                 v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
                 :title="tab.title"
@@ -110,6 +110,7 @@
                 <div v-if="show_tab_context && tab.context_id" class="sidebar-tab-view-item-context" :style="context_styles[ tab.context_id ]"></div>
               </div>
             </div>
+            <div :class="[ `sidebar-tab-group-tabs-list--${ theme }__drag-target-ink--is-last` ]"></div>
           </div>
           <!-- </transition-group> -->
         </div>
@@ -584,22 +585,21 @@ $empty-dropzone__themes: (
 
     &__drag-target-icon {
       @extend %slow-transition;
-      // transition-property: opacity;
-      // display: none; // Remove the spacer when not required (list is full)
-      // opacity: 0;
-      fill: map-get( $colors, --drag-target--color );
-    }
-
-    &--drag-tab-target {
-      background-color: map-get( $colors, --drag-target--background-color );
-    }
-
-    &--drag-tab_group-target &__drag-target-ink {
-      @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
+      transition-property: fill, opacity;
+      position: absolute;
     }
 
     &--is-handler &__drag-target-icon {
       display: initial;
+    }
+
+    &--drag-tab-target {
+      background-color: map-get( $colors, --drag-target--background-color );
+      fill: map-get( $colors, --drag-target--color );
+    }
+
+    &--drag-tab_group-target &__drag-target-ink {
+      @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
     }
   }
 }
@@ -669,8 +669,16 @@ $action-strip__themes: (
       color: map-get( $colors, __text--color );
     }
 
+    &__button--drag-target &__button-text {
+      color: $white-100;
+    }
+
     &__button-icon {
       fill: map-get( $colors, __text--color );
+    }
+
+    &__button--drag-target &__button-icon {
+      fill: $white-100;
     }
 
     &__search {
@@ -868,7 +876,7 @@ $sidebar-tab_groups-list__themes: (
 }
 
 // =============================================================================
-// Tab Group List Item Header
+// Tab Groups List Item Header
 // =============================================================================
 
 $tab-groups-list-item-header__themes: (
@@ -893,7 +901,7 @@ $tab-groups-list-item-header__themes: (
 @each $theme, $colors in $tab-groups-list-item-header__themes {
   .tab-groups-list-item-header--#{$theme} {
     @extend %slow-transition;
-    transition-property: background-color, padding-top;
+    transition-property: background-color;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -905,16 +913,6 @@ $tab-groups-list-item-header__themes: (
     background-color: map-get( $colors, --background-color );
     cursor: pointer;
 
-    // &--active::before {
-    //   content: '';
-    //   background-color: $light-border-color;
-    //   border-left: 1px solid map-get( $colors, --background-color );
-    //   height: 34px;
-    //   min-width: 4px;
-    //   margin-top: -1px;
-    //   margin-bottom: -1px;
-    // }
-
     &--active:not(#{&}--open)::before {
       background-color: $blue-50;
     }
@@ -922,17 +920,12 @@ $tab-groups-list-item-header__themes: (
     &__container {
       @extend %slow-transition;
       position: relative;
-      transition-property: background-color, padding-top;
+      transition-property: background-color;
       flex: 1;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-
-      &--drag-tab_group-target {
-        // background-color: map-get( $colors, --drag-target--background-color );
-        // padding-top: 34px;
-      }
 
       &--drag-tab-target {
         background-color: $purple-50;
@@ -1005,6 +998,7 @@ $tab-groups-list-item-header__themes: (
       height: 16px;
       width: 16px;
       margin-right: 4px;
+      fill: map-get( $colors, primary-text--color );
     }
 
     &__carat-icon {
@@ -1082,6 +1076,9 @@ $sidebar-tab-group-tabs-list__themes: (
     max-height: 80vh;
     overflow-y: auto;
     border-bottom: solid 1px map-get( $colors, --border-color );
+    padding-top: 1px;
+    background-color: map-get( $colors, --background-color );
+    position: relative;
 
     &__item-container {
       @extend %slow-transition;
@@ -1118,6 +1115,17 @@ $sidebar-tab-group-tabs-list__themes: (
 
       &:not(#{&}--active):hover {
         background-color: map-get( $colors, --hover--background-color );
+      }
+    }
+
+    // @todo should clean up this cross-component rule
+    .sidebar-tab_groups-list--#{$theme}__item-container--drag-tab-target &__drag-target-ink--is-last {
+      @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
+      top: initial;
+      bottom: 0;
+
+      &::before {
+        border-bottom: none;
       }
     }
   }

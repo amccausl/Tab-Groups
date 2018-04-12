@@ -709,6 +709,9 @@ export function moveTabs( state, { source_data, target_data } ) {
           } else {
             tabs.splice( target_data.tab_group_index, 0, ...source_data.tabs )
           }
+          if( window_active_tab_id && tabs.some( tab => tab.id === window_active_tab_id ) ) {
+            active_tab_id = window_active_tab_id
+          }
         }
 
         if( tabs !== tab_group.tabs ) {
