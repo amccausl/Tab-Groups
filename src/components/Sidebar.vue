@@ -107,6 +107,11 @@
                   <br>
                   <span class="sidebar-tab-view-item-url">{{ tab.url | url }}</span>
                 </div>
+                <div :class="[ `sidebar-tab-group-tabs-list--${ theme }__item-close` ]" @click.stop="closeTab( tab )">
+                  <svg :class="[ `sidebar-tab-group-tabs-list--${ theme }__item-close-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path d="M9.061 8l3.47-3.47a.75.75 0 0 0-1.061-1.06L8 6.939 4.53 3.47a.75.75 0 1 0-1.06 1.06L6.939 8 3.47 11.47a.75.75 0 1 0 1.06 1.06L8 9.061l3.47 3.47a.75.75 0 0 0 1.06-1.061z"></path>
+                  </svg>
+                </div>
                 <div v-if="show_tab_context && tab.context_id" class="sidebar-tab-view-item-context" :style="context_styles[ tab.context_id ]"></div>
               </div>
             </div>
@@ -117,7 +122,7 @@
       </div>
     </div>
     <!-- </transition-group> -->
-    <div :class="bem( `empty-dropzone--${ theme }`, { [`drag-${ drag_state.source.type }-target`]: drag_state.target.tab_group_new, 'is-handler': drag_state.target.handler_id === 'dropzone' } )"
+    <div :class="bem( `empty-dropzone--${ theme }`, { [`drag-${ drag_state.source.type }-target`]: drag_state.target.tab_group_new } )"
         @click.right.prevent
         @dragenter="onTabGroupDragEnter( $event, null, null, 'dropzone' )"
         @dragover.prevent
@@ -126,7 +131,7 @@
         @drop="onTabGroupDrop"
     >
       <div :class="[ `empty-dropzone--${ theme }__drag-target-ink` ]"></div>
-      <svg v-if="drag_state.target.handler_id === 'dropzone'" :class="[ `empty-dropzone--${ theme }__drag-target-icon` ]" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
+      <svg v-if="drag_state.target.tab_group_new && drag_state.source.type === 'tab'" :class="[ `empty-dropzone--${ theme }__drag-target-icon` ]" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
         <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
       </svg>
     </div>
@@ -913,10 +918,6 @@ $tab-groups-list-item-header__themes: (
     background-color: map-get( $colors, --background-color );
     cursor: pointer;
 
-    &--active:not(#{&}--open)::before {
-      background-color: $blue-50;
-    }
-
     &__container {
       @extend %slow-transition;
       position: relative;
@@ -941,6 +942,10 @@ $tab-groups-list-item-header__themes: (
       min-width: 4px;
       margin-top: -1px;
       margin-bottom: -1px;
+    }
+
+    &--active:not(#{&}--open) &__container::before {
+      background-color: $blue-50;
     }
 
     &--drag-tab_group-target &__drag-target-ink {
@@ -997,7 +1002,6 @@ $tab-groups-list-item-header__themes: (
     &__icon {
       height: 16px;
       width: 16px;
-      margin-right: 4px;
       fill: map-get( $colors, primary-text--color );
     }
 
@@ -1050,6 +1054,7 @@ $tab-groups-list-item-header__themes: (
 
 $sidebar-tab-group-tabs-list__themes: (
   light: (
+    --color: $grey-90,
     --background-color: $white-100,
     --active--background-color: $light-header-active-background,
     --drag-target--background-color: $white-100,
@@ -1058,6 +1063,7 @@ $sidebar-tab-group-tabs-list__themes: (
     --border-color: map-get( $--theme-light, --border-color ),
   ),
   dark: (
+    --color: $white-100,
     --background-color: $dark-header-background,
     --active--background-color: $dark-header-active-background,
     --drag-target--background-color: $dark-header-active-background,
@@ -1116,6 +1122,16 @@ $sidebar-tab-group-tabs-list__themes: (
       &:not(#{&}--active):hover {
         background-color: map-get( $colors, --hover--background-color );
       }
+    }
+
+    &__item-close {
+      height: 24px;
+      padding: 4px;
+      margin-right: 4px;
+    }
+
+    &__item-close-icon {
+      fill: map-get( $colors, --color );
     }
 
     // @todo should clean up this cross-component rule
@@ -1214,6 +1230,7 @@ $sidebar-tab-group-tabs-list__themes: (
     position: absolute;
     right: 0;
     top: 0;
+    z-index: -10;
   }
 }
 

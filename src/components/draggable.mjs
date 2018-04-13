@@ -144,6 +144,9 @@ export function onTabDragEnter( event, tab_group, tab ) {
     Object.assign( this.drag_state, getTabDragProperties( event, tab_group, tab ) )
     event.preventDefault()
   } else {
+    if( transfer_type === "tab_group" ) {
+      Object.assign( this.drag_state.source, { type: "tab_group", tab_group_id: event_data.tab_group_id } )
+    }
     event.dataTransfer.dropEffect = "none"
   }
   console.info('drag_state', JSON.stringify(this.drag_state))
@@ -194,7 +197,7 @@ export function onTabGroupDragEnd( event, tab_group ) {
   console.info('drag_state', JSON.stringify(this.drag_state))
 }
 
-export function onTabGroupDragEnter( event, tab_group, tab_group_index, handler_id ) {
+export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
   console.info(`onTabGroupDragEnter( tab_group_id=${ tab_group ? tab_group.id : null }, tab_group_index=${ tab_group_index } )`)
   const event_data = getTransferData( event.dataTransfer )
   const transfer_type = getTransferType( event_data )
@@ -212,7 +215,6 @@ export function onTabGroupDragEnter( event, tab_group, tab_group_index, handler_
         Object.assign( this.drag_state, getTabGroupDragProperties( event, tab_group ) )
         break
     }
-    this.drag_state.target.handler_id = handler_id
     event.preventDefault()
   }
   console.info('drag_state', JSON.stringify(this.drag_state))
@@ -222,7 +224,7 @@ export function onTabGroupDragLeave( event, tab_group, tab_group_index ) {
   // Leave is fired after the new enter, so detect if this is still the active group
   if( drag_target === event.target ) {
     console.info(`onTabGroupDragLeave( tab_group_id=${ tab_group ? tab_group.id : null }, tab_group_index=${ tab_group_index } )`)
-    Object.assign( this.drag_state, { source: {}, target: {} } )
+    Object.assign( this.drag_state, { target: {} } )
   }
   console.info('drag_state', JSON.stringify(this.drag_state))
 }
