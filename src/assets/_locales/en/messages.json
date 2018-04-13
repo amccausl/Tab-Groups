@@ -1,11 +1,11 @@
 {
   "extension_name": {
-    "message": "Tab Focus",
+    "message": "Tabulate",
     "description": "Name of the extension."
   },
 
   "extension_description": {
-    "message": "Tab Focus is an easy way to organize a lot of tabs. You can switch between groups, and quickly search through all of your tabs to switch to a specific one.",
+    "message": "An easy way to organize your tabs. You can switch between groups to stay focused, mute noisy groups, or copy tabs for reference later.",
     "description": "Description of the extension."
   },
 
