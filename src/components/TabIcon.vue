@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-icon">
+  <div :class="bem( 'tab-icon', { 'is-loading': tab.status === 'loading' } )">
     <img class="tab-icon__img" :src="icon_url" :style="{ height: `${ size }px`, width: `${ size }px` }" @error="onIconLoadError"/>
     <svg v-if="tab.muted" class="tab-icon__state audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
         @click.prevent="unmuteTab( $event, tab.id )"
@@ -17,6 +17,20 @@
         <path d="M13 8a3 3 0 0 0-2.056-2.787.5.5 0 1 0-.343.939A2.008 2.008 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
       </g>
     </svg>
+    <div class="tab-icon__spinner">
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-0"></div>
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-1"></div>
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-2"></div>
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-3"></div>
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-4"></div>
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-5"></div>
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-6"></div>
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-7"></div>
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-8"></div>
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-9"></div>
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-10"></div>
+      <div class="tab-icon__spinner-sub tab-icon__spinner-sub--index-11"></div>
+    </div>
   </div>
 </template>
 
@@ -24,6 +38,9 @@
 import {
   INK_90,
 } from "./photon-colors"
+import {
+  bem,
+} from "./helpers.mjs"
 
 export default {
   name: "tab-icon",
@@ -64,6 +81,7 @@ export default {
   created() {
   },
   methods: {
+    bem,
     muteTab( event ) {
       console.info('muteTab', this.tab.id)
       event.stopPropagation()
@@ -82,8 +100,21 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../styles/photon-colors";
+
 $tab-icon--size: 16px !default;
 $tab-icon__state--size: 12px !default;
+
+%slow-transition {
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(.07,.95,0,1);
+}
+
+@keyframes spinner {
+  0% { opacity: 1; }
+  50% { opacity: 0.25; }
+  100% { opacity: 1; }
+}
 
 .tab-icon {
   position: relative;
@@ -99,6 +130,36 @@ $tab-icon__state--size: 12px !default;
     right: -8px;
     height: $tab-icon__state--size;
     width: $tab-icon__state--size;
+  }
+
+  &__spinner {
+    @extend %slow-transition;
+    transition-property: opacity;
+    opacity: 0;
+  }
+
+  &--is-loading &__spinner {
+    opacity: 1;
+  }
+
+  &__spinner-sub {
+    position: absolute;
+    top: 0;
+    width: 4px;
+    height: 6px;
+    border-radius: 2px;
+    background: $grey-50;
+
+    animation-name: spinner;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+
+    @for $i from 0 through 11 {
+      &--index-#{$i} {
+        transform: translateX(10px) translateY(9px) rotate($i * 30deg) translateY(-12px);
+        animation-delay: $i * 2s / 12;
+      }
+    }
   }
 }
 </style>

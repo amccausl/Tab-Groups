@@ -4,6 +4,7 @@ import buble from 'rollup-plugin-buble'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import nodeGlobals from 'rollup-plugin-node-globals'
+import replace from 'rollup-plugin-replace'
 
 let plugins = [
   alias({
@@ -25,6 +26,9 @@ let plugins = [
       templateString: false
     }
   }),
+  replace({
+    'process.env.NODE_ENV': JSON.stringify( 'production' )
+  }),
   nodeResolve({
     jsnext: true,
     main: true,
@@ -41,7 +45,7 @@ let config = {
     format: 'umd',
     sourcemap: true
   },
-  plugins: plugins
+  plugins
 }
 
 export default config

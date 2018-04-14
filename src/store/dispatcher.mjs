@@ -41,7 +41,6 @@ export function createStore( reducer, initial_state ) {
       const new_state = reducer( current_state, action )
       console.timeEnd( `dispatch ${ action.type }` )
       if( validateState( new_state ) ) {
-        current_state = new_state
         console.info( 'state', current_state )
       } else {
         console.error( 'Validator failed on new state' )
@@ -50,6 +49,7 @@ export function createStore( reducer, initial_state ) {
         console.info('new_state', new_state)
         console.info('errors', validateState.errors)
       }
+      current_state = new_state
     } finally {
       store.is_dispatching = false
     }
