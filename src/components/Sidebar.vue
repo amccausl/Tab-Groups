@@ -1,6 +1,6 @@
 <template>
   <body :class="[ `sidebar--${ theme }`, theme ]">
-    <div :class="[ `action-strip--${ theme }` ]" @click.right.prevent>
+    <div v-if="show_header" :class="[ `action-strip--${ theme }` ]" @click.right.prevent>
       <input v-if="is_search_enabled" :class="[ `action-strip--${ theme }__search` ]" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/>
       <div v-else :class="[ `action-strip--${ theme }__spacer` ]"></div>
       <div :class="bem( `action-strip--${ theme }__button`, { 'no-grow': true } )" @click="openOptionsPage()">
@@ -98,7 +98,7 @@
                 >
                   <div class="sidebar-tab-view-item-icon-background"
                       :class="[ `sidebar-tab-group-tabs-list--${ theme }__item-icon-background` ]"
-                      v-if="show_tab_icon_background"
+                      v-if="show_tab_icon_background && tab.status !== 'loading'"
                   ></div>
                   <tab-icon :theme="theme" :tab="tab" size="24"></tab-icon>
                 </div>
@@ -232,6 +232,7 @@ export default {
       search_text: '',
       search_resolved: true,
       selected_tab_ids: [],
+      show_header: true,
       show_tabs: true,
       show_tabs_count: true,
       show_pinned_tabs: true,
@@ -249,9 +250,10 @@ export default {
   created() {
     onStateChange( state => {
       this.theme = ( state.config.theme === 'dark' ? 'dark' : 'light' )
+      this.show_header = state.config.show_header
       this.show_tabs_count = state.config.show_tabs_count
       this.show_tabs = state.config.show_tabs
-      this.show_pinned_tabs = this.show_tabs && state.config.show_pinned_tabs
+      this.show_pinned_tabs = false && this.show_tabs && state.config.show_pinned_tabs
       this.show_tab_context = this.show_tabs && state.config.show_tab_context
       this.show_tab_icon_background = this.show_tabs && state.config.show_tab_icon_background
 

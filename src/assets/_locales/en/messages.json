@@ -54,6 +54,11 @@
     "description": ""
   },
 
+  "options_sidebar_show_header": {
+    "message": "Show header bar",
+    "description": ""
+  },
+
   "options_sidebar_show_tabs_count": {
     "message": "Show tabs count on group",
     "description": ""

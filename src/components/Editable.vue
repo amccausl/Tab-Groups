@@ -3,18 +3,18 @@
 </template>
 
 <script>
-import Vue from 'vue'
+import Vue from "vue"
 
 // https://vuejs.org/v2/guide/components.html#Form-Input-Components-using-Custom-Events
 
 export default {
-  name: 'editable',
+  name: "editable",
   props: {
-    'value': {
+    "value": {
       type: String,
       required: true
     },
-    'active': {
+    "active": {
       type: Boolean,
       default: true
     }
@@ -27,7 +27,7 @@ export default {
       })
     }
 
-    this.$on( 'input', this.onInput )
+    this.$on( "input", this.onInput )
   },
   methods: {
     onClick( event ) {
@@ -45,7 +45,7 @@ export default {
       sel.addRange( range )
     },
     onBlur() {
-      this.$emit( 'input', this.$el.innerText.replace( /\n/g, "" ) )
+      this.$emit( "input", this.$el.innerText.replace( /\n/g, "" ) )
       this.$el.parentElement.scrollLeft = 0
     },
     onPressEnter() {
@@ -68,7 +68,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
 // @todo some of these properties should be moved into calling context
 .editable {

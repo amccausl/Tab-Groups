@@ -1,6 +1,7 @@
 
 export const default_config = {
-  theme: 'dark',
+  theme: 'light',
+  show_header: true,
   show_tabs_count: true,
   show_tabs: true,
   show_tab_context: true,

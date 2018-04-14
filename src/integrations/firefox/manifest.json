@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "__MSG_extension_name__",
   "description": "__MSG_extension_description__",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "applications": {
     "gecko": {
       "id": "{65afae73-8786-42d1-a6e7-95dc884dfb3a}"
@@ -26,7 +26,7 @@
   },
   "sidebar_action": {
     "default_icon": "icons/tab-groups.svg",
-    "default_title" : "__MSG_sidebar_name__",
+    "default_title": "__MSG_sidebar_name__",
     "default_panel": "sidebar.html"
   },
   "options_ui": {

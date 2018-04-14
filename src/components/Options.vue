@@ -15,12 +15,12 @@
           <li :class="{ 'active': selected_section === 'preferences' }">
             <a href="javascript:void(0)" @click="selectSection( 'preferences' )">{{ __MSG_options_section_preferences__ }}</a>
           </li>
-          <li :class="{ 'active': selected_section === 'data' }">
+          <!-- <li :class="{ 'active': selected_section === 'data' }">
             <a href="javascript:void(0)" @click="selectSection( 'data' )">{{ __MSG_options_section_data__ }}</a>
           </li>
           <li :class="{ 'active': selected_section === 'debug' }">
             <a href="javascript:void(0)" @click="selectSection( 'debug' )">{{ __MSG_options_section_debug__ }}</a>
-          </li>
+          </li> -->
         </ul>
       </nav>
       <article class="main">
@@ -40,6 +40,12 @@
               <legend>{{ __MSG_options_sidebar_legend__ }}</legend>
 
               <label class="checkbox">
+                <input class="checkbox__input" type="checkbox" v-model="show_header">
+                <span class="checkbox__icon"></span>
+                <span class="checkbox__label">{{ __MSG_options_sidebar_show_header__ }}</span>
+              </label>
+
+              <label class="checkbox">
                 <input class="checkbox__input" type="checkbox" v-model="show_tabs_count">
                 <span class="checkbox__icon"></span>
                 <span class="checkbox__label">{{ __MSG_options_sidebar_show_tabs_count__ }}</span>
@@ -51,11 +57,11 @@
                 <span class="checkbox__label">{{ __MSG_options_sidebar_show_tabs__ }}</span>
               </label>
 
-              <label v-if="show_tabs" class="checkbox checkbox--nested">
+              <!-- <label v-if="show_tabs" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_pinned_tabs">
                 <span class="checkbox__icon"></span>
                 <span class="checkbox__label">{{ __MSG_options_sidebar_show_pinned_tabs__ }}</span>
-              </label>
+              </label> -->
 
               <label v-if="show_tabs" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_tab_context">
@@ -103,6 +109,7 @@ export default {
       },
       preferences: {
         theme: 'dark',
+        show_header: true,
         show_tabs_count: false,
         show_tabs: false,
         show_pinned_tabs: false,
@@ -134,6 +141,9 @@ export default {
     __MSG_options_sidebar_legend__() {
       return window.background.getMessage( "options_sidebar_legend" )
     },
+    __MSG_options_sidebar_show_header__() {
+      return window.background.getMessage( "options_sidebar_show_header" )
+    },
     __MSG_options_sidebar_show_tabs_count__() {
       return window.background.getMessage( "options_sidebar_show_tabs_count" )
     },
@@ -148,6 +158,14 @@ export default {
     },
     __MSG_options_sidebar_show_tab_icon_background__() {
       return window.background.getMessage( "options_sidebar_show_tab_icon_background" )
+    },
+    show_header: {
+      get() {
+        return this.preferences.show_header
+      },
+      set( value ) {
+        window.background.setConfig( 'show_header', value )
+      }
     },
     show_tabs: {
       get() {
