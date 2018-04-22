@@ -1,5 +1,5 @@
 {
-  "name": "sidebar-tab-groups",
+  "name": "tabulate",
   "description": "A web-extensions port for Tab Groups",
   "main": "",
   "authors": [
@@ -14,5 +14,8 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "fira": "Fira#*"
+  }
 }

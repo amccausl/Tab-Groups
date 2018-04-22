@@ -10,6 +10,11 @@
     "**/dist": true,
     "**/node_modules": true
   },
-  "nodeTdd.minimal": false,
-  "nodeTdd.reporter": "tap"
+  "nodeTdd.buildOnActivation": true,
+  "nodeTdd.buildOnCreate": true,
+  "nodeTdd.buildOnDelete": true,
+  "nodeTdd.minimal": true,
+  "nodeTdd.reporter": "tap",
+  "nodeTdd.testScript": "test",
+  "nodeTdd.glob": "{src,test}/**/*.{mjs}"
 }

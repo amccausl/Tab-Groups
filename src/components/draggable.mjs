@@ -15,8 +15,16 @@ function setTabGroupTransferData( data_transfer, window_id, tab_group ) {
 
 function getTransferType( event_data ) {
   if( event_data ) {
-    if( event_data.type === 'moz-tab' ) {
-      return 'tab'
+    if( event_data.type != null ) {
+      if( event_data.type === 'moz-tab' ) {
+        return 'tab'
+      }
+      if( event_data.type === 'moz-url' ) {
+        return 'tab'
+      }
+      if( event_data.type === 'moz-place' ) {
+        return 'tab'
+      }
     }
     if( event_data.tab_ids != null ) {
       return 'tab'
@@ -24,18 +32,25 @@ function getTransferType( event_data ) {
     if( event_data.tab_group_id != null ) {
       return 'tab_group'
     }
-    if( event_data.type != null && event_data.type === 'moz-tab' ) {
-      return 'tab'
-    }
   }
   return null
 }
 
-function getTransferData( data_transfer ) {
+function getLinks( moz_urls ) {
+  const chunks = moz_urls.split( "\r\n" )
+  const links = []
+  const len = chunks.length
+  for( let i = 0; i < len; i = i + 2 ) {
+    links.push({ url: chunks[ i ], title: chunks[ i + 1 ] })
+  }
+  return links
+}
+
+export function getTransferData( data_transfer ) {
   let event_data = null
-  const count = data_transfer.mozItemCount
 
   /*
+  const count = data_transfer.mozItemCount
   for( let i = 0; i < count; i++ ) {
     const types = data_transfer.mozTypesAt( i )
     for( let t = 0; t < types.length; t++ ) {
@@ -51,23 +66,51 @@ function getTransferData( data_transfer ) {
   }
   */
 
-  // From bookmarks
-  if( data_transfer.types.includes( 'text/x-moz-place' ) ) {
-    console.info('text/x-moz-place', data_transfer.getData( 'text/x-moz-place' ) )
-  }
-  if( data_transfer.types.includes( 'text/x-moz-url' ) ) {
+ if( data_transfer.types.includes( 'text/x-moz-place' ) ) {
+    // console.info('text/x-moz-place', data_transfer.getData( 'text/x-moz-place' ) )
+    // From bookmarks, library
+    if( data_transfer.getData( 'text/x-moz-place' ) ) {
+      try {
+        const moz_place = JSON.parse( data_transfer.getData( 'text/x-moz-place' ) )
+        switch( moz_place.type ) {
+          case "text/x-moz-place-container": // Bookmark folder
+            event_data = {
+              type: "moz-place",
+              title: moz_place.title,
+              links: getLinks( data_transfer.getData( "text/x-moz-url" ) )
+            }
+            break
+          case "text/x-moz-place": // Bookmark or URL bar
+            event_data = {
+              type: "moz-place",
+              links: getLinks( data_transfer.getData( "text/x-moz-url" ) )
+            }
+            break
+        }
+      } catch( ex ) {
+        // @todo
+        console.info('caught ex', ex)
+      }
+    } else {
+      event_data = {
+        type: "moz-place"
+      }
+    }
+  } else if( data_transfer.types.includes( "text/x-moz-url" ) ) {
+    // From bookmark or URL bar
     console.info('text/x-moz-url', data_transfer.getData( 'text/x-moz-url' ) )
+    event_data = { type: "moz-url", url: data_transfer.getData( "text/x-moz-url" ) }
   }
   // From Native Tab
   // if( data_transfer.types.includes( 'application/x-moz-tabbrowser-tab' ) ) {
   //   console.info('application/x-moz-tabbrowser-tab', data_transfer.getData( 'application/x-moz-tabbrowser-tab' ) )
   // }
-  if( data_transfer.types.includes( 'text/x-moz-text-internal' ) ) {
-    event_data = { type: 'moz-tab', url: data_transfer.getData( 'text/x-moz-text-internal' ) }
+  if( data_transfer.types.includes( "text/x-moz-text-internal" ) ) {
+    event_data = { type: "moz-tab", url: data_transfer.getData( "text/x-moz-text-internal" ) }
   }
-  if( data_transfer.types.includes( 'application/json' ) ) {
+  if( data_transfer.types.includes( "application/json" ) ) {
     try {
-      event_data = JSON.parse( data_transfer.getData( 'application/json' ) )
+      event_data = JSON.parse( data_transfer.getData( "application/json" ) )
     } catch( ex ) {
       console.warn('problem parsing "application/json" type', data_transfer.getData( 'application/json' ))
     }
@@ -108,6 +151,7 @@ export function onTabDragStart( event, tab ) {
   this.is_dragging = true
 
   // Use the selected tabs if the tab is selected
+  let drag_image = new Image()
   let tab_ids
   if( this.isSelected( tab ) ) {
     tab_ids = [ ...this.selected_tab_ids ]
@@ -116,6 +160,7 @@ export function onTabDragStart( event, tab ) {
     tab_ids = [ tab.id ]
   }
   setTabTransferData( event.dataTransfer, this.window_id, tab_ids )
+  event.dataTransfer.setDragImage( drag_image, 10, 10 )
 
   this.drag_state.source = {
     type: "tab",

@@ -1,5 +1,6 @@
 
 import {
+  getTransferData,
   onTabDragStart,
   onTabDragEnter,
 } from '../../src/components/draggable.mjs'
@@ -83,7 +84,45 @@ function draggingLocalTab( t ) {
   t.end()
 }
 
+function getTransferDataFromBookmark( t ) {
+  const { dataTransfer } = createTestEvent()
+  dataTransfer.setData( "text/x-moz-place", JSON.stringify({ title: "Form Input Bindings - vue.js", id: 23, instanceId: "tZs5c2LkrbEw", itemGuid: "6DOtb-vmPSoP", parent: 16, parentGuid: "-vT2uwGSD6NZ", dateAdded: 1523984481255000, lastModified: 0, type: "text/x-moz-place", uri: "https://v1.vuejs.org/guide/forms.html" }) )
+  dataTransfer.setData( "text/x-moz-url", "https://v1.vuejs.org/guide/forms.html\r\nForm Input Bindings - vue.js" )
+  const event_data = getTransferData( dataTransfer )
+
+  t.same( event_data, { type: "moz-place", links: [ { url: "https://v1.vuejs.org/guide/forms.html", title: "Form Input Bindings - vue.js" } ] } )
+  t.end()
+}
+
+function getTransferDataFromBookmarkFolder( t ) {
+  const { dataTransfer } = createTestEvent()
+  dataTransfer.setData( "text/x-moz-place", JSON.stringify({ title: "New Folder", id: 16, instanceId: "tZs5c2LkrbEw", itemGuid: "-vT2uwGSD6NZ", parent: 3, parentGuid: "toolbar_____", dateAdded: 1523984341977000, lastModified: 1523984389474000, annos: [{ name: "bookmarkPropertiesDialog/folderLastUsed", flags: 0, expires: 4, value: 1523984389473 }], type: "text/x-moz-place-container" }) )
+  dataTransfer.setData( "text/x-moz-url", "https://support.mozilla.org/en-US/kb/get-started-firefox-overview-main-features\r\nGet started with Firefox\r\nhttps://v1.vuejs.org/guide/forms.html\r\nForm Input Bindings - vue.js" )
+  const event_data = getTransferData( dataTransfer )
+
+  t.same( event_data, { type: "moz-place", title: "New Folder", links: [
+    { url: "https://support.mozilla.org/en-US/kb/get-started-firefox-overview-main-features", title: "Get started with Firefox" },
+    { url: "https://v1.vuejs.org/guide/forms.html", title: "Form Input Bindings - vue.js" }
+  ]})
+  t.end()
+}
+
+function getTransferDataFromLibraryLink( t ) {
+  t.end()
+}
+
+function getTransferDataFromLocationBar( t ) {
+  t.end()
+}
+
+function getTransferDataFromLink( t ) {
+  const { dataTransfer } = createTestEvent()
+  t.end()
+}
+
 export default function( tap ) {
-  tap.test( draggingLocalTab )
+  // tap.test( draggingLocalTab )
+  tap.test( getTransferDataFromBookmark )
+  tap.test( getTransferDataFromBookmarkFolder )
   tap.end()
 }

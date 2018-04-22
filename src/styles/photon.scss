@@ -1,10 +1,12 @@
 
+$border-radius: 2px;
+
 @import "photon-colors";
 @import "photon-typography";
-@import "photon-buttons";
-@import "photon-message-bars";
 
-$border-radius: 2px;
+@import "photon-buttons";
+@import "photon-inputs";
+@import "photon-message-bars";
 
 %slow-transition {
   transition-duration: 250ms;

@@ -1,6 +1,6 @@
 {
-  "name": "sidebar-tab-groups",
-  "version": "3.0.0a1",
+  "name": "tabulate",
+  "version": "0.0.2",
   "description": "A web-extensions port for Tab Groups",
   "scripts": {
     "build": "./build.sh",
@@ -15,10 +15,10 @@
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/amccausl/Tab-Groups.git"
+    "url": "git+https://github.com/amccausl/tabulate.git"
   },
   "bugs": {
-    "url": "https://github.com/amccausl/Tab-Groups/issues"
+    "url": "https://github.com/amccausl/tabulate/issues"
   },
   "dependencies": {
     "vue": "2.5.16"

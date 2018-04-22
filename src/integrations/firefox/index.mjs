@@ -56,7 +56,13 @@ export function loadBrowserState() {
   ]).then(
     ( [ storage, _browser_tabs, _theme, _contextual_identities ] ) => {
       browser_tabs = _browser_tabs
-      config = storage[ LOCAL_CONFIG_KEY ] || default_config
+      config = storage[ LOCAL_CONFIG_KEY ] || {}
+      for( const [ key, value ] of Object.entries( default_config ) ) {
+        if( ! config.hasOwnProperty( key ) ) {
+          config[ key ] = default_config[ key ]
+        }
+      }
+
       contextual_identities = _contextual_identities || []
       theme = _theme || {}
 
@@ -240,8 +246,10 @@ function resetWindowState( window ) {
 }
 
 function resetTabState( tab ) {
-  return browser.sessions.removeTabValue( tab.id, TAB_GROUP_ID_KEY )
-  return browser.sessions.removeTabValue( tab.id, TAB_PREVIEW_IMAGE_KEY )
+  return Promise.all([
+    browser.sessions.removeTabValue( tab.id, TAB_GROUP_ID_KEY ),
+    browser.sessions.removeTabValue( tab.id, TAB_PREVIEW_IMAGE_KEY ),
+  ])
 }
 
 /**
@@ -445,6 +453,9 @@ export function moveTabsToGroup( store, source_data, target_data ) {
   console.info('moveTabsToGroup', source_data, target_data)
   let state = store.getState()
   const updates = []
+
+  // @todo if source_data.type === "moz-url", find index and create tab
+
   const move_data = getTabMoveData( state, source_data, target_data )
 
   if( ! move_data ) {
@@ -456,31 +467,45 @@ export function moveTabsToGroup( store, source_data, target_data ) {
   target_data = move_data.target_data
   const { tab_ids } = source_data
 
-  store.dispatch( moveTabsAction( source_data, target_data ) )
-
-  // Reload the state
-  state = store.getState()
-
-  if( target_data.tab_group_id ) {
-    tab_ids.forEach( ( tab_id ) => {
-      console.info(`browser.sessions.setTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY }, ${ JSON.stringify( target_data.tab_group_id ) } )`)
-      updates.push( browser.sessions.setTabValue( tab_id, TAB_GROUP_ID_KEY, target_data.tab_group_id ) )
-    })
-  }
-
-  if( target_data.index != null ) {
-    const move_properties = {
-      index: target_data.index
-    }
-
-    if( source_data.window_id !== target_data.window_id ) {
-      move_properties.windowId = target_data.window_id
-    }
-    console.info('browser.tabs.move', tab_ids, move_properties)
-    updates.push( browser.tabs.move( tab_ids, move_properties ) )
+  if( source_data.links ) {
+    updates.push( ...source_data.links.map( ( link, index_offset ) => {
+      // @todo filter invalid URLs to prevent errors, add warning
+      const create_properties = {
+        url: link.url,
+        index: target_data.index + index_offset
+      }
+      console.info(`browser.tabs.create( ${ JSON.stringify( create_properties ) } )`)
+      return browser.tabs.create( create_properties )
+    }))
   }
 
   return Promise.all( updates )
+    .then( browser_tabs => {
+      console.info('browser_tabs', browser_tabs)
+      // @todo if this was spawned with URLs, update source_data with new
+      store.dispatch( moveTabsAction( source_data, target_data ) )
+
+      if( target_data.tab_group_id ) {
+        tab_ids.forEach( ( tab_id ) => {
+          console.info(`browser.sessions.setTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY }, ${ JSON.stringify( target_data.tab_group_id ) } )`)
+          updates.push( browser.sessions.setTabValue( tab_id, TAB_GROUP_ID_KEY, target_data.tab_group_id ) )
+        })
+      }
+
+      if( target_data.index != null ) {
+        const move_properties = {
+          index: target_data.index
+        }
+
+        if( source_data.window_id !== target_data.window_id ) {
+          move_properties.windowId = target_data.window_id
+        }
+        console.info('browser.tabs.move', tab_ids, move_properties)
+        updates.push( browser.tabs.move( tab_ids, move_properties ) )
+      }
+
+      return Promise.all( updates )
+    })
 }
 
 export function moveTabGroup( store, source_data, target_data ) {
@@ -550,14 +575,6 @@ export function moveTabGroup( store, source_data, target_data ) {
  */
 export function runTabSearch( store, window_id, search_text ) {
   console.info('runSearch', window_id, search_text)
-  const state = store.getState()
-  const window = state.windows.find( _window => _window.id === window_id )
-
-  if( ! window ) {
-    // @todo error
-    return
-  }
-
   if( ! search_text ) {
     store.dispatch( resetSearchAction( window_id ) )
     return
@@ -566,31 +583,42 @@ export function runTabSearch( store, window_id, search_text ) {
   // Update the store with the search
   store.dispatch( startSearchAction( window_id, search_text ) )
 
-  const search_tabs = []
-  const matching_tab_ids = []
+  const state = store.getState()
+  const window = state.windows.find( _window => _window.id === window_id )
 
-  window.tab_groups.forEach( tab_group => {
-    tab_group.tabs.forEach( tab => {
-      search_tabs.push( browser.find.find( search_text, { tabId: tab.id } )
+  if( ! window ) {
+    // @todo error
+    return
+  }
+
+  const { search } = window
+
+  const matched_tab_ids = []
+  const queued_tab_ids = [ ...( search.queued_tab_ids || [] ) ]
+
+  const nextFind = () => {
+    if( queued_tab_ids.length > 0 ) {
+      const tab_id = queued_tab_ids.shift()
+      console.info(`browser.find.find( "${ search.text }", { tabId: ${ tab_id } } )`)
+      return browser.find.find( search.text, { tabId: tab_id } )
         .then(
           ( { count } ) => {
             if( count > 0 ) {
-              matching_tab_ids.push( tab.id )
+              matched_tab_ids.push( tab_id )
             }
           },
           ( err ) => {
-            // @todo handle error
+            // @todo handling
+            console.info('browser.find.find error', err, tab_id)
           }
         )
-      )
-    })
-  })
+        .finally( nextFind )
+    }
+    return Promise.resolve()
+  }
 
-  return Promise.all( search_tabs )
-    .then(
-      () => {
-        console.info('finished', search_text, matching_tab_ids)
-        store.dispatch( finishSearchAction( window_id, search_text, matching_tab_ids ) )
-      }
-    )
+  return nextFind()
+    .then( () => {
+      store.dispatch( finishSearchAction( window_id, search_text, matched_tab_ids ) )
+    })
 }

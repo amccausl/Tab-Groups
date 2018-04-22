@@ -3,36 +3,6 @@
   border: none;
   cursor: pointer;
 
-  &--color {
-    &-default {
-      background-color: $grey-90;
-      color: $grey-90-a10;
-    }
-
-    &-primary {
-      background-color: $blue-60;
-      color: $white-100;
-
-      &:hover:not(:disabled) {
-        background-color: $blue-70;
-      }
-
-      &:focus {
-        box-shadow: 0 0 0 1px $blue-50 inset, 0 0 0 1px $blue-50, 0 0 0 4px $blue-50-a30
-      }
-
-      &:disabled {
-        opacity: 0.40;
-        cursor: default;
-      }
-    }
-
-    &-ghost {
-      background-color: transparent;
-      fill: $grey-90-a80;
-    }
-  }
-
   &--size {
     &-default {
       font-size: 13px;
@@ -63,6 +33,70 @@
       border-radius: 4px;
       padding-left: 16px;
       padding-right: 16px;
+    }
+  }
+
+  // @todo rename style or type
+  &--color {
+    &-default {
+      background-color: $grey-90;
+      color: $grey-90-a10;
+    }
+
+    &-primary {
+      background-color: $blue-60;
+      color: $white-100;
+
+      &:hover:not(:disabled) {
+        background-color: $blue-70;
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 1px $blue-50 inset, 0 0 0 1px $blue-50, 0 0 0 4px $blue-50-a30
+      }
+
+      &:disabled {
+        opacity: 0.40;
+        cursor: default;
+      }
+    }
+
+    &-ghost {
+      background-color: transparent;
+      height: 24px;
+      padding: 4px;
+      margin-right: 4px;
+      margin-left: 4px;
+      border-radius: 2px;
+
+      &:focus {
+        box-shadow: 0 0 0 1px $blue-50 inset, 0 0 0 1px $blue-50, 0 0 0 4px $blue-50-a30
+      }
+
+      &:disabled {
+        opacity: 0.40;
+        cursor: default;
+      }
+    }
+  }
+
+  &--theme {
+    &-light {
+      fill: $grey-90-a80;
+      color: $grey-90-a80;
+
+      &:hover:not(:disabled) {
+        background-color: $grey-90-a20;
+      }
+    }
+
+    &-dark {
+      fill: $white-100;
+      color: $white-100;
+
+      &:hover:not(:disabled) {
+        background-color: #666667;
+      }
     }
   }
 }

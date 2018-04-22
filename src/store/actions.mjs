@@ -1,11 +1,10 @@
 import {
   INIT,
   CONFIG_UPDATE,
-  WINDOW_ADD,
-  WINDOW_REMOVE,
-  WINDOW_SEARCH_START,
-  WINDOW_SEARCH_FINISH,
-  WINDOW_SEARCH_RESET,
+  CONTEXTUAL_IDENTITY_CREATE,
+  CONTEXTUAL_IDENTITY_UPDATE,
+  CONTEXTUAL_IDENTITY_REMOVE,
+  FEATURES_UPDATE,
   GROUP_ACTIVATE,
   GROUP_CREATE,
   GROUP_REMOVE,
@@ -21,6 +20,11 @@ import {
   TAB_UPDATE_IMAGE,
   TAB_MOVE,
   TAB_ATTACH,
+  WINDOW_ADD,
+  WINDOW_REMOVE,
+  WINDOW_SEARCH_START,
+  WINDOW_SEARCH_FINISH,
+  WINDOW_SEARCH_RESET,
 } from './action-types.mjs'
 
 export function initAction({ browser_tabs, config, contextual_identities, theme, window_tab_groups_map }) {
@@ -31,6 +35,48 @@ export function initAction({ browser_tabs, config, contextual_identities, theme,
     contextual_identities,
     theme,
     window_tab_groups_map
+  }
+}
+
+export function updateConfigAction( config ) {
+  return {
+    type: CONFIG_UPDATE,
+    config
+  }
+}
+
+export function createContextualIdentityAction( contextual_identity ) {
+  return {
+    type: CONTEXTUAL_IDENTITY_CREATE,
+    contextual_identity
+  }
+}
+
+export function updateContextualIdentityAction( contextual_identity ) {
+  return {
+    type: CONTEXTUAL_IDENTITY_UPDATE,
+    contextual_identity
+  }
+}
+
+export function removeContextualIdentityAction( contextual_identity ) {
+  return {
+    type: CONTEXTUAL_IDENTITY_REMOVE,
+    contextual_identity
+  }
+}
+
+export function updateFeaturesAction( features ) {
+  return {
+    type: FEATURES_UPDATE,
+    features
+  }
+}
+
+export function updateThemeAction( theme ) {
+  return {
+    type: THEME_UPDATE,
+    theme
   }
 }
 
@@ -189,12 +235,12 @@ export function startSearchAction( window_id, search_text ) {
   }
 }
 
-export function finishSearchAction( window_id, search_text, matching_tab_ids ) {
+export function finishSearchAction( window_id, search_text, matched_tab_ids ) {
   return {
     type: WINDOW_SEARCH_FINISH,
     window_id,
     search_text,
-    matching_tab_ids
+    matched_tab_ids
   }
 }
 
@@ -202,12 +248,5 @@ export function resetSearchAction( window_id ) {
   return {
     type: WINDOW_SEARCH_RESET,
     window_id
-  }
-}
-
-export function updateConfigAction( config ) {
-  return {
-    type: CONFIG_UPDATE,
-    config
   }
 }

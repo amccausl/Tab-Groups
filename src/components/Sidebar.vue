@@ -1,6 +1,24 @@
 <template>
   <body :class="[ `sidebar--${ theme }`, theme ]">
-    <div v-if="show_header" :class="[ `action-strip--${ theme }` ]" @click.right.prevent>
+    <div v-if="show_search" :class="[ `action-strip--${ theme }` ]" @click.right.prevent>
+      <div :class="[ `action-strip--${ theme }__search` ]">
+        <label :class="[ `action-strip--${ theme }__search-label` ]">
+          <svg :class="[ `action-strip--${ theme }__search-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M15.707 14.293l-4.822-4.822a6.019 6.019 0 1 0-1.414 1.414l4.822 4.822a1 1 0 0 0 1.414-1.414zM6 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"></path>
+          </svg>
+          <input :class="[ `action-strip--${ theme }__search-input` ]" type="search" v-model="search_text" @input="onUpdateSearchText" :placeholder="__MSG_tab_search_placeholder__"/>
+          <svg :class="[ `action-strip--${ theme }__search-clear-icon` ]" @click="clearSearchText()" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M6.586 8l-2.293 2.293a1 1 0 0 0 1.414 1.414L8 9.414l2.293 2.293a1 1 0 0 0 1.414-1.414L9.414 8l2.293-2.293a1 1 0 1 0-1.414-1.414L8 6.586 5.707 4.293a1 1 0 0 0-1.414 1.414L6.586 8zM8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0z"></path>
+          </svg>
+        </label>
+      </div>
+      <div :class="[ bem( 'button', { 'theme': theme, 'color': 'ghost' } ), `action-strip--${ theme }__button-icon` ]" @click="openOptionsPage()">
+        <svg :class="[ `button--color-ghost__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+          <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
+        </svg>
+      </div>
+    </div>
+    <div v-else-if="show_header" :class="[ `action-strip--${ theme }` ]" @click.right.prevent>
       <input v-if="is_search_enabled" :class="[ `action-strip--${ theme }__search` ]" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/>
       <div v-else :class="[ `action-strip--${ theme }__spacer` ]"></div>
       <div :class="bem( `action-strip--${ theme }__button`, { 'no-grow': true } )" @click="openOptionsPage()">
@@ -268,7 +286,8 @@ export default {
         // @todo if active_tab_group_id has changed, open the new active group
         this.active_tab_group_id = state_window.active_tab_group_id
 
-        this.search_text = state_window.search_text
+        // @todo only update if this doesn't have focus
+        // this.search_text = state_window.search_text
         this.search_resolved = state_window.search_resolved
 
         // @todo this could be done more efficiently
@@ -442,10 +461,15 @@ export default {
       // @todo should be moved to background
       window.store.dispatch( updateGroupAction( tab_group.id, this.window_id, { title } ) )
     },
-    onUpdateSearchText: debounce( function( search_text ) {
-      console.info('runSearch', search_text)
-      window.background.runTabSearch( window.store, this.window_id, search_text )
+    onUpdateSearchText: debounce( function() {
+      console.info('runSearch', this.search_text)
+      window.background.runTabSearch( window.store, this.window_id, this.search_text )
     }, 250 ),
+    clearSearchText() {
+      console.info('clearSearchText', this.search_text)
+      this.search_text = ""
+      window.background.runTabSearch( window.store, this.window_id, this.search_text )
+    },
     openOptionsPage() {
       window.background.openOptionsPage()
     },
@@ -465,6 +489,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "../styles/photon-colors";
+@import "../styles/photon-typography";
 
 $photon-border-radius: 2px;
 $--drag-source--opacity: 0.3;
@@ -596,10 +621,6 @@ $empty-dropzone__themes: (
       position: absolute;
     }
 
-    &--is-handler &__drag-target-icon {
-      display: initial;
-    }
-
     &--drag-tab-target {
       background-color: map-get( $colors, --drag-target--background-color );
       fill: map-get( $colors, --drag-target--color );
@@ -617,16 +638,18 @@ $empty-dropzone__themes: (
 
 $action-strip__themes: (
   light: (
+    --background-color: #f5f6f7,
     __button--background-color: #f5f6f7,
     __button--hover--background-color: #d0d0d0,
     __button--drag-target--background-color: map-get( $--theme-light, --drag-target--background-color ),
     __search--background-color: $white-100,
-    __search--color: $ink-90,
+    __search--color: $grey-90,
     __search--border-color: #ccc,
     __separator--color: #cccccc,
     __text--color: $grey-90-a80,
   ),
   dark: (
+    --background-color: #323234,
     __button--background-color: #323234,
     __button--hover--background-color: #5b5b5d,
     __button--drag-target--background-color: map-get( $--theme-dark, --drag-target--background-color ),
@@ -643,9 +666,9 @@ $action-strip__themes: (
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: stretch;
-    height: 32px;
+    align-items: center;
     border-bottom: solid 1px transparent;
+    background-color: map-get( $colors, --background-color );
 
     &__button {
       @extend %slow-transition;
@@ -656,7 +679,6 @@ $action-strip__themes: (
       padding: 0 8px;
       height: 32px;
       cursor: pointer;
-      background-color: map-get( $colors, __button--background-color );
 
       &--no-grow {
         flex: 0;
@@ -681,7 +703,7 @@ $action-strip__themes: (
     }
 
     &__button-icon {
-      fill: map-get( $colors, __text--color );
+      margin: 4px;
     }
 
     &__button--drag-target &__button-icon {
@@ -689,14 +711,59 @@ $action-strip__themes: (
     }
 
     &__search {
-      flex: 0;
-      padding: 4px 8px;
-      margin: 4px;
-      border-radius: $photon-border-radius;
-      max-width: 50%;
+      flex: 1;
+      padding: 4px 0 4px 4px;
+    }
+
+    &__search-label {
+      position: relative;
+    }
+
+    &__search-input {
+      @extend %text-body-10;
+      width: 100%;
+      height: 30px;
+      padding-left: 28px;
       background-color: map-get( $colors, __search--background-color );
+      border: 1px solid $grey-90-a30;
+      border-radius: 4px;
       color: map-get( $colors, __search--color );
-      border: 1px solid map-get( $colors, __search--border-color );
+
+      &::-moz-placeholder {
+        @extend %text-body-10;
+        color: rbga( map-get( $colors, __search--color ), 0.4 );
+      }
+    }
+
+    &__search-label:hover &__search-input {
+      border-color: $grey-90-a50;
+    }
+
+    &__search-icon {
+      height: 16px;
+      width: 16px;
+      fill: rbga( map-get( $colors, __search--color ), 0.4 );
+      position: absolute;
+      left: 8px;
+      top: 0;
+    }
+
+    &__search-clear-icon {
+      @extend %slow-transition;
+      transition-property: opacity;
+      opacity: 0.4;
+      height: 16px;
+      width: 16px;
+      fill: map-get( $colors, __search--color );
+      position: absolute;
+      right: 8px;
+      top: 0;
+      cursor: pointer;
+    }
+
+    &__search-input:placeholder-shown + &__search-clear-icon {
+      display: none;
+      opacity: 0;
     }
 
     &__spacer {

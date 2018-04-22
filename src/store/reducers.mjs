@@ -1,10 +1,7 @@
 import {
   INIT,
-  WINDOW_ADD,
-  WINDOW_REMOVE,
-  WINDOW_SEARCH_START,
-  WINDOW_SEARCH_FINISH,
-  WINDOW_SEARCH_RESET,
+  CONFIG_UPDATE,
+  FEATURES_UPDATE,
   GROUP_CREATE,
   GROUP_REMOVE,
   GROUP_UPDATE,
@@ -19,7 +16,11 @@ import {
   TAB_UPDATE_IMAGE,
   TAB_MOVE,
   TAB_ATTACH,
-  CONFIG_UPDATE,
+  WINDOW_ADD,
+  WINDOW_REMOVE,
+  WINDOW_SEARCH_START,
+  WINDOW_SEARCH_FINISH,
+  WINDOW_SEARCH_RESET,
 } from './action-types.mjs'
 
 import {
@@ -256,90 +257,74 @@ export function startWindowSearch( state, { window_id, search_text } ) {
         return window
       }
 
-      let tab_groups = window.tab_groups
-      if( window.search_text ) {
-        tab_groups = tab_groups.map( tab_group => {
-          return Object.assign( {}, tab_group, {
-            tabs: tab_group.tabs.map( tab => {
-              if( ! tab.matched ) {
-                return tab
-              }
-              const new_tab = {}
-              for( let key in tab ) {
-                if( key !== 'matched' ) {
-                  new_tab[ key ] = tab[ key ]
-                }
-              }
-              return new_tab
-            })
-          })
-        })
-      }
-
-      return Object.assign( {}, window, {
-        search_text,
-        search_resolved: !search_text,
-        tab_groups
-      })
-    })
-  })
-}
-
-export function finishWindowSearch( state, { window_id, search_text, matching_tab_ids } ) {
-  return Object.assign( {}, state, {
-    windows: state.windows.map( window => {
-      if( window.id !== window_id || window.search_text !== search_text || matching_tab_ids.length === 0 ) {
-        return window
-      }
-
-      return Object.assign( {}, window, {
-        search_resolved: true,
-        tab_groups: window.tab_groups.map( tab_group => {
-          if( ! tab_group.tabs.some( tab => matching_tab_ids.indexOf( tab.id ) > -1 ) ) {
-            return tab_group
+      const matched_tab_ids = []
+      const queued_tab_ids = []
+      const search_regex = new RegExp( `${ search_text }`, 'i' )
+      for( let tab_group of window.tab_groups ) {
+        for( let tab of tab_group.tabs ) {
+          if( tab.title && search_regex.test( tab.title ) ) {
+            matched_tab_ids.push( tab.id )
+          } else if( tab.url && search_regex.test( tab.url ) ) {
+            matched_tab_ids.push( tab.id )
+          } else {
+            queued_tab_ids.push( tab.id )
           }
-          return Object.assign( {}, tab_group, {
-            tabs: tab_group.tabs.map( tab => {
-              if( matching_tab_ids.indexOf( tab.id ) === -1 ) {
-                return tab
-              }
-              return Object.assign( {}, tab, {
-                matched: true
-              })
-            })
-          })
-        })
+        }
+      }
+
+      return Object.assign( {}, window, {
+        search: {
+          text: search_text,
+          resolved: ( queued_tab_ids.length === 0 ),
+          matched_tab_ids,
+          queued_tab_ids
+        }
       })
     })
   })
 }
 
-export function resetWindowSearch( state, { window_id } ) {
-  return Object.assign( {}, state, {
-    windows: state.windows.map( window => {
-      if( window.id !== window_id ) {
+export function finishWindowSearch( state0, { window_id, search_text, matched_tab_ids } ) {
+  let is_updated = false
+
+  const state1 = Object.assign( {}, state0, {
+    windows: state0.windows.map( window => {
+      if( window.id !== window_id || window.search != null && window.search.text !== search_text ) {
         return window
       }
-
-      const new_window = omit( window, 'search_text', 'search_resolved' )
-
-      new_window.tab_groups = window.tab_groups.map( tab_group => {
-        if( ! tab_group.tabs.some( tab => tab.hasOwnProperty( 'matched' ) && tab.matched ) ) {
-          return tab_group
-        }
-        return Object.assign( {}, tab_group, {
-          tabs: tab_group.tabs.map( tab => {
-            if( tab.hasOwnProperty( 'matched' ) && tab.matched ) {
-              return omit( tab, 'matched' )
-            }
-            return tab
-          })
+      is_updated = true
+      return Object.assign( {}, window, {
+        search: Object.assign( {}, window.search, {
+          resolved: true,
+          matched_tab_ids: window.search.matched_tab_ids.concat( matched_tab_ids ),
+          queued_tab_ids: []
         })
       })
-
-      return new_window
     })
   })
+
+  if( is_updated ) {
+    return state1
+  }
+  return state0
+}
+
+export function resetWindowSearch( state0, { window_id } ) {
+  let is_updated = false
+  const state1 = Object.assign( {}, state0, {
+    windows: state0.windows.map( window => {
+      if( window.id !== window_id || window.search == null ) {
+        return window
+      }
+      is_updated = true
+      return omit( window, 'search' )
+    })
+  })
+
+  if( is_updated ) {
+    return state1
+  }
+  return state0
 }
 
 function mapTabGroup( state, window_id, tab_group_id, fn ) {
@@ -843,6 +828,12 @@ export function updateConfig( state, { config } ) {
   })
 }
 
+export function updateFeatures( state, { features } ) {
+  return Object.assign( {}, state, {
+    features: Object.assign( {}, state.features, features )
+  })
+}
+
 export function addContext( state, { context } ) {
   let contexts = Object.assign( {}, state.contexts )
 
@@ -879,6 +870,8 @@ export default function App( state = initial_state, action ) {
       return init( state, action )
     case CONFIG_UPDATE:
       return updateConfig( state, action )
+    case FEATURES_UPDATE:
+      return updateFeatures( state, action )
     case WINDOW_ADD:
       return addWindow( state, action )
     case WINDOW_REMOVE:

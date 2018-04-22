@@ -103,6 +103,29 @@
           "id": {
             "type": "integer"
           },
+          "search": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "resolved": {
+                "type": "boolean"
+              },
+              "matched_tab_ids": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "queued_tab_ids": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
           "active_tab_group_id": {
             "type": "integer",
             "minimum": 1

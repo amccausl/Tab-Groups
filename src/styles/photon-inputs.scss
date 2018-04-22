@@ -1,0 +1,92 @@
+
+$input__themes: (
+  light: (
+    --color: $grey-90,
+  ),
+  dark: (
+    --color: $white-100,
+  )
+);
+
+.input-field {
+  &--checkbox {
+    display: flex;
+    align-items: flex-start;
+    padding: 3px;
+
+    &--nested {
+      padding-left: 2em;
+    }
+
+    &__input {
+      // @todo need to determine how this is still selectable
+      display: none;
+    }
+
+    &__icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 2px;
+      background-color: $grey-90-a10;
+      border: 1px solid $grey-90-a30;
+      margin-right: 4px;
+    }
+
+    &__icon:hover {
+      background-color: $grey-90-a20;
+    }
+
+    &__input:checked + &__icon {
+      border: none;
+      background-color: $blue-60;
+      background-image: url("/icons/checkbox-check-16.svg");
+    }
+
+    &:hover &__icon {
+      background-color: $grey-90-a20;
+    }
+
+    &:hover &__input:checked + &__icon {
+      background-color: $blue-70;
+    }
+  }
+
+  &--text {
+    position: relative;
+
+    &__label {
+      @extend %text-body-10;
+      color: $grey-90;
+    }
+
+    &__input {
+      @extend %text-body-10;
+      height: 30px;
+      padding-left: 8px;
+      border: 1px solid $grey-90-a30;
+      border-radius: 4px;
+      color: $grey-90;
+
+      &::-moz-placeholder {
+        color: $grey-90-a40;
+      }
+    }
+
+    &__icon {
+      height: 16px;
+      width: 16px;
+      fill: $grey-90-a40;
+      position: absolute;
+      left: 8px;
+      top: 0;
+    }
+
+    &__icon + &__input {
+      padding-left: 28px;
+    }
+
+    &:hover &__input {
+      border-color: $grey-90-a50;
+    }
+  }
+}

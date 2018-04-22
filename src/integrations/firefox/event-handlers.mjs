@@ -1,4 +1,10 @@
 import {
+  updateConfigAction,
+  createContextualIdentityAction,
+  updateContextualIdentityAction,
+  removeContextualIdentityAction,
+  updateFeaturesAction,
+  updateThemeAction,
   addWindowAction,
   removeWindowAction,
   activateTabAction,
@@ -8,7 +14,6 @@ import {
   updateTabImageAction,
   moveTabAction,
   attachTabAction,
-  updateConfigAction,
 } from "../../store/actions.mjs"
 import {
   default_config,
@@ -16,10 +21,6 @@ import {
   getCreateTabTarget,
   getSourceTabGroupData,
 } from "../../store/helpers.mjs"
-
-import {
-  moveTabsToGroup,
-} from "./index.mjs"
 
 // @todo pull to shared file
 const LOCAL_CONFIG_KEY = "config"
@@ -98,17 +99,23 @@ export function bindBrowserEvents( store ) {
     onTabUpdated( store, tab_id, change_info, browser_tab )
   })
 
+  if( browser.theme ) {
+    browser.theme.onUpdated.addListener( ( { theme, windowId } ) => {
+      onThemeUpdated( store, theme, windowId )
+    })
+  }
+
   if( browser.contextualIdentities ) {
     browser.contextualIdentities.onCreated.addListener( ( { contextualIdentity } ) => {
-      console.info('contextualIdentities.onCreated', contextualIdentity)
+      onContextualIdentityCreated( store, contextualIdentity )
     })
 
     browser.contextualIdentities.onUpdated.addListener( ( { contextualIdentity } ) => {
-      console.info('contextualIdentities.onUpdated', contextualIdentity)
+      onContextualIdentityUpdated( store, contextualIdentity )
     })
 
     browser.contextualIdentities.onRemoved.addListener( ( { contextualIdentity } ) => {
-      console.info('contextualIdentities.onRemoved', contextualIdentity)
+      onContextualIdentityRemoved( store, contextualIdentity )
     })
   }
 
@@ -146,6 +153,7 @@ export function bindBrowserEvents( store ) {
         updates.push( browser.tabs.show( show_ids ) )
         // updates.push( ...show_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: false } ) ) )
       }
+      // @todo if tabhide is disabled in api update suceeds and is false, updateFeaturesAction
     }
   })
 }
@@ -240,4 +248,20 @@ export function onTabRemoved( store, tab_id, window_id ) {
 export function onTabMoved( store, tab_id, window_id, index ) {
   console.info(`onTabMoved( tab_id=${ tab_id }, window_id=${ window_id }, index=${ index } )`)
   store.dispatch( moveTabAction( tab_id, window_id, index ) )
+}
+
+export function onContextualIdentityCreated( store, contextual_identity ) {
+  console.info('onContextualIdentityCreated', contextual_identity)
+}
+
+export function onContextualIdentityUpdated( store, contextual_identity ) {
+  console.info('onContextualIdentityUpdated', contextual_identity)
+}
+
+export function onContextualIdentityRemoved( store, contextual_identity ) {
+  console.info('onContextualIdentityRemoved', contextual_identity)
+}
+
+export function onThemeUpdated( store, theme, window_id ) {
+  console.info('onThemeUpdated', window_id, theme)
 }

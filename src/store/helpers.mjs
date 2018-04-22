@@ -254,18 +254,17 @@ export function getTargetTabGroupData( target_window, target_data, ignored_tabs 
  */
 export function getTabMoveData( state, source_data, target_data ) {
   let { windows } = state
+  source_data = Object.assign( {}, source_data )
+  target_data = Object.assign( {}, target_data )
 
-  // Load source_tabs with array of tabs
-  let source_tabs
-  if( source_data.tabs ) {
-    source_tabs = source_data.tabs
+  if( source_data.tabs || source_data.type === "moz-place" || source_data.type === "moz-url" ) {
   } else if( source_data.tab_ids ) {
-    source_tabs = Array( source_data.tab_ids ).fill( null )
+    source_data.tabs = Array( source_data.tab_ids ).fill( null )
     const scanTabGroup = ( tab_group ) => {
       tab_group.tabs.forEach( tab => {
         const tab_index = source_data.tab_ids.indexOf( tab.id )
         if( tab_index > -1 ) {
-          source_tabs[ tab_index ] = tab
+          source_data.tabs[ tab_index ] = tab
         }
       })
     }
@@ -287,36 +286,29 @@ export function getTabMoveData( state, source_data, target_data ) {
       break
     }
   } else if( source_data.type === 'moz-tab' ) {
-    // @todo scan target_data window first
-    source_tabs = [ null ]
+    // @todo scan target_data group, then window first
+    source_data.tabs = [ null ]
     for( let window of windows ) {
       for( let tab_group of window.tab_groups ) {
         for( let tab of tab_group.tabs ) {
           if( tab.id === window.active_tab_id && tab.url === source_data.url ) {
-            source_data = {
-              window_id: window.id,
-              tab_ids: [ tab.id ]
-            }
-            source_tabs[ 0 ] = tab
+            source_data.window_id = window.id
+            source_data.tab_ids = [ tab.id ]
+            source_data.tabs[ 0 ] = tab
           }
         }
       }
     }
+    // @todo if scan doesn't find anything, dragging from another instance of firefox, can process as URL
   } else {
     console.warn( "Problem loading source tab", source_data )
     return null
   }
 
-  if( source_tabs.includes( null ) ) {
-    console.warn( "Problem loading source tab", source_tabs )
+  if( source_data.tabs != null && source_data.tabs.includes( null ) ) {
+    console.warn( "Problem loading source tab", source_data.tabs )
     return null
   }
-
-  source_data = Object.assign( {}, source_data, {
-    tabs: source_tabs
-  })
-
-  target_data = Object.assign( {}, target_data )
 
   let target_window = state.windows.find( window => window.id === target_data.window_id )
   if( ! target_window ) {
@@ -340,7 +332,7 @@ export function getTabMoveData( state, source_data, target_data ) {
     // Load the global index for the target
     if( target_data.tab_group_id != null || target_data.tab_group != null ) {
       target_data = Object.assign( {}, target_data,
-        getTargetIndex( target_window, target_data, source_tabs )
+        getTargetIndex( target_window, target_data, source_data.tabs || [] )
       )
       // @todo check result
     }
