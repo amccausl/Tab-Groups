@@ -22,7 +22,7 @@ export default function testStore( tap ) {
   tap.test( './store/tab-move.mjs', testTabMove )
   tap.test( './store/tabs-move.mjs', testTabsMove )
   tap.test( './store/window-add.mjs', testWindowAdd )
-  // tap.test( './store/window-search.mjs', testWindowSearch )
+  tap.test( './store/window-search.mjs', testWindowSearch )
   tap.test( './store/pinned-tabs.mjs', testPinnedTabs )
   tap.test( './store/reducers/group-create.mjs', testGroupCreate )
   tap.test( './store/reducers/group-move.mjs', testGroupMove )

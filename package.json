@@ -6,7 +6,7 @@
     "build": "./build.sh",
     "build-windows": "build.bat",
     "dev": "./node_modules/.bin/cross-env NODE_ENV=development ./build.sh",
-    "test": "node --experimental-modules test/index.mjs",
+    "test": "node --experimental-modules test/index.mjs | tap -",
     "debug": "./node_modules/.bin/web-ext --source-dir dist run --verbose",
     "debug-de": "./node_modules/.bin/web-ext --source-dir dist run --verbose --firefox firefox-de",
     "pack": "./node_modules/.bin/web-ext build --source-dir dist"

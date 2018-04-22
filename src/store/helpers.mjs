@@ -222,13 +222,14 @@ export function getTargetTabGroupData( target_window, target_data, ignored_tabs 
       tabs_count = tab_group.tabs.filter( tab => ! ignored_tabs.includes( tab ) ).length
     }
     if( ! target_data.hasOwnProperty( 'pinned' ) || ( target_data.pinned && tab_group.pinned || ! tab_group.hasOwnProperty( 'pinned' ) ) ) {
-      if( target_data.index - index_offset < tabs_count ) {
-        return {
-          tab_group_id: tab_group.id,
-          tab_group_index: target_data.index - index_offset
-        }
-      }
-      if( target_data.index - index_offset == tabs_count ) {
+      // @todo can be more efficient
+      const next_tab_group = target_window.tab_groups[ target_window.tab_groups.indexOf( tab_group ) + 1 ]
+      if( target_data.index - index_offset === tabs_count && next_tab_group != null && next_tab_group.id === target_window.active_tab_group_id ) {
+        // return {
+        //   tab_group_id: tab_group.id,
+        //   tab_group_index: target_data.index - index_offset
+        // }
+      } else if( target_data.index - index_offset <= tabs_count ) {
         return {
           tab_group_id: tab_group.id,
           tab_group_index: target_data.index - index_offset

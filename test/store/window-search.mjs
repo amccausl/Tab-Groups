@@ -2,7 +2,6 @@ import {
   createPinnedTabGroup,
   createTabGroup,
   createWindow,
-  getTabMoveData,
 } from '../../src/store/helpers.mjs'
 import {
   startWindowSearch,

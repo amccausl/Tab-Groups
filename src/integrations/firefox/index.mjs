@@ -99,6 +99,9 @@ export function loadBrowserState() {
       }
 
       const features = {
+        contextual_identities: {
+          enabled: true
+        },
         tabhide: {
           enabled: tabhide_enabled
         }

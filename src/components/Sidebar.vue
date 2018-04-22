@@ -185,7 +185,8 @@
       </div>
       <!-- <div class="context-menu__item">Move to New <span>W</span>indow</div> -->
       <!-- <div class="context-menu__item" @click="archiveTabGroup( tab_group_context_menu.tab_group_id )"><span>A</span>rchive</div> -->
-      <div class="context-menu__item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span class="context-menu__item-hotkey">C</span>lose</div>
+      <div v-if="tab_groups.length > 1" class="context-menu__item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span class="context-menu__item-hotkey">C</span>lose</div>
+      <div v-else class="context-menu__item context-menu__item--is-disabled" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span class="context-menu__item-hotkey">C</span>lose</div>
     </div>
   </body>
 </template>
@@ -1259,9 +1260,13 @@ $sidebar-tab-group-tabs-list__themes: (
   }
 
   &__item {
-    padding: 4px 8px;
     @extend %slow-transition;
     transition-property: background-color;
+    padding: 4px 8px;
+
+    &--is-disabled {
+      // @todo
+    }
 
     &:hover {
       background-color: $grey-20;
