@@ -24,6 +24,10 @@ export function addWindow( state, { browser_window } ) {
 }
 
 export function removeWindow( state, { window_id } ) {
+  // Only remove if exists
+  if( ! state.windows.some( window => window.id === window_id ) ) {
+    return state
+  }
   return Object.assign( {}, state, {
     windows: state.windows.filter( window => window.id !== window_id )
   })

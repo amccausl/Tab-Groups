@@ -1,6 +1,6 @@
 import {
   moveGroup
-} from "../../../src/store/reducers.mjs"
+} from "../../../src/store/reducers/group.mjs"
 import {
   validateState
 } from "../../../src/store/validators.mjs"

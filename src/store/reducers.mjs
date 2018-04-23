@@ -7,7 +7,7 @@ import {
   INIT,
   CONFIG_UPDATE,
   FEATURES_UPDATE,
-  GROUP_CREATE,
+  GROUP_ADD,
   GROUP_REMOVE,
   GROUP_UPDATE,
   GROUP_MOVE,
@@ -47,11 +47,34 @@ import attachTab from "./reducers/attach-tab.mjs"
 import moveTab from "./reducers/move-tab.mjs"
 import moveTabs from "./reducers/move-tabs.mjs"
 import addTab from "./reducers/add-tab.mjs"
-import { updateConfig } from "./reducers/config.mjs"
-import { addContextualIdentity, updateContextualIdentity, removeContextualIdentity } from "./reducers/contextual-identity.mjs"
-import { updateFeatures } from "./reducers/feature.mjs"
-import { addWindow, removeWindow } from "./reducers/window.mjs"
-import { startWindowSearch, finishWindowSearch, resetWindowSearch } from "./reducers/search.mjs"
+import {
+  updateConfig
+} from "./reducers/config.mjs"
+import {
+  addContextualIdentity,
+  updateContextualIdentity,
+  removeContextualIdentity,
+} from "./reducers/contextual-identity.mjs"
+import {
+  updateFeatures
+} from "./reducers/feature.mjs"
+import {
+  addGroup,
+  removeGroup,
+  updateGroup,
+  moveGroup,
+  muteGroup,
+  unmuteGroup,
+} from "./reducers/group.mjs"
+import {
+  addWindow,
+  removeWindow,
+} from "./reducers/window.mjs"
+import {
+  startWindowSearch,
+  finishWindowSearch,
+  resetWindowSearch,
+} from "./reducers/search.mjs"
 
 function findTabGroupId( tab_groups, tab_id ) {
   let tab_group = tab_groups.find( tab_group => tab_group.tabs.some( tab => tab.id === tab_id ) )
@@ -107,115 +130,6 @@ function _removeTab( state, { tab_id, window_id, index } ) {
   })
 
   return new_state
-}
-
-function mapTabGroup( state, window_id, tab_group_id, fn ) {
-  return Object.assign( {}, state, {
-    windows: state.windows.map( window => {
-      if( window.id !== window_id ) {
-        return window
-      }
-      return Object.assign( {}, window, {
-        tab_groups: window.tab_groups.map( tab_group => {
-          if( tab_group.id !== tab_group_id ) {
-            return tab_group
-          }
-          return fn( tab_group )
-        })
-      })
-    })
-  })
-}
-
-export function createGroup( state, { window_id, new_tab_group } ) {
-  if( ! new_tab_group ) {
-    new_tab_group = createTabGroup( getNewTabGroupId( state ), [] )
-  }
-  return Object.assign( {}, state, {
-    windows: state.windows.map( window => {
-      if( window.id !== window_id ) {
-        return window
-      }
-      return Object.assign( {}, window, {
-        tab_groups: [ ...window.tab_groups, new_tab_group ]
-      })
-    })
-  })
-}
-
-export function removeGroup( state, { tab_group_id, window_id } ) {
-  return Object.assign( {}, state, {
-    windows: state.windows.map( window => {
-      if( window.id !== window_id ) {
-        return window
-      }
-      return Object.assign( {}, window, {
-        tab_groups: window.tab_groups.filter( tab_group => tab_group.id !== tab_group_id )
-      })
-    })
-  })
-}
-
-export function updateGroup( state, { tab_group_id, window_id, change_info } ) {
-  return mapTabGroup( state, window_id, tab_group_id,
-    tab_group => {
-      if( change_info.title && change_info.title !== tab_group.title ) {
-        // @todo validation
-      }
-      return Object.assign( {}, tab_group, change_info )
-    }
-  )
-}
-
-export function moveGroup( state, { source_data, target_data } ) {
-  const windows = [ ...state.windows ]
-
-  const source_window_index = windows.findIndex( window => window.id === source_data.window_id )
-  const target_window_index = windows.findIndex( window => window.id === target_data.window_id )
-
-  let source_tab_group = null
-  let source_tab_group_index = null
-  windows[ source_window_index ] = Object.assign( {}, windows[ source_window_index ], {
-    tab_groups: windows[ source_window_index ].tab_groups.filter( ( tab_group, index ) => {
-      if( tab_group.id === source_data.tab_group_id ) {
-        source_tab_group = tab_group
-        source_tab_group_index = index
-        return false
-      }
-      return true
-    })
-  })
-  if( ! source_tab_group ) {
-    // @todo error
-    return state
-  }
-  const target_tab_groups = [ ...windows[ target_window_index ].tab_groups ]
-  let target_tab_group_index = target_data.tab_group_index
-  if( target_tab_group_index == null ) {
-    target_tab_group_index = target_tab_groups.length
-  } else if( source_window_index === target_window_index && source_tab_group_index < target_tab_group_index ) {
-    target_tab_group_index--
-  }
-  target_tab_groups.splice( target_tab_group_index, 0, source_tab_group )
-  windows[ target_window_index ] = Object.assign( {}, windows[ target_window_index ], {
-    tab_groups: target_tab_groups
-  })
-
-  return Object.assign( {}, state, { windows } )
-}
-
-// @todo consider merging these with updateGroup
-
-export function muteGroup( state, { tab_group_id, window_id } ) {
-  return mapTabGroup( state, window_id, tab_group_id,
-    tab_group => Object.assign( {}, tab_group, { muted: true } )
-  )
-}
-
-export function unmuteGroup( state, { tab_group_id, window_id } ) {
-  return mapTabGroup( state, window_id, tab_group_id,
-    tab_group => omit( tab_group, 'muted')
-  )
 }
 
 export function activateTab( state, { tab_id, window_id } ) {
@@ -331,43 +245,6 @@ export function updateTabImage( state, { tab_id, window_id, preview_image_uri } 
   })
 }
 
-export function moveTabWithDelegate( state, { tab_id, window_id, index } ) {
-  const target_window = state.windows.find( window => window.id === window_id )
-  if( ! target_window ) {
-    console.error( 'window missing' )
-    return state
-  }
-
-  const source_tab_group_data = getSourceTabGroupData( target_window, { tab_id } )
-
-  // No-op if index is not updated
-  if( source_tab_group_data.index === index ) {
-    console.info('no-op move')
-    return state
-  }
-
-  const source_data = {
-    window_id,
-    tab_ids: [ tab_id ],
-    tabs: [ findTab( state, window_id, tab_id ) ],
-  }
-
-  let target_data = {
-    window_id,
-    index,
-  }
-
-  if( source_tab_group_data.group_id == null || source_tab_group_data.group_id !== 0 ) {
-    target_data.pinned = false
-  }
-
-  target_data = Object.assign( {}, target_data,
-    getTargetTabGroupData( target_window, target_data, source_data.tabs )
-  )
-
-  return moveTabs( state, { source_data, target_data } )
-}
-
 export default function App( state, action ) {
   switch( action.type ) {
     case INIT:
@@ -386,8 +263,8 @@ export default function App( state, action ) {
       return finishWindowSearch( state, action )
     case WINDOW_SEARCH_RESET:
       return resetWindowSearch( state, action )
-    case GROUP_CREATE:
-      return createGroup( state, action )
+    case GROUP_ADD:
+      return addGroup( state, action )
     case GROUP_REMOVE:
       return removeGroup( state, action )
     case GROUP_UPDATE:

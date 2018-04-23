@@ -6,7 +6,7 @@ import {
   CONTEXTUAL_IDENTITY_REMOVE,
   FEATURES_UPDATE,
   GROUP_ACTIVATE,
-  GROUP_CREATE,
+  GROUP_ADD,
   GROUP_REMOVE,
   GROUP_UPDATE,
   GROUP_MOVE,
@@ -96,7 +96,7 @@ export function removeWindowAction( window_id ) {
 
 export function createGroupAction( new_tab_group, window_id ) {
   return {
-    type: GROUP_CREATE,
+    type: GROUP_ADD,
     new_tab_group,
     window_id
   }
