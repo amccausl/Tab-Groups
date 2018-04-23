@@ -2,14 +2,15 @@ import {
   createPinnedTabGroup,
   createTabGroup,
   createWindow,
-} from '../../src/store/helpers.mjs'
+} from '../../../src/store/helpers.mjs'
 import {
   startWindowSearch,
   finishWindowSearch,
-} from '../../src/store/reducers.mjs'
+  resetWindowSearch,
+} from '../../../src/store/reducers/search.mjs'
 import {
   createTestTab,
-} from './helpers.mjs'
+} from '../helpers.mjs'
 
 function testSingleWindowSearch( t ) {
   const window_id = 1

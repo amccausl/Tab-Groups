@@ -1,7 +1,8 @@
 import { createStore } from './store/dispatcher.mjs'
 
 import { initAction } from './store/actions.mjs'
-import App, { init } from './store/reducers.mjs'
+import init from "./store/reducers/init.mjs"
+import App from './store/reducers.mjs'
 import { getTabGroupsPersistState } from './store/helpers.mjs'
 import {
   bindBrowserEvents,

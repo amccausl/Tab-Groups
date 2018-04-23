@@ -1,13 +1,13 @@
-import { createTestTab } from './helpers'
+import { createTestTab } from "../helpers"
 import {
   createPinnedTabGroup,
   createTabGroup,
   createWindow,
   getTabMoveData,
-} from '../../src/store/helpers.mjs'
-import { validateState } from '../../src/store/validators.mjs'
+} from "../../../src/store/helpers.mjs"
+import { validateState } from "../../../src/store/validators.mjs"
 
-import { moveTabs } from '../../src/store/reducers'
+import moveTabs from "../../../src/store/reducers/move-tabs.mjs"
 
 function testSingleWindowMoveOne( t ) {
   const initial_state = {

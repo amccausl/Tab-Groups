@@ -165,8 +165,17 @@ export function getNewTabGroupId( state ) {
 }
 
 export function getTargetIndex( target_window, target_data, ignored_tabs ) {
-  function isIncluded( tab ) {
+  function isIncludedGroup( tab ) {
     return ! ignored_tabs.includes( tab )
+  }
+
+  let is_first_match = true
+  function isIncludedGlobal( tab ) {
+    if( is_first_match && ignored_tabs.includes( tab ) ) {
+      is_first_match = false
+      return false
+    }
+    return true
   }
   let target_tab_group_index = target_data.tab_group_index
   let index_offset = 0
@@ -180,7 +189,7 @@ export function getTargetIndex( target_window, target_data, ignored_tabs ) {
             tab_group_index: target_tab_group_index
           }
         }
-        if( isIncluded( tab ) ) {
+        if( isIncludedGroup( tab ) ) {
           tab_group_index++
         } else {
           target_tab_group_index--
@@ -191,7 +200,7 @@ export function getTargetIndex( target_window, target_data, ignored_tabs ) {
         tab_group_index
       }
     }
-    index_offset += tab_group.tabs.filter( isIncluded ).length
+    index_offset += tab_group.tabs.filter( isIncludedGlobal ).length
   }
   // @todo should this add to the last group?
   return { index: index_offset, tab_group_index: 0 }

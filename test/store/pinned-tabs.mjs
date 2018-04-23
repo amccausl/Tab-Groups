@@ -2,15 +2,17 @@ import {
   createBrowserTab,
   createTestTab,
   getInitialState,
-} from './helpers.mjs'
+} from "./helpers.mjs"
 
 import {
   createTabGroup,
   createPinnedTabGroup,
   createWindow,
-} from '../../src/store/helpers.mjs'
-import { init, addTab, updateTab } from '../../src/store/reducers.mjs'
-import { validateState } from '../../src/store/validators.mjs'
+} from "../../src/store/helpers.mjs"
+import init from "../../src/store/reducers/init.mjs"
+import addTab from "../../src/store/reducers/add-tab.mjs"
+import { updateTab } from "../../src/store/reducers.mjs"
+import { validateState } from "../../src/store/validators.mjs"
 
 function testSingleWindowFreshInit( t ) {
   const browser_tabs = [

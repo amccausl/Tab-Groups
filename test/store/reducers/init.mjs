@@ -1,4 +1,4 @@
-import { init } from "../../../src/store/reducers.mjs"
+import init from "../../../src/store/reducers/init.mjs"
 import { validateState } from "../../../src/store/validators.mjs"
 import { default_config } from "../../../src/store/helpers.mjs"
 

@@ -199,7 +199,7 @@ export function onTabCreated( store, browser_tab ) {
   const state = store.getState()
   const { index } = getCreateTabTarget( state, browser_tab )
   if( browser_tab.index !== index ) {
-    console.info('tabs.move', [ browser_tab.id ], { index })
+    console.info('browser.tabs.move', [ browser_tab.id ], { index })
     browser.tabs.move( [ browser_tab.id ], { index } )
   }
 
@@ -245,9 +245,20 @@ export function onTabRemoved( store, tab_id, window_id ) {
   store.dispatch( removeTabAction( tab_id, window_id ) )
 }
 
+const ignore_moves = []
+export function ignorePendingMove( tab_ids ) {
+  ignore_moves.push( ...tab_ids )
+}
+
 export function onTabMoved( store, tab_id, window_id, index ) {
   console.info(`onTabMoved( tab_id=${ tab_id }, window_id=${ window_id }, index=${ index } )`)
-  store.dispatch( moveTabAction( tab_id, window_id, index ) )
+  const ignore_index = ignore_moves.indexOf( tab_id )
+  if( ignore_index > -1 ) {
+    ignore_moves.splice( ignore_index, 1 )
+    console.info('ignoring')
+  } else {
+    store.dispatch( moveTabAction( tab_id, window_id, index ) )
+  }
 }
 
 export function onContextualIdentityCreated( store, contextual_identity ) {

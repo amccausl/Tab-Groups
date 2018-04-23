@@ -18,6 +18,10 @@ import {
   getTabMoveData,
 } from '../../store/helpers.mjs'
 
+import {
+  ignorePendingMove,
+} from "./event-handlers.mjs"
+
 export const LOCAL_CONFIG_KEY = 'config'
 export const WINDOW_TAB_GROUPS_KEY = 'tab_groups'
 export const TAB_GROUP_ID_KEY = 'group_id'
@@ -503,6 +507,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
         if( source_data.window_id !== target_data.window_id ) {
           move_properties.windowId = target_data.window_id
         }
+        ignorePendingMove( tab_ids )
         console.info('browser.tabs.move', tab_ids, move_properties)
         updates.push( browser.tabs.move( tab_ids, move_properties ) )
       }
@@ -566,7 +571,8 @@ export function moveTabGroup( store, source_data, target_data ) {
   if( ! move_properties ) {
     return Promise.resolve()
   }
-  console.info(`tabs.move( ${ JSON.stringify( tab_ids ) } )`, move_properties)
+  ignorePendingMove( tab_ids )
+  console.info(`browser.tabs.move( ${ JSON.stringify( tab_ids ) } )`, move_properties)
   return browser.tabs.move( tab_ids, move_properties )
 }
 

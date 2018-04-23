@@ -1,6 +1,4 @@
-import {
-  attachTab
-} from '../../../src/store/reducers.mjs'
+import attachTab from '../../../src/store/reducers/attach-tab.mjs'
 import {
   validateState
 } from '../../../src/store/validators.mjs'

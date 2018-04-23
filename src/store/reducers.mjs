@@ -42,9 +42,16 @@ import {
   omit,
 } from "./helpers.mjs"
 
-export { default as init } from "./actions/init.mjs"
-export { default as attachTab } from "./actions/attach-tab.mjs"
-export { default as moveTabs } from "./actions/move-tabs.mjs"
+import init from "./reducers/init.mjs"
+import attachTab from "./reducers/attach-tab.mjs"
+import moveTab from "./reducers/move-tab.mjs"
+import moveTabs from "./reducers/move-tabs.mjs"
+import addTab from "./reducers/add-tab.mjs"
+import { updateConfig } from "./reducers/config.mjs"
+import { addContextualIdentity, updateContextualIdentity, removeContextualIdentity } from "./reducers/contextual-identity.mjs"
+import { updateFeatures } from "./reducers/feature.mjs"
+import { addWindow, removeWindow } from "./reducers/window.mjs"
+import { startWindowSearch, finishWindowSearch, resetWindowSearch } from "./reducers/search.mjs"
 
 function findTabGroupId( tab_groups, tab_id ) {
   let tab_group = tab_groups.find( tab_group => tab_group.tabs.some( tab => tab.id === tab_id ) )
@@ -100,106 +107,6 @@ function _removeTab( state, { tab_id, window_id, index } ) {
   })
 
   return new_state
-}
-
-export function addWindow( state, { browser_window } ) {
-  // Only add if not already exists
-  if( state.windows.some( window => window.id === browser_window.id ) ) {
-    return state
-  }
-
-  return Object.assign( {}, state, {
-    windows: [
-      ...state.windows,
-      createWindow( browser_window.id, [
-        createPinnedTabGroup( [] ),
-        createTabGroup( getNewTabGroupId( state ), [] )
-      ])
-    ]
-  })
-}
-
-export function removeWindow( state, { window_id } ) {
-  return Object.assign( {}, state, {
-    windows: state.windows.filter( window => window.id !== window_id )
-  })
-}
-
-export function startWindowSearch( state, { window_id, search_text } ) {
-  return Object.assign( {}, state, {
-    windows: state.windows.map( window => {
-      if( window.id !== window_id ) {
-        return window
-      }
-
-      const matched_tab_ids = []
-      const queued_tab_ids = []
-      const search_regex = new RegExp( `${ search_text }`, 'i' )
-      for( let tab_group of window.tab_groups ) {
-        for( let tab of tab_group.tabs ) {
-          if( tab.title && search_regex.test( tab.title ) ) {
-            matched_tab_ids.push( tab.id )
-          } else if( tab.url && search_regex.test( tab.url ) ) {
-            matched_tab_ids.push( tab.id )
-          } else {
-            queued_tab_ids.push( tab.id )
-          }
-        }
-      }
-
-      return Object.assign( {}, window, {
-        search: {
-          text: search_text,
-          resolved: ( queued_tab_ids.length === 0 ),
-          matched_tab_ids,
-          queued_tab_ids
-        }
-      })
-    })
-  })
-}
-
-export function finishWindowSearch( state0, { window_id, search_text, matched_tab_ids } ) {
-  let is_updated = false
-
-  const state1 = Object.assign( {}, state0, {
-    windows: state0.windows.map( window => {
-      if( window.id !== window_id || window.search != null && window.search.text !== search_text ) {
-        return window
-      }
-      is_updated = true
-      return Object.assign( {}, window, {
-        search: Object.assign( {}, window.search, {
-          resolved: true,
-          matched_tab_ids: window.search.matched_tab_ids.concat( matched_tab_ids ),
-          queued_tab_ids: []
-        })
-      })
-    })
-  })
-
-  if( is_updated ) {
-    return state1
-  }
-  return state0
-}
-
-export function resetWindowSearch( state0, { window_id } ) {
-  let is_updated = false
-  const state1 = Object.assign( {}, state0, {
-    windows: state0.windows.map( window => {
-      if( window.id !== window_id || window.search == null ) {
-        return window
-      }
-      is_updated = true
-      return omit( window, 'search' )
-    })
-  })
-
-  if( is_updated ) {
-    return state1
-  }
-  return state0
 }
 
 function mapTabGroup( state, window_id, tab_group_id, fn ) {
@@ -346,70 +253,6 @@ export function activateTab( state, { tab_id, window_id } ) {
   })
 }
 
-export function addTab( state, { browser_tab } ) {
-  const target_window = state.windows.find( window => window.id === browser_tab.windowId )
-
-  const tab = getTabState( browser_tab )
-  const target_info = getCreateTabTarget( state, browser_tab )
-
-  if( target_window ) {
-    if( target_info.tab_group_id != null ) {
-      return Object.assign( {}, state, {
-        windows: state.windows.map( window => {
-          if( window.id !== browser_tab.windowId ) {
-            return window
-          }
-          let index_offset = 0
-          return Object.assign( {}, window, {
-            tab_groups: window.tab_groups.map( tab_group => {
-              // We know what group we're targeting
-              if( tab_group.id === target_info.tab_group_id ) {
-                let tabs
-                if( target_info.index <= index_offset ) {
-                  tabs = [ tab, ...tab_group.tabs ]
-                } else if( target_info.index >= index_offset + tab_group.tabs_count ) {
-                  tabs = [ ...tab_group.tabs, tab ]
-                } else {
-                  tabs = tab_group.tabs.slice( 0 )
-                  tabs.splice( target_info.index - index_offset, 0, tab )
-                }
-                tab_group = Object.assign( {}, tab_group, {
-                  tabs,
-                  tabs_count: tab_group.tabs_count + 1
-                })
-              }
-              index_offset += tab_group.tabs_count
-              return tab_group
-            })
-          })
-        })
-      })
-    } else {
-      const move_data = getTabMoveData(
-        state,
-        { tabs: [ tab ] },
-        Object.assign(
-          {
-            window_id: browser_tab.windowId,
-            pinned: browser_tab.pinned
-          },
-          getCreateTabTarget( state, browser_tab )
-        )
-      )
-
-      return moveTabs( state, move_data )
-    }
-  } else {
-    // Add tab event is fired before the window is created, so we have to stub it
-    return Object.assign( {}, state, {
-      windows: [ ...state.windows, createWindow( browser_tab.windowId, [
-        createPinnedTabGroup( [] ),
-        createTabGroup( getNewTabGroupId( state ), [ tab ] )
-      ])]
-    })
-  }
-}
-
 export function removeTab( state, { tab_id, window_id } ) {
   return _removeTab( state, { tab_id, window_id } )
 }
@@ -488,57 +331,6 @@ export function updateTabImage( state, { tab_id, window_id, preview_image_uri } 
   })
 }
 
-/**
- * Only run by the onMove event handler.  Intentionally prevents moving tabs
- * between groups, as that introduces some race conditions with other setters
- * and the interaction between events triggered by internal calls vs the events
- * triggered by external native moves
- */
-export function moveTab( state, { tab_id, window_id, index } ) {
-  for( let window of state.windows ) {
-    if( window.id !== window_id ) {
-      continue
-    }
-    let index_offset = 0
-    for( let tab_group of window.tab_groups ) {
-      const tab_index = tab_group.tabs.findIndex( tab => tab.id === tab_id )
-      if( tab_index === -1 ) {
-        index_offset += tab_group.tabs_count
-        continue
-      }
-      const group_index = Math.max( 0, Math.min( tab_group.tabs_count - 1, index - index_offset ) )
-      if( tab_index === group_index ) {
-        // No change is required, just return
-        return state
-      }
-
-      return Object.assign( {}, state, {
-        windows: state.windows.map( window => {
-          if( window.id !== window_id ) {
-            return window
-          }
-          return Object.assign( {}, window, {
-            tab_groups: window.tab_groups.map( _tab_group => {
-              if( _tab_group !== tab_group ) {
-                return _tab_group
-              }
-              let tabs = tab_group.tabs.filter( tab => tab.id !== tab_id )
-              tabs.splice( group_index, 0, tab_group.tabs[ tab_index ] )
-
-              return Object.assign( {}, tab_group, {
-                tabs
-              })
-            })
-          })
-        })
-      })
-    }
-  }
-
-  // No change is required, return original
-  return state
-}
-
 export function moveTabWithDelegate( state, { tab_id, window_id, index } ) {
   const target_window = state.windows.find( window => window.id === window_id )
   if( ! target_window ) {
@@ -574,48 +366,6 @@ export function moveTabWithDelegate( state, { tab_id, window_id, index } ) {
   )
 
   return moveTabs( state, { source_data, target_data } )
-}
-
-export function updateConfig( state, { config } ) {
-  return Object.assign( {}, state, {
-    config
-  })
-}
-
-export function updateFeatures( state, { features } ) {
-  return Object.assign( {}, state, {
-    features: Object.assign( {}, state.features, features )
-  })
-}
-
-export function addContext( state, { context } ) {
-  let contexts = Object.assign( {}, state.contexts )
-
-  contexts[ context.id ] = context
-
-  return Object.assign( {}, state, {
-    contexts
-  })
-}
-
-export function updateContext( state, { context } ) {
-  let contexts = Object.assign( {}, state.contexts )
-
-  contexts[ context.id ] = context
-
-  return Object.assign( {}, state, {
-    contexts
-  })
-}
-
-export function removeContext( state, { context } ) {
-  let contexts = Object.assign( {}, state.contexts )
-
-  delete contexts[ context.id ]
-
-  return Object.assign( {}, state, {
-    contexts
-  })
 }
 
 export default function App( state, action ) {

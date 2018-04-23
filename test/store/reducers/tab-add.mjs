@@ -3,16 +3,16 @@ import {
   createTestTab,
   getInitialState,
   getMultiWindowInitialState,
-} from './helpers.mjs'
+} from "../helpers.mjs"
 
 import {
   default_config,
   createTabGroup,
   createPinnedTabGroup,
   createWindow,
-} from '../../src/store/helpers.mjs'
-import { addTab } from '../../src/store/reducers.mjs'
-import { validateState } from '../../src/store/validators.mjs'
+} from "../../../src/store/helpers.mjs"
+import addTab from "../../../src/store/reducers/add-tab.mjs"
+import { validateState } from "../../../src/store/validators.mjs"
 
 function testSingleWindowAdd( t ) {
   let state = getInitialState()

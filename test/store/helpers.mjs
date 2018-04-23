@@ -125,7 +125,7 @@ function testGetTabMoveData( t ) {
   t.equal( tab_move_data.source_data.tabs[ 1 ], initial_state.windows[ 0 ].tab_groups[ 1 ].tabs[ 1 ], "copy tab 5 by reference" )
   t.same( tab_move_data.target_data, {
     window_id: 1,
-    index: 3,
+    index: 4, // Native index is only offset by 1, instead of 2.  Think this is an upstream bug
     tab_group_id: 3,
     tab_group_index: 2
   })
