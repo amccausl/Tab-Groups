@@ -355,6 +355,7 @@ export function unmuteTab( store, window_id, tab_id ) {
 }
 
 export function createGroup( store, window_id, source_data ) {
+  console.info(`background.createGroup( ${ window_id } )`, source_data)
   const state = store.getState()
   const tab_group = createTabGroup( getNewTabGroupId( state ), [] )
   const target_data = {
@@ -448,38 +449,27 @@ export function unmuteTabGroup( store, window_id, tab_group_id ) {
  *   window_id
  *   tab_ids
  * @param target_data
- * @returns move_data
- *   source_data
- *     window_id
- *     tab_ids
- *     tabs
- *   target_data
- *     window_id
  */
 export function moveTabsToGroup( store, source_data, target_data ) {
-  console.info('moveTabsToGroup', source_data, target_data)
-  let state = store.getState()
+  console.info('background.moveTabsToGroup', source_data, target_data)
   const updates = []
 
-  // @todo if source_data.type === "moz-url", find index and create tab
+  if( source_data.links != null ) {
+    // @todo can skip dispatching create for tabs to optimize performance
 
-  const move_data = getTabMoveData( state, source_data, target_data )
+    const state = store.getState()
+    const move_data = getTabMoveData( state, source_data, target_data )
+    if( ! move_data ) {
+      console.info('error')
+      return
+    }
 
-  if( ! move_data ) {
-    console.info('error')
-    return
-  }
-
-  source_data = move_data.source_data
-  target_data = move_data.target_data
-  const { tab_ids } = source_data
-
-  if( source_data.links ) {
     updates.push( ...source_data.links.map( ( link, index_offset ) => {
       // @todo filter invalid URLs to prevent errors, add warning
       const create_properties = {
+        windowId: move_data.target_data.window_id,
         url: link.url,
-        index: target_data.index + index_offset
+        index: move_data.target_data.index + index_offset
       }
       console.info(`browser.tabs.create( ${ JSON.stringify( create_properties ) } )`)
       return browser.tabs.create( create_properties )
@@ -489,9 +479,28 @@ export function moveTabsToGroup( store, source_data, target_data ) {
   return Promise.all( updates )
     .then( browser_tabs => {
       console.info('browser_tabs', browser_tabs)
+
+      if( browser_tabs.length > 0 ) {
+        source_data = {
+          window_id: target_data.window_id,
+          tab_ids: browser_tabs.map( browser_tab => browser_tab.id )
+        }
+      }
+
+      const state = store.getState()
+      const move_data = getTabMoveData( state, source_data, target_data )
+      if( ! move_data ) {
+        console.info('error')
+        return
+      }
+
+      source_data = move_data.source_data
+      target_data = move_data.target_data
+
       // @todo if this was spawned with URLs, update source_data with new
       store.dispatch( moveTabsAction( source_data, target_data ) )
 
+      const { tab_ids } = source_data
       if( target_data.tab_group_id ) {
         tab_ids.forEach( ( tab_id ) => {
           console.info(`browser.sessions.setTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY }, ${ JSON.stringify( target_data.tab_group_id ) } )`)
@@ -516,6 +525,14 @@ export function moveTabsToGroup( store, source_data, target_data ) {
     })
 }
 
+/**
+ * Move a tab group to a another window or index
+ * @param store
+ * @param source_data
+ *   window_id
+ *   tab_group_id
+ * @param target_data
+ */
 export function moveTabGroup( store, source_data, target_data ) {
   console.info('moveTabGroup', source_data, target_data)
 
@@ -567,6 +584,8 @@ export function moveTabGroup( store, source_data, target_data ) {
     }
     index_offset += tab_group.tabs_count
   }
+
+  // @todo if new group index > old group index, move other groups up instead
 
   if( ! move_properties ) {
     return Promise.resolve()

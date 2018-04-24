@@ -1,0 +1,302 @@
+
+import {
+  getTabState,
+} from "../../integrations/index.mjs"
+import {
+  getTabMoveData,
+} from "../helpers.mjs"
+
+export function attachTab( state, { tab_id, window_id, index } ) {
+  const source_data = {
+    window_id: null,
+    tab_ids: [ tab_id ]
+  }
+
+  for( let window of state.windows ) {
+    let index = 0
+    for( let tab_group of window.tab_groups ) {
+      for( let tab of tab_group.tabs ) {
+        if( tab.id === tab_id ) {
+          if( window.id === window_id ) {
+            // Attach has already been handled, we can ignore
+            return state
+          }
+          source_data.window_id = window.id
+          source_data.window_index = index
+        }
+        index++
+      }
+    }
+  }
+
+  if( source_data.window_id == null ) {
+    // @todo error
+    return state
+  }
+
+  const move_data = getTabMoveData( state, source_data, { window_id, index, pinned: false } )
+  return moveTabs( state, move_data )
+}
+
+export function activateTab( state, { tab_id, window_id } ) {
+  // @todo activate the group the tab is in
+  // @todo optimize to return existing state if tab already active
+  return Object.assign( {}, state, {
+    windows: state.windows.map( window => {
+      if( window.id === window_id ) {
+        let { active_tab_group_id } = window
+        let active_tab_id = null
+        const tab_groups = window.tab_groups.map( tab_group => {
+          // If tab_group contains the tab_id, return a copy with active toggled
+          if( tab_group.tabs.some( tab => tab.id === tab_id ) ) {
+            if( tab_group.id ) {
+              active_tab_group_id = tab_group.id
+            }
+            active_tab_id = tab_id
+            tab_group = Object.assign( {}, tab_group, {
+              active_tab_id
+            })
+          }
+          return tab_group
+        })
+
+        if( active_tab_id ) {
+          window = Object.assign( {}, window, {
+            active_tab_group_id,
+            active_tab_id,
+            tab_groups
+          })
+        }
+      }
+      return window
+    })
+  })
+}
+
+export function updateTab( state, { browser_tab, change_info } ) {
+  if( change_info.hasOwnProperty( 'pinned' ) ) {
+    const window_id = browser_tab.windowId
+    const target_window = state.windows.find( window => window.id === window_id )
+    const tab_group_id = change_info.pinned ? 0 : target_window.active_tab_group_id
+    const move_data = getTabMoveData(
+      state,
+      {
+        window_id,
+        tab_ids: [ browser_tab.id ]
+      },
+      {
+        window_id,
+        tab_group_id,
+        tab_group_index: change_info.pinned ? null : 0
+      }
+    )
+
+    return moveTabs( state, move_data )
+  }
+  // @todo change use the nature of change_info to ignore changes
+  return Object.assign( {}, state, {
+    windows: state.windows.map( window => {
+      if( window.id !== browser_tab.windowId ) {
+        return window
+      }
+      return Object.assign( {}, window, {
+        tab_groups: window.tab_groups.map( tab_group => {
+          const tab_index = tab_group.tabs.findIndex( _tab => _tab.id === browser_tab.id )
+          if( tab_index > -1 ) {
+            tab_group = Object.assign( {}, tab_group, {
+              tabs: [ ...tab_group.tabs ]
+            })
+            tab_group.tabs[ tab_index ] = getTabState( browser_tab )
+          }
+          return tab_group
+        })
+      })
+    })
+  })
+}
+
+export function updateTabImage( state, { tab_id, window_id, preview_image_uri } ) {
+  return Object.assign( {}, state, {
+    windows: state.windows.map( window => {
+      if( window.id !== window_id ) {
+        return window
+      }
+      return Object.assign( {}, window, {
+        tab_groups: window.tab_groups.map( tab_group => {
+          const tab_index = tab_group.tabs.findIndex( _tab => _tab.id === tab_id )
+          if( tab_index > -1 ) {
+            tab_group = Object.assign( {}, tab_group, {
+              tabs: [ ...tab_group.tabs ]
+            })
+
+            const preview_image = {
+              width: tab_group.tabs[ tab_index ].width,
+              height: tab_group.tabs[ tab_index ].height,
+              uri: preview_image_uri
+            }
+
+            // Clone tab, update image
+            tab_group.tabs[ tab_index ] = Object.assign( {}, tab_group.tabs[ tab_index ], {
+              preview_image
+            })
+          }
+          return tab_group
+        })
+      })
+    })
+  })
+}
+
+/**
+ * Return a copy of state with tab identified by source_data moved to the target
+ * @todo what if source location doesn't match info
+ * @param state
+ * @param source_data
+ *   { window_id, tab_ids }
+ *   { window_id, index, pinned }
+ *   { window_id, tabs }
+ *   // @todo { browser_tabs }
+ * @param target_data
+ *   { window_id, index, pinned }
+ *   { window_id, tab_group_id }
+ *   { window_id, tab_group_id, tab_group_index }
+ *   { window_id, tab_group }
+ */
+export function moveTabs( state, { source_data, target_data } ) {
+  let { windows } = state
+
+  // Target is new window
+  if( target_data.window ) {
+    windows = [ ...windows, target_data.window ]
+  }
+
+  // @todo If source is same as target, noop
+  // @todo if active tab is moved, switch to next one
+  return Object.assign( {}, state, {
+    windows: windows.map( window => {
+      if( window.id !== source_data.window_id && window.id !== target_data.window_id ) {
+        return window
+      }
+
+      let active_tab_group_id = window.active_tab_group_id
+      let window_active_tab_id = window.active_tab_id || null
+      let tab_groups = window.tab_groups.map( tab_group => {
+        let { tabs, active_tab_id } = tab_group
+
+        if( tabs.some( tab => source_data.tabs.includes( tab ) ) ) {
+          const filtered_tabs = []
+
+          for( let tab of tabs ) {
+            if( ! source_data.tabs.includes( tab ) ) {
+              filtered_tabs.push( tab )
+              if( active_tab_id == null ) {
+                active_tab_id = tab.id
+                if( window_active_tab_id == null ) {
+                  window_active_tab_id = tab.id
+                }
+              }
+            } else {
+              if( tab.id === active_tab_id && tab_group.id !== target_data.tab_group_id ) {
+                active_tab_id = null
+                // If the active tab in the active group is moving, activate new group
+                if( active_tab_group_id === tab_group.id && target_data.tab_group_id !== 0 ) {
+                  active_tab_group_id = target_data.tab_group_id
+                }
+              }
+
+              if( tab.id === window_active_tab_id && source_data.window_id !== target_data.window_id ) {
+                window_active_tab_id = null
+              }
+            }
+          }
+
+          if( active_tab_id == null && filtered_tabs.length ) {
+            active_tab_id = filtered_tabs[ filtered_tabs.length - 1 ].id
+          }
+
+          if( window_active_tab_id == null && filtered_tabs.length ) {
+            window_active_tab_id = filtered_tabs[ filtered_tabs.length - 1 ].id
+          }
+
+          tabs = filtered_tabs
+        }
+
+        if( target_data.tab_group_id === tab_group.id ) {
+          tabs = [ ...tabs ]
+          if( target_data.tab_group_index == null ) {
+            tabs.push( ...source_data.tabs )
+          } else {
+            tabs.splice( target_data.tab_group_index, 0, ...source_data.tabs )
+          }
+          if( window_active_tab_id && tabs.some( tab => tab.id === window_active_tab_id ) ) {
+            active_tab_id = window_active_tab_id
+          }
+        }
+
+        if( tabs !== tab_group.tabs ) {
+          tab_group = Object.assign( {}, tab_group, {
+            active_tab_id,
+            tabs,
+            tabs_count: tabs.length
+          })
+        }
+
+        return tab_group
+      })
+
+      if( window.id === target_data.window_id && target_data.tab_group ) {
+        tab_groups.push( target_data.tab_group )
+
+        if( target_data.tab_group.tabs.some( tab => tab.id === window_active_tab_id ) ) {
+          target_data.tab_group.active_tab_id = window_active_tab_id
+          active_tab_group_id = target_data.tab_group.id
+        }
+      }
+
+      return Object.assign( {}, window, { tab_groups, active_tab_group_id, active_tab_id: window_active_tab_id } )
+    })
+  })
+}
+
+export function removeTab( state, { tab_id, window_id } ) {
+  // @todo update active_tab_id if required
+
+  const windows = state.windows.map( window => {
+    if( window.id === window_id ) {
+      let active_tab_id = window.active_tab_id
+      let tab_groups = window.tab_groups.map( tab_group => {
+        const tab_index = tab_group.tabs.findIndex( tab => tab.id === tab_id )
+        if( tab_index > -1 ) {
+          tab_group = Object.assign( {}, tab_group, {
+            tabs: [ ...tab_group.tabs ],
+            tabs_count: tab_group.tabs_count - 1
+          })
+          tab_group.tabs.splice( tab_index, 1 )[ 0 ]
+          if( tab_group.active_tab_id === tab_id ) {
+            if( tab_group.tabs_count > 0 ) {
+              tab_group.active_tab_id = tab_group.tabs[ Math.min( tab_index, tab_group.tabs_count - 1 ) ].id
+            } else {
+              tab_group.active_tab_id = null
+            }
+            if( active_tab_id === tab_id ) {
+              active_tab_id = tab_group.active_tab_id
+            }
+          }
+        }
+        return tab_group
+      })
+
+      window = Object.assign( {}, window, {
+        active_tab_id,
+        tab_groups,
+      })
+    }
+    return window
+  })
+
+  const new_state = Object.assign( {}, state, {
+    windows
+  })
+
+  return new_state
+}

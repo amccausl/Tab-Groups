@@ -10,7 +10,7 @@ import {
 } from '../../src/store/helpers.mjs'
 import {
   removeTab,
-} from '../../src/store/reducers.mjs'
+} from '../../src/store/reducers/tab.mjs'
 import {
   validateState,
 } from '../../src/store/validators.mjs'

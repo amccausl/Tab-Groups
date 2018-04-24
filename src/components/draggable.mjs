@@ -37,11 +37,11 @@ function getTransferType( event_data ) {
 }
 
 function getLinks( moz_urls ) {
-  const chunks = moz_urls.split( "\r\n" )
+  const chunks = moz_urls.split( "\n" )
   const links = []
   const len = chunks.length
   for( let i = 0; i < len; i = i + 2 ) {
-    links.push({ url: chunks[ i ], title: chunks[ i + 1 ] })
+    links.push({ url: chunks[ i ].trim(), title: chunks[ i + 1 ] ? chunks[ i + 1 ].trim() : undefined })
   }
   return links
 }
@@ -79,13 +79,17 @@ export function getTransferData( data_transfer ) {
               title: moz_place.title,
               links: getLinks( data_transfer.getData( "text/x-moz-url" ) )
             }
+            // console.info('loading from bookmark folder', event_data)
             break
           case "text/x-moz-place": // Bookmark or URL bar
             event_data = {
               type: "moz-place",
               links: getLinks( data_transfer.getData( "text/x-moz-url" ) )
             }
+            // console.info('loading from bookmark or URL bar', event_data)
             break
+          default:
+            // console.info('@todo')
         }
       } catch( ex ) {
         // @todo
@@ -95,11 +99,16 @@ export function getTransferData( data_transfer ) {
       event_data = {
         type: "moz-place"
       }
+      // console.info('loading from unknown', event_data)
     }
   } else if( data_transfer.types.includes( "text/x-moz-url" ) ) {
-    // From bookmark or URL bar
-    console.info('text/x-moz-url', data_transfer.getData( 'text/x-moz-url' ) )
-    event_data = { type: "moz-url", url: data_transfer.getData( "text/x-moz-url" ) }
+    // From link
+    // console.info('text/x-moz-url', data_transfer.getData( 'text/x-moz-url' ) )
+    event_data = {
+      type: "moz-url",
+      links: getLinks( data_transfer.getData( "text/x-moz-url" ) )
+    }
+    // console.info('loading from link', event_data)
   }
   // From Native Tab
   // if( data_transfer.types.includes( 'application/x-moz-tabbrowser-tab' ) ) {
@@ -260,23 +269,24 @@ export function onTabGroupDrop( event, tab_group, tab_group_index ) {
     event.preventDefault()
     resetDragState.call( this )
     switch( transfer_type ) {
-      case "tab_group":
+      case "tab_group": {
         const target_data = {
           window_id: this.window_id,
           tab_group_index
         }
         return window.background.moveTabGroup( window.store, event_data, target_data )
-      case "tab":
+      }
+      case "tab": {
         if( tab_group == null ) {
           return window.background.createGroup( window.store, this.window_id, event_data )
-            .then( tab_group => this.renameTabGroup( tab_group.id ) )
-        } else {
-          const target_data = {
-            window_id: this.window_id,
-            tab_group_id: tab_group ? tab_group.id : null
-          }
-          return window.background.moveTabsToGroup( window.store, event_data, target_data )
+          .then( tab_group => this.renameTabGroup( tab_group.id ) )
         }
+        const target_data = {
+          window_id: this.window_id,
+          tab_group_id: tab_group ? tab_group.id : null
+        }
+        return window.background.moveTabsToGroup( window.store, event_data, target_data )
+      }
     }
   }
 }

@@ -335,20 +335,20 @@ export function getTabMoveData( state, source_data, target_data ) {
 
   if( target_data.index == null ) {
     if( target_data.tab_group_id == null ) {
-      target_data.tab_group = createTabGroup( target_data.tab_group == null ? getNewTabGroupId( state ) : target_data.tab_group.id, source_data.tabs, source_data.tabs[ 0 ].id )
-      target_data.tab_group_id = target_data.tab_group.id
+      target_data.tab_group_id = ( target_data.tab_group == null ? getNewTabGroupId( state ) : target_data.tab_group.id )
+      if( source_data.tabs != null ) {
+        target_data.tab_group = createTabGroup( target_data.tab_group_id, source_data.tabs, source_data.tabs[ 0 ].id )
+      } else {
+        target_data.tab_group = createTabGroup( target_data.tab_group_id, [] )
+      }
     }
 
     // Load the global index for the target
-    if( target_data.tab_group_id != null || target_data.tab_group != null ) {
-      target_data = Object.assign( {}, target_data,
-        getTargetIndex( target_window, target_data, source_data.tabs || [] )
-      )
-      // @todo check result
-    }
-  }
-
-  if( target_data.tab_group_id == null ) {
+    target_data = Object.assign( {}, target_data,
+      getTargetIndex( target_window, target_data, source_data.tabs || [] )
+    )
+    // @todo check result
+  } else if( target_data.tab_group_id == null ) {
     target_data = Object.assign( {}, target_data,
       getTargetTabGroupData( target_window, target_data )
     )

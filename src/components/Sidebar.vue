@@ -186,7 +186,7 @@
       <!-- <div class="context-menu__item">Move to New <span>W</span>indow</div> -->
       <!-- <div class="context-menu__item" @click="archiveTabGroup( tab_group_context_menu.tab_group_id )"><span>A</span>rchive</div> -->
       <div v-if="tab_groups.length > 1" class="context-menu__item" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span class="context-menu__item-hotkey">C</span>lose</div>
-      <div v-else class="context-menu__item context-menu__item--is-disabled" @click="closeTabGroup( tab_group_context_menu.tab_group_id )"><span class="context-menu__item-hotkey">C</span>lose</div>
+      <div v-else class="context-menu__item context-menu__item--is-disabled"><span class="context-menu__item-hotkey">C</span>lose</div>
     </div>
   </body>
 </template>
@@ -668,7 +668,6 @@ $action-strip__themes: (
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    border-bottom: solid 1px transparent;
     background-color: map-get( $colors, --background-color );
 
     &__button {
@@ -705,6 +704,7 @@ $action-strip__themes: (
 
     &__button-icon {
       margin: 4px;
+      fill: map-get( $colors, __text--color );
     }
 
     &__button--drag-target &__button-icon {

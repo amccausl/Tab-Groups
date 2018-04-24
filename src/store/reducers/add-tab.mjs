@@ -10,7 +10,9 @@ import {
   getNewTabGroupId,
   getTabMoveData,
 } from "../helpers.mjs"
-import moveTabs from "./move-tabs.mjs"
+import {
+  moveTabs
+} from "./tab.mjs"
 
 export default function addTab( state, { browser_tab } ) {
   const target_window = state.windows.find( window => window.id === browser_tab.windowId )

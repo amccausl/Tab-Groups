@@ -7,7 +7,7 @@ import {
 } from "../../../src/store/helpers.mjs"
 import { validateState } from "../../../src/store/validators.mjs"
 
-import moveTabs from "../../../src/store/reducers/move-tabs.mjs"
+import { moveTabs } from "../../../src/store/reducers/tab.mjs"
 
 function testSingleWindowMoveOne( t ) {
   const initial_state = {
@@ -87,8 +87,51 @@ function testMoveActiveTab( t ) {
   t.end()
 }
 
+function testMoveTabsToNewGroup( t ) {
+  const state0 = {
+    config: {},
+    windows: [
+      {
+        id: 3,
+        active_tab_group_id: 1,
+        active_tab_id: 7,
+        tab_groups: [
+          createPinnedTabGroup( [] ),
+          createTabGroup( 1, [
+            createTestTab({ id: 4 }),
+            createTestTab({ id: 5 }),
+            createTestTab({ id: 6 }),
+            createTestTab({ id: 7 }),
+          ], 7)
+        ]
+      }
+    ]
+  }
+
+  let source_data = {
+    window_id: 3,
+    tab_ids: [ 6, 7 ]
+  }
+  let target_data = {
+    window_id: 3,
+    tab_group_id: null,
+  }
+
+  let tab_move_data = getTabMoveData( state0, source_data, target_data )
+
+  const state1 = moveTabs( state0, tab_move_data )
+
+  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.equal( state1.windows[ 0 ].tab_groups.length, 3 )
+  t.same( state1.windows[ 0 ].tab_groups[ 2 ].tabs.map( tab => tab.id ), source_data.tab_ids )
+  t.equal( state1.windows[ 0 ].active_tab_id, 7 )
+  t.equal( state1.windows[ 0 ].active_tab_group_id, tab_move_data.target_data.tab_group_id )
+  t.end()
+}
+
 export default function( tap ) {
   tap.test( testSingleWindowMoveOne )
   tap.test( testMoveActiveTab )
+  tap.test( testMoveTabsToNewGroup )
   tap.end()
 }
