@@ -1,5 +1,4 @@
 import {
-  default_config,
   createTabGroup,
   createPinnedTabGroup,
   createWindow,
@@ -26,7 +25,7 @@ function testStateValidation( t ) {
 
 function shouldFailWhenActiveTabNotInActiveGroup( t ) {
   const state0 = {
-    config: default_config,
+    config: {},
     windows: [
       createWindow( 1, [
         createPinnedTabGroup( [

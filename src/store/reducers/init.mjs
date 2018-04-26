@@ -7,7 +7,6 @@ import {
 import {
   createTabGroup,
   createPinnedTabGroup,
-  default_config,
 } from "../helpers.mjs"
 
 export default function init( state, { browser_tabs, config, contextual_identities, features, theme, window_tab_groups_map } ) {

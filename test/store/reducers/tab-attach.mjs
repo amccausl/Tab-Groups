@@ -8,7 +8,6 @@ import {
   createTabGroup,
   createPinnedTabGroup,
   createWindow,
-  default_config,
 } from '../../../src/store/helpers.mjs'
 import {
   createTestTab,
@@ -17,9 +16,9 @@ import {
 function shouldValidateNativeTabDragToNativeTabBar( t ) {
   const window_id = 1
   const state0 = {
-    config: default_config,
+    config: {},
     windows: [
-      createWindow( 1, [
+      createWindow( window_id, [
         createPinnedTabGroup( [] ),
         createTabGroup( 3, [
           createTestTab({ id: 5 }),
@@ -35,7 +34,7 @@ function shouldValidateNativeTabDragToNativeTabBar( t ) {
     ]
   }
 
-  const state1 = attachTab( state0, { tab_id: 7, window_id: 1, index: 2 } )
+  const state1 = attachTab( state0, { tab_id: 7, window_id, index: 2 } )
 
   t.ok( validateState( state1 ), "state validates", validateState.errors )
   t.end()

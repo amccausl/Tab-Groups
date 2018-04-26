@@ -11,15 +11,13 @@ import {
   addTabAction,
   removeTabAction,
   updateTabAction,
-  updateTabImageAction,
+  // updateTabImageAction,
   moveTabAction,
   attachTabAction,
 } from "../../store/actions.mjs"
 import {
   default_config,
-  findTab,
   getCreateTabTarget,
-  getSourceTabGroupData,
 } from "../../store/helpers.mjs"
 
 // @todo pull to shared file
@@ -263,16 +261,20 @@ export function onTabMoved( store, tab_id, window_id, index ) {
 
 export function onContextualIdentityCreated( store, contextual_identity ) {
   console.info('onContextualIdentityCreated', contextual_identity)
+  store.dispatch( createContextualIdentityAction( contextual_identity ) )
 }
 
 export function onContextualIdentityUpdated( store, contextual_identity ) {
   console.info('onContextualIdentityUpdated', contextual_identity)
+  store.dispatch( updateContextualIdentityAction( contextual_identity ) )
 }
 
 export function onContextualIdentityRemoved( store, contextual_identity ) {
   console.info('onContextualIdentityRemoved', contextual_identity)
+  store.dispatch( removeContextualIdentityAction( contextual_identity ) )
 }
 
 export function onThemeUpdated( store, theme, window_id ) {
   console.info('onThemeUpdated', window_id, theme)
+  store.dispatch( updateThemeAction( theme ) )
 }

@@ -3,7 +3,7 @@ import {
   createPinnedTabGroup,
   createWindow,
 } from "../../../src/store/helpers.mjs"
-import moveTab from "../../../src/store/reducers/move-tab.mjs"
+import { moveTab } from "../../../src/store/reducers/tab.mjs"
 import { validateState } from "../../../src/store/validators.mjs"
 import { createTestTab } from "../helpers.mjs"
 

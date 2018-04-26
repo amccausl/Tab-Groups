@@ -10,8 +10,7 @@ import {
   createWindow,
 } from "../../src/store/helpers.mjs"
 import init from "../../src/store/reducers/init.mjs"
-import addTab from "../../src/store/reducers/add-tab.mjs"
-import { updateTab } from "../../src/store/reducers/tab.mjs"
+import { addTab, updateTab } from "../../src/store/reducers/tab.mjs"
 import { validateState } from "../../src/store/validators.mjs"
 
 function testSingleWindowFreshInit( t ) {

@@ -1,6 +1,5 @@
 import init from "../../../src/store/reducers/init.mjs"
 import { validateState } from "../../../src/store/validators.mjs"
-import { default_config } from "../../../src/store/helpers.mjs"
 
 import { createBrowserTab } from "../helpers.mjs"
 
@@ -19,7 +18,7 @@ function freshInitWithSingleWindow( t ) {
   ]
   const window_tab_groups_map = new Map()
 
-  let initial_state = init( null, { browser_tabs, config: default_config, window_tab_groups_map })
+  let initial_state = init( null, { browser_tabs, config: {}, window_tab_groups_map })
 
   t.ok( validateState( initial_state ), "initial state validates", validateState.errors )
 
@@ -57,7 +56,7 @@ function freshInitWithMultipleWindows( t ) {
         windowId: 2
       })
     ],
-    config: default_config,
+    config: {},
     window_tab_groups_map: new Map()
   }
 
@@ -105,7 +104,7 @@ function testSingleWindowMultiGroupDetectActive( t ) {
         windowId: 1
       })
     ],
-    config: default_config,
+    config: {},
     contextual_identities: [],
     theme: {},
     window_tab_groups_map: new Map([[ 1, [
@@ -170,7 +169,7 @@ function testSingleWindowSessionLoad( t ) {
         }
       })
     ],
-    config: default_config,
+    config: {},
     contextual_identities: [],
     theme: {},
     window_tab_groups_map: new Map([[ 1, [

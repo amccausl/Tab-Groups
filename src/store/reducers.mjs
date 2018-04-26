@@ -1,6 +1,9 @@
 import {
   INIT,
   CONFIG_UPDATE,
+  CONTEXTUAL_IDENTITY_CREATE,
+  CONTEXTUAL_IDENTITY_UPDATE,
+  CONTEXTUAL_IDENTITY_REMOVE,
   FEATURES_UPDATE,
   GROUP_ADD,
   GROUP_REMOVE,
@@ -16,6 +19,7 @@ import {
   TAB_UPDATE_IMAGE,
   TAB_MOVE,
   TAB_ATTACH,
+  THEME_UPDATE,
   WINDOW_ADD,
   WINDOW_REMOVE,
   WINDOW_SEARCH_START,
@@ -23,13 +27,7 @@ import {
   WINDOW_SEARCH_RESET,
 } from "./action-types.mjs"
 
-import {
-  getTabMoveData,
-} from "./helpers.mjs"
-
 import init from "./reducers/init.mjs"
-import moveTab from "./reducers/move-tab.mjs"
-import addTab from "./reducers/add-tab.mjs"
 import {
   updateConfig
 } from "./reducers/config.mjs"
@@ -42,10 +40,12 @@ import {
   updateFeatures,
 } from "./reducers/features.mjs"
 import {
+  addTab,
   activateTab,
   attachTab,
   updateTab,
   updateTabImage,
+  moveTab,
   moveTabs,
   removeTab,
 } from "./reducers/tab.mjs"
@@ -66,15 +66,12 @@ import {
   finishWindowSearch,
   resetWindowSearch,
 } from "./reducers/search.mjs"
+import {
+  updateTheme,
+} from "./reducers/theme.mjs"
 
 export default function App( state, action ) {
   switch( action.type ) {
-    case INIT:
-      return init( state, action )
-    case CONFIG_UPDATE:
-      return updateConfig( state, action )
-    case FEATURES_UPDATE:
-      return updateFeatures( state, action )
     case WINDOW_ADD:
       return addWindow( state, action )
     case WINDOW_REMOVE:
@@ -113,6 +110,20 @@ export default function App( state, action ) {
       return moveTab( state, action )
     case TAB_ATTACH:
       return attachTab( state, action )
+    case INIT:
+      return init( state, action )
+    case CONFIG_UPDATE:
+      return updateConfig( state, action )
+    case CONTEXTUAL_IDENTITY_CREATE:
+      return addContextualIdentity( state, action )
+    case CONTEXTUAL_IDENTITY_UPDATE:
+      return updateContextualIdentity( state, action )
+    case CONTEXTUAL_IDENTITY_REMOVE:
+      return removeContextualIdentity( state, action )
+    case FEATURES_UPDATE:
+      return updateFeatures( state, action )
+    case THEME_UPDATE:
+      return updateTheme( state, action )
     default:
       console.warn('unknown action type', action.type)
       return state

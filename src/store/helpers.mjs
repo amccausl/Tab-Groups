@@ -267,52 +267,53 @@ export function getTabMoveData( state, source_data, target_data ) {
   source_data = Object.assign( {}, source_data )
   target_data = Object.assign( {}, target_data )
 
-  if( source_data.tabs || source_data.type === "moz-place" || source_data.type === "moz-url" ) {
-  } else if( source_data.tab_ids ) {
-    source_data.tabs = Array( source_data.tab_ids ).fill( null )
-    const scanTabGroup = ( tab_group ) => {
-      tab_group.tabs.forEach( tab => {
-        const tab_index = source_data.tab_ids.indexOf( tab.id )
-        if( tab_index > -1 ) {
-          source_data.tabs[ tab_index ] = tab
-        }
-      })
-    }
-
-    for( let window of windows ) {
-      if( window.id !== source_data.window_id ) {
-        continue
+  if( source_data.tabs == null && source_data.type !== "moz-place" && source_data.type !== "moz-url" ) {
+    if( source_data.tab_ids ) {
+      source_data.tabs = Array( source_data.tab_ids ).fill( null )
+      const scanTabGroup = ( tab_group ) => {
+        tab_group.tabs.forEach( tab => {
+          const tab_index = source_data.tab_ids.indexOf( tab.id )
+          if( tab_index > -1 ) {
+            source_data.tabs[ tab_index ] = tab
+          }
+        })
       }
 
-      const { tab_groups } = window
-      if( source_data.tab_group_id != null ) {
-        const tab_group_index = tab_groups.findIndex( _tab_group => _tab_group.id === source_data.tab_group_id )
-        if( tab_group_index !== -1 ) {
-          scanTabGroup( tab_groups[ tab_group_index ] )
+      for( let window of windows ) {
+        if( window.id !== source_data.window_id ) {
+          continue
         }
-      } else {
-        tab_groups.forEach( scanTabGroup )
+
+        const { tab_groups } = window
+        if( source_data.tab_group_id != null ) {
+          const tab_group_index = tab_groups.findIndex( _tab_group => _tab_group.id === source_data.tab_group_id )
+          if( tab_group_index !== -1 ) {
+            scanTabGroup( tab_groups[ tab_group_index ] )
+          }
+        } else {
+          tab_groups.forEach( scanTabGroup )
+        }
+        break
       }
-      break
-    }
-  } else if( source_data.type === 'moz-tab' ) {
-    // @todo scan target_data group, then window first
-    source_data.tabs = [ null ]
-    for( let window of windows ) {
-      for( let tab_group of window.tab_groups ) {
-        for( let tab of tab_group.tabs ) {
-          if( tab.id === window.active_tab_id && tab.url === source_data.url ) {
-            source_data.window_id = window.id
-            source_data.tab_ids = [ tab.id ]
-            source_data.tabs[ 0 ] = tab
+    } else if( source_data.type === 'moz-tab' ) {
+      // @todo scan target_data group, then window first
+      source_data.tabs = [ null ]
+      for( let window of windows ) {
+        for( let tab_group of window.tab_groups ) {
+          for( let tab of tab_group.tabs ) {
+            if( tab.id === window.active_tab_id && tab.url === source_data.url ) {
+              source_data.window_id = window.id
+              source_data.tab_ids = [ tab.id ]
+              source_data.tabs[ 0 ] = tab
+            }
           }
         }
       }
+      // @todo if scan doesn't find anything, dragging from another instance of firefox, can process as URL
+    } else {
+      console.warn( "Problem loading source tab", source_data )
+      return null
     }
-    // @todo if scan doesn't find anything, dragging from another instance of firefox, can process as URL
-  } else {
-    console.warn( "Problem loading source tab", source_data )
-    return null
   }
 
   if( source_data.tabs != null && source_data.tabs.includes( null ) ) {
@@ -320,7 +321,7 @@ export function getTabMoveData( state, source_data, target_data ) {
     return null
   }
 
-  let target_window = state.windows.find( window => window.id === target_data.window_id )
+  let target_window = windows.find( window => window.id === target_data.window_id )
   if( ! target_window ) {
     // This can trigger on window creation (the tab create is called before window create)
     // Create a new window as a placeholder

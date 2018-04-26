@@ -3,7 +3,6 @@ import {
   createWindow,
   createTabGroup,
   createPinnedTabGroup,
-  default_config,
   findTab,
   getTabGroupsPersistState,
   getTabMoveData,
@@ -43,7 +42,7 @@ export function createTestTab( tab ) {
 
 export function getInitialState() {
   const initial_state = {
-    config: default_config,
+    config: {},
     windows: [
       createWindow( 1, [
         createPinnedTabGroup( [] ),

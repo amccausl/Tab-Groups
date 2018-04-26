@@ -12,7 +12,6 @@ import {
 import {
   createTabGroup,
   default_config,
-  findTab,
   findTabGroup,
   getNewTabGroupId,
   getTabMoveData,
@@ -28,8 +27,6 @@ export const TAB_GROUP_ID_KEY = 'group_id'
 export const TAB_PREVIEW_IMAGE_KEY = 'preview_image'
 
 const EMPTY = {}
-
-const TAB_GROUP_ID_MAP = new Map()
 
 // LOCALIZATION
 
@@ -63,7 +60,7 @@ export function loadBrowserState() {
       config = storage[ LOCAL_CONFIG_KEY ] || {}
       for( const [ key, value ] of Object.entries( default_config ) ) {
         if( ! config.hasOwnProperty( key ) ) {
-          config[ key ] = default_config[ key ]
+          config[ key ] = value
         }
       }
 
@@ -74,11 +71,7 @@ export function loadBrowserState() {
       const browser_tab_preview_images = []
 
       let window_tab_groups = []
-      let active_browser_tab;
       browser_tabs.forEach( browser_tab => {
-        if( browser_tab.active ) {
-          active_browser_tab = browser_tab
-        }
         browser_tab_group_ids.push( getTabGroupId( browser_tab.id ) )
         browser_tab_preview_images.push( getTabPreviewState( browser_tab.id ) )
         if( window_ids.indexOf( browser_tab.windowId ) === -1 ) {
@@ -257,6 +250,12 @@ function resetTabState( tab ) {
     browser.sessions.removeTabValue( tab.id, TAB_GROUP_ID_KEY ),
     browser.sessions.removeTabValue( tab.id, TAB_PREVIEW_IMAGE_KEY ),
   ])
+}
+
+function moveBrowserTabs( tab_ids, move_properties ) {
+  ignorePendingMove( tab_ids )
+  console.info(`browser.tabs.move( ${ JSON.stringify( tab_ids ) }, ${ JSON.stringify( move_properties ) } )`)
+  return browser.tabs.move( tab_ids, move_properties )
 }
 
 /**
@@ -503,8 +502,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
       const { tab_ids } = source_data
       if( target_data.tab_group_id ) {
         tab_ids.forEach( ( tab_id ) => {
-          console.info(`browser.sessions.setTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY }, ${ JSON.stringify( target_data.tab_group_id ) } )`)
-          updates.push( browser.sessions.setTabValue( tab_id, TAB_GROUP_ID_KEY, target_data.tab_group_id ) )
+          updates.push( setTabGroupId( tab_id, target_data.tab_group_id ) )
         })
       }
 
@@ -532,6 +530,8 @@ export function moveTabsToGroup( store, source_data, target_data ) {
  *   window_id
  *   tab_group_id
  * @param target_data
+ *   window_id
+ *   tab_group_index
  */
 export function moveTabGroup( store, source_data, target_data ) {
   console.info('moveTabGroup', source_data, target_data)
@@ -544,13 +544,12 @@ export function moveTabGroup( store, source_data, target_data ) {
   }
   const source_tab_group_index = source_window.tab_groups.findIndex( tab_group => tab_group.id === source_data.tab_group_id )
   const source_tab_group = source_window.tab_groups[ source_tab_group_index ]
+  const source_tab_ids = source_tab_group.tabs.map( tab => tab.id )
 
   // Dispatch the update first to prevent move event handlers from getting confused
   store.dispatch( moveGroupAction( source_data, target_data ) )
 
-  const tab_ids = source_tab_group.tabs.map( tab => tab.id )
-
-  if( tab_ids.length === 0 ) {
+  if( source_tab_ids.length === 0 ) {
     return Promise.resolve()
   }
 
@@ -562,37 +561,35 @@ export function moveTabGroup( store, source_data, target_data ) {
     return Promise.reject()
   }
 
-  let move_properties
-
   let index_offset = 0
-  for( let tab_group of target_window.tab_groups ) {
-    if( tab_group.id === source_data.tab_group_id ) {
-      if( source_data.window_id === target_data.window_id ) {
-        // let target_tab_group_index = target_window.tab_groups.indexOf( tab_group )
-        // let index = index_offset
-        // if( target_tab_group_index > source_tab_group_index ) {
-        //   index += source_tab_group.tabs.length
-        // }
-        move_properties = { index: index_offset }
-      } else {
-        move_properties = {
-          index: index_offset,
-          windowId: target_window.id
-        }
+  const tab_groups_length = target_window.tab_groups.length
+  for( let tab_group_index = 0; tab_group_index < tab_groups_length; tab_group_index++ ) {
+    const tab_group = target_window.tab_groups[ tab_group_index ]
+
+    // If this is the new index of the tab group, move tabs here
+    if( tab_group.id === source_tab_group.id ) {
+      const move_properties = {
+        index: index_offset
       }
-      break
+      if( source_data.window_id !== target_data.window_id ) {
+        move_properties.windowId = target_data.window_id
+      }
+      return moveBrowserTabs( source_tab_ids, move_properties )
+    }
+    // If move is local to window, and new index is after old index, move other tabs forward to prevent browser issue
+    if( source_data.window_id === target_data.window_id && tab_group_index === source_tab_group_index ) {
+      const tab_ids = []
+      for( ; tab_group_index < tab_groups_length && target_window.tab_groups[ tab_group_index ].id !== source_tab_group.id; tab_group_index++ ) {
+        tab_ids.push( ...target_window.tab_groups[ tab_group_index ].tabs.map( tab => tab.id ) )
+      }
+      if( tab_ids.length === 0 ) {
+        return Promise.resolve()
+      }
+      return moveBrowserTabs( tab_ids, { index: index_offset } )
     }
     index_offset += tab_group.tabs_count
   }
-
-  // @todo if new group index > old group index, move other groups up instead
-
-  if( ! move_properties ) {
-    return Promise.resolve()
-  }
-  ignorePendingMove( tab_ids )
-  console.info(`browser.tabs.move( ${ JSON.stringify( tab_ids ) } )`, move_properties)
-  return browser.tabs.move( tab_ids, move_properties )
+  return Promise.reject()
 }
 
 /**

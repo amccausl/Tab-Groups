@@ -8,7 +8,6 @@ import {
   createTabGroup,
   createPinnedTabGroup,
   createWindow,
-  default_config,
 } from "../../../src/store/helpers.mjs"
 import {
   createTestTab
@@ -19,7 +18,7 @@ function toSameWindow( t ) {
   const tab_group_id = 3
   const tab_group_index = 1
   const state0 = {
-    config: default_config,
+    config: {},
     windows: [
       createWindow( window_id, [
         createPinnedTabGroup( [] ),
@@ -47,7 +46,7 @@ function toSameWindowDropZone( t ) {
   const window_id = 1
   const tab_group_id = 3
   const state0 = {
-    config: default_config,
+    config: {},
     windows: [
       createWindow( window_id, [
         createPinnedTabGroup( [] ),
@@ -84,7 +83,7 @@ function toDifferentWindow( t ) {
   }
 
   const state0 = {
-    config: default_config,
+    config: {},
     windows: [
       createWindow( source_data.window_id, [
         createPinnedTabGroup( [] ),

@@ -6,12 +6,11 @@ import {
 } from "../helpers.mjs"
 
 import {
-  default_config,
   createTabGroup,
   createPinnedTabGroup,
   createWindow,
 } from "../../../src/store/helpers.mjs"
-import addTab from "../../../src/store/reducers/add-tab.mjs"
+import { addTab } from "../../../src/store/reducers/tab.mjs"
 import { validateState } from "../../../src/store/validators.mjs"
 
 function testSingleWindowAdd( t ) {
@@ -71,7 +70,7 @@ function testAddToNewWindow( t ) {
 
 function testReopenClosedPinnedTab( t ) {
   const state0 = {
-    config: default_config,
+    config: {},
     windows: [
       createWindow( 1, [
         createPinnedTabGroup( [
@@ -106,7 +105,7 @@ function testReopenClosedPinnedTab( t ) {
 
 function testOpenNewTabWithOpenerId( t ) {
   const state0 = {
-    config: default_config,
+    config: {},
     windows: [
       createWindow( 1, [
         createPinnedTabGroup( [

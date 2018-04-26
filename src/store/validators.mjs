@@ -1,31 +1,36 @@
 import validateStateSchema from '../schemas/validate_state'
 
 export function validateState( state ) {
-  const tab_ids_map = new Map()
+  const tab_ids_map = new Set()
 
   // @todo ensure tab_group_ids are unique
   const errors = []
 
   // @todo ensure window active tab is in pinned or active group
 
-  for( let window of state.windows ) {
+  const windows_length = state.windows.length
+  for( let window_index = 0; window_index < windows_length; window_index++ ) {
+    const window = state.windows[ window_index ]
+    const tab_groups_length = window.tab_groups.length
+
     // Ensure that the active tab is in active group or pinned
     if( window.hasOwnProperty( 'active_tab_id' ) && window.active_tab_id != null ) {
       let is_window_active_tab_valid = false
-      for( let tab_group of window.tab_groups ) {
+      for( let tab_group_index = 0; tab_group_index < tab_groups_length; tab_group_index++ ) {
+        const tab_group = window.tab_groups[ tab_group_index ]
         for( let tab of tab_group.tabs ) {
           if( tab.id === window.active_tab_id ) {
             is_window_active_tab_valid = true
             if( tab_group.id !== 0 && window.active_tab_group_id !== tab_group.id ) {
               errors.push({
                 keyword: 'link',
-                dataPath: `window[${ state.windows.indexOf( window ) }].active_tab_group_id`,
+                dataPath: `window[${ window_index }].active_tab_group_id`,
                 message: `Active tab "${ window.active_tab_id }" isn't in the active tab group`
               })
             } else if( tab.id !== tab_group.active_tab_id ) {
               errors.push({
                 keyword: 'link',
-                dataPath: `window[${ state.windows.indexOf( window ) }].tab_groups[${ window.tab_groups.indexOf( tab_group ) }].active_tab_id`,
+                dataPath: `window[${ window_index }].tab_groups[${ tab_group_index }].active_tab_id`,
                 message: `Window active tab "${ window.active_tab_id }" isn't active in tab group`
               })
             }
@@ -36,13 +41,14 @@ export function validateState( state ) {
       if( ! is_window_active_tab_valid ) {
         errors.push({
           keyword: 'link',
-          dataPath: `window[${ state.windows.indexOf( window ) }].active_tab_id`,
+          dataPath: `window[${ window_index }].active_tab_id`,
           message: `Active tab "${ window.active_tab_id }" isn't in tabs array`
         })
       }
     }
 
-    for( let tab_group of window.tab_groups ) {
+    for( let tab_group_index = 0; tab_group_index < tab_groups_length; tab_group_index++ ) {
+      const tab_group = window.tab_groups[ tab_group_index ]
       // Validate first group against pinned, rest as normal
       if( tab_group === window.tab_groups[ 0 ] ) {
         // if( ! validatePinnedTabGroupStateSchema( tab_group ) ) {
@@ -56,29 +62,30 @@ export function validateState( state ) {
         // }
       }
 
-      if( tab_group.hasOwnProperty( 'active_tab_id' ) && tab_group.active_tab_id ) {
-        if( ! tab_group.tabs.some( tab => tab.id === tab_group.active_tab_id ) ) {
+      let is_active_tab_valid = ! tab_group.hasOwnProperty( 'active_tab_id' ) || tab_group.active_tab_id == null
+      const tabs_length = tab_group.tabs.length
+      for( let tab_index = 0; tab_index < tabs_length; tab_index++ ) {
+        const tab_id = tab_group.tabs[ tab_index ].id
+        if( tab_ids_map.has( tab_id ) ) {
           errors.push({
-            keyword: 'link',
-            dataPath: `window[${ state.windows.indexOf( window ) }].tab_groups[${ window.tab_groups.indexOf( tab_group ) }].active_tab_id`,
-            message: `Active tab "${ tab_group.active_tab_id }" isn't in tabs array`
+            keyword: 'duplicate',
+            dataPath: `window[${ window_index }].tab_groups[${ tab_group_index }].tabs[${ tab_index }]`,
+            message: `Tab "${ tab_id }" is duplicated`
           })
+        }
+        tab_ids_map.add( tab_id )
+
+        if( ! is_active_tab_valid && tab_group.active_tab_id === tab_id ) {
+          is_active_tab_valid = true
         }
       }
 
-      let is_active_tab_valid = false
-      for( let tab of tab_group.tabs ) {
-        if( tab_ids_map.has( tab.id ) ) {
-          let { window_id, tab_group_id } = tab_ids_map.get( tab.id )
-          // @todo can clean up dataPath by using `in` loops
-          errors.push({
-            keyword: 'duplicate',
-            dataPath: `window[${ state.windows.indexOf( window ) }].tab_groups[${ window.tab_groups.indexOf( tab_group ) }].tabs[${ tab_group.tabs.indexOf( tab ) }]`,
-            message: `Tab "${ tab.id }" is duplicated`
-          })
-        }
-
-        tab_ids_map.set( tab.id, { window_id: window.id, tab_group_id: tab_group.id } )
+      if( ! is_active_tab_valid ) {
+        errors.push({
+          keyword: 'link',
+          dataPath: `window[${ window_index }].tab_groups[${ tab_group_index }].active_tab_id`,
+          message: `Active tab "${ tab_group.active_tab_id }" isn't in tabs array`
+        })
       }
     }
   }
