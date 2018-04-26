@@ -336,11 +336,20 @@ export function getTabMoveData( state, source_data, target_data ) {
 
   if( target_data.index == null ) {
     if( target_data.tab_group_id == null ) {
-      target_data.tab_group_id = ( target_data.tab_group == null ? getNewTabGroupId( state ) : target_data.tab_group.id )
-      if( source_data.tabs != null ) {
-        target_data.tab_group = createTabGroup( target_data.tab_group_id, source_data.tabs, source_data.tabs[ 0 ].id )
+      if( target_data.tab_group != null ) {
+        target_data.tab_group_id = target_data.tab_group.id
+        if( source_data.tabs != null ) {
+          target_data.tab_group.tabs = source_data.tabs
+          target_data.tab_group.tabs_count = source_data.tabs.length
+          target_data.tab_group.active_tab_id = target_data.tab_group.tabs[ 0 ].id
+        }
       } else {
-        target_data.tab_group = createTabGroup( target_data.tab_group_id, [] )
+        target_data.tab_group_id = getNewTabGroupId( state )
+        if( source_data.tabs != null ) {
+          target_data.tab_group = createTabGroup( target_data.tab_group_id, source_data.tabs, source_data.tabs[ 0 ].id )
+        } else {
+          target_data.tab_group = createTabGroup( target_data.tab_group_id, [] )
+        }
       }
     }
 

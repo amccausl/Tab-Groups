@@ -1,6 +1,6 @@
 <template>
   <body class="page page--options">
-    <div v-if="! features.tabhide_enabled" :class="bem( 'message-bar', { 'is-warning': true } )">
+    <div v-if="! features_tabhide_enabled" :class="bem( 'message-bar', { 'is-warning': true } )">
       <!-- @todo localize -->
       <div class="message-bar__icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -15,12 +15,12 @@
           <li :class="{ 'active': selected_section === 'preferences' }">
             <a href="javascript:void(0)" @click="selectSection( 'preferences' )">{{ __MSG_options_section_preferences__ }}</a>
           </li>
-          <!-- <li :class="{ 'active': selected_section === 'data' }">
+          <li :class="{ 'active': selected_section === 'data' }">
             <a href="javascript:void(0)" @click="selectSection( 'data' )">{{ __MSG_options_section_data__ }}</a>
           </li>
           <li :class="{ 'active': selected_section === 'debug' }">
             <a href="javascript:void(0)" @click="selectSection( 'debug' )">{{ __MSG_options_section_debug__ }}</a>
-          </li> -->
+          </li>
         </ul>
       </nav>
       <article class="main">
@@ -63,7 +63,7 @@
                 <span class="checkbox__label">{{ __MSG_options_sidebar_show_pinned_tabs__ }}</span>
               </label> -->
 
-              <label v-if="show_tabs" class="checkbox checkbox--nested">
+              <label v-if="show_tabs && contexual_identities_enabled" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_tab_context">
                 <span class="checkbox__icon"></span>
                 <span class="checkbox__label">{{ __MSG_options_sidebar_show_tab_context__ }}</span>
@@ -73,6 +73,12 @@
                 <input class="checkbox__input" type="checkbox" v-model="show_tab_icon_background">
                 <span class="checkbox__icon"></span>
                 <span class="checkbox__label">{{ __MSG_options_sidebar_show_tab_icon_background__ }}</span>
+              </label>
+
+              <label v-if="show_tabs && show_header && show_tabs_count" class="checkbox checkbox--nested checkbox--is-experimental">
+                <input class="checkbox__input" type="checkbox" v-model="show_search">
+                <span class="checkbox__icon"></span>
+                <span class="checkbox__label checkbox__label">{{ __MSG_options_sidebar_show_search__ }}</span>
               </label>
             </fieldset>
           </form>
@@ -104,9 +110,8 @@ export default {
   name: 'options',
   data() {
     return {
-      features: {
-        tabhide_enabled: false
-      },
+      features_contexual_identities_enabled: false,
+      features_tabhide_enabled: false,
       preferences: {
         theme: 'dark',
         show_header: true,
@@ -115,6 +120,7 @@ export default {
         show_pinned_tabs: false,
         show_tab_context: false,
         show_tab_icon_background: false,
+        show_search: false,
       },
       selected_section: 'preferences',
     }
@@ -158,6 +164,9 @@ export default {
     },
     __MSG_options_sidebar_show_tab_icon_background__() {
       return window.background.getMessage( "options_sidebar_show_tab_icon_background" )
+    },
+    __MSG_options_sidebar_show_search__() {
+      return window.background.getMessage( "options_sidebar_show_search" )
     },
     show_header: {
       get() {
@@ -206,13 +215,22 @@ export default {
       set( value ) {
         window.background.setConfig( 'show_tab_icon_background', value )
       }
+    },
+    show_search: {
+      get() {
+        return this.preferences.show_search
+      },
+      set( value ) {
+        window.background.setConfig( 'show_search', value )
+      }
     }
   },
   created() {
     onStateChange( state => {
       console.info('loadState', state)
       Object.assign( this.preferences, state.config )
-      this.features.tabhide_enabled = state.features.tabhide.enabled
+      this.features_contexual_identities_enabled = state.features.contextual_identities.enabled
+      this.features_tabhide_enabled = state.features.tabhide.enabled
     })
   },
   methods: {

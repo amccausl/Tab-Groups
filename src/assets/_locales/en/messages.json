@@ -84,6 +84,11 @@
     "description": ""
   },
 
+  "options_sidebar_show_search": {
+    "message": "Show search (Experimental)",
+    "description": ""
+  },
+
   "tab_group_name_placeholder": {
     "message": "Group $INDEX$",
     "description": "This is used as a placeholder name for new groups",

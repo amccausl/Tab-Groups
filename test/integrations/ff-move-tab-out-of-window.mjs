@@ -10,12 +10,12 @@ import { getMockBrowser } from './helpers.mjs'
 
 export default function( tap ) {
   const emitter = new EventEmitter()
-  global.browser = getMockBrowser( emitter )
 
   // Initialize state with 1 window, 2 tabs
   let state = getInitialState()
+  const browser = getMockBrowser( emitter )
   const store = createStore( App, state )
-  bindBrowserEvents( store )
+  bindBrowserEvents( browser, store )
 
   // @todo Run browser events
 

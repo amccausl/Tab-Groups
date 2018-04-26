@@ -1,3 +1,4 @@
+import { omit } from "../helpers.mjs"
 
 export function startWindowSearch( state, { window_id, search_text } ) {
   return Object.assign( {}, state, {

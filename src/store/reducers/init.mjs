@@ -96,8 +96,12 @@ export default function init( state, { browser_tabs, config, contextual_identiti
         window_tab_groups.push( tab_group )
       }
       if( ungrouped_tabs.length > 0 ) {
-        window_tab_groups[ window_tab_groups.length - 1 ].tabs.push( ...ungrouped_tabs )
-        window_tab_groups[ window_tab_groups.length - 1 ].tabs_count = window_tab_groups[ window_tab_groups.length - 1 ].tabs.length
+        const tab_group = window_tab_groups[ window_tab_groups.length - 1 ]
+        tab_group.tabs.push( ...ungrouped_tabs )
+        tab_group.tabs_count = tab_group.tabs.length
+        if( tab_group.tabs.some( tab => tab.id === active_tab_id ) ) {
+          active_tab_group_id = tab_group.id
+        }
       }
     } else {
       // No state, assign all tabs to new groups

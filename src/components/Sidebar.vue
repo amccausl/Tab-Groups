@@ -257,6 +257,7 @@ export default {
       show_pinned_tabs: true,
       show_tab_context: true,
       show_tab_icon_background: true,
+      show_search: true,
       pinned_tabs: [],
       tab_groups: [],
       drag_state: {
@@ -275,6 +276,7 @@ export default {
       this.show_pinned_tabs = false && this.show_tabs && state.config.show_pinned_tabs
       this.show_tab_context = this.show_tabs && state.config.show_tab_context
       this.show_tab_icon_background = this.show_tabs && state.config.show_tab_icon_background
+      this.show_search = this.show_tabs && state.config.show_search
 
       for( let context_id in state.contexts || {} ) {
         this.context_styles[ context_id ] = {

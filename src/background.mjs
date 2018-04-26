@@ -35,7 +35,7 @@ const store_promise = loadBrowserState()
     const { window_tab_groups_map } = browser_state
     const store = createStore( App, init( null, browser_state ) )
 
-    bindBrowserEvents( store )
+    bindBrowserEvents( browser, store )
 
     store.subscribe( () => {
       const state = store.getState()

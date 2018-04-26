@@ -97,7 +97,7 @@ export function loadBrowserState() {
 
       const features = {
         contextual_identities: {
-          enabled: true
+          enabled: isContextualIdentitiesEnabled( browser_tabs )
         },
         tabhide: {
           enabled: tabhide_enabled
@@ -108,6 +108,10 @@ export function loadBrowserState() {
       return { browser_tabs, config, contextual_identities, features, theme, window_tab_groups_map }
     }
   )
+}
+
+export function isContextualIdentitiesEnabled( browser_tabs ) {
+  return browser_tabs.some( browser_tab => browser_tab.cookieStoreId != null && browser_tab.cookieStoreId !== "firefox-default" )
 }
 
 export function isTabHideEnabled( browser_tabs ) {
@@ -357,16 +361,15 @@ export function createGroup( store, window_id, source_data ) {
   console.info(`background.createGroup( ${ window_id } )`, source_data)
   const state = store.getState()
   const tab_group = createTabGroup( getNewTabGroupId( state ), [] )
-  const target_data = {
-    window_id,
-    tab_group
-  }
 
   if( source_data ) {
-    // @todo queue move?
-    moveTabsToGroup( store, source_data, target_data )
+    // If the source is a bookmark folder, we can use the title
+    if( source_data.title != null ) {
+      tab_group.title = source_data.title
+    }
     // @todo call process to activate the new group?  maybe in caller
-    return Promise.resolve( tab_group )
+    return moveTabsToGroup( store, source_data, { window_id, tab_group } )
+      .then( () => tab_group )
   }
 
   store.dispatch( createGroupAction( tab_group, window_id ) )
@@ -463,13 +466,16 @@ export function moveTabsToGroup( store, source_data, target_data ) {
       return
     }
 
+    let active = true
     updates.push( ...source_data.links.map( ( link, index_offset ) => {
       // @todo filter invalid URLs to prevent errors, add warning
       const create_properties = {
         windowId: move_data.target_data.window_id,
         url: link.url,
-        index: move_data.target_data.index + index_offset
+        index: move_data.target_data.index + index_offset,
+        active
       }
+      active = false
       console.info(`browser.tabs.create( ${ JSON.stringify( create_properties ) } )`)
       return browser.tabs.create( create_properties )
     }))

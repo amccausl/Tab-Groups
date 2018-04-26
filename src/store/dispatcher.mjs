@@ -30,9 +30,6 @@ export function createStore( reducer, initial_state ) {
 
   function dispatch( action ) {
     let local_dispatch_id = ++dispatch_id
-    // if( is_dispatching ) {
-    //   throw new Error('Reducers may not dispatch actions.')
-    // }
 
     try {
       // @todo put profiling behind debug flag
@@ -41,13 +38,14 @@ export function createStore( reducer, initial_state ) {
       const new_state = reducer( current_state, action )
       console.timeEnd( `dispatch ${ action.type }` )
       if( validateState( new_state ) ) {
-        console.info( 'state', current_state )
+        console.info( 'action', action )
+        console.info( 'state', new_state )
       } else {
         console.error( 'Validator failed on new state' )
-        console.info('current_state',current_state)
-        console.info('action', action)
-        console.info('new_state', new_state)
-        console.info('errors', validateState.errors)
+        console.info( 'current_state',current_state )
+        console.info( 'action', action )
+        console.info( 'new_state', new_state )
+        console.info( 'errors', validateState.errors )
       }
       current_state = new_state
     } finally {
