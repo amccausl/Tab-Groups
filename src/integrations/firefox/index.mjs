@@ -616,7 +616,6 @@ export function runTabSearch( store, window_id, search_text ) {
 
   const state = store.getState()
   const window = state.windows.find( _window => _window.id === window_id )
-
   if( ! window ) {
     // @todo error
     return
@@ -630,6 +629,7 @@ export function runTabSearch( store, window_id, search_text ) {
   const nextFind = () => {
     if( queued_tab_ids.length > 0 ) {
       const tab_id = queued_tab_ids.shift()
+      // @todo skip tabs "about:addons", "about:debugging"
       console.info(`browser.find.find( "${ search.text }", { tabId: ${ tab_id } } )`)
       return browser.find.find( search.text, { tabId: tab_id } )
         .then(

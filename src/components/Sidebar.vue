@@ -734,7 +734,7 @@ $action-strip__themes: (
 
       &::-moz-placeholder {
         @extend %text-body-10;
-        color: rbga( map-get( $colors, __search--color ), 0.4 );
+        color: map-get( $colors, __search-icon--color );
       }
     }
 
@@ -743,9 +743,10 @@ $action-strip__themes: (
     }
 
     &__search-icon {
+      opacity: 0.4;
       height: 16px;
       width: 16px;
-      fill: rbga( map-get( $colors, __search--color ), 0.4 );
+      fill: map-get( $colors, __search--color );
       position: absolute;
       left: 8px;
       top: 0;
