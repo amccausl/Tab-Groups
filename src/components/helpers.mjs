@@ -77,6 +77,22 @@ export function getFriendlyUrlText( uri_string ) {
   }
 }
 
+export function getNewSelectedTabIds( old_selected_tab_ids, tab_groups ) {
+  if( old_selected_tab_ids.length === 0 ) {
+    return []
+  }
+  const selected_tab_ids_set = new Set( old_selected_tab_ids )
+  const new_selected_tab_ids = []
+  for( const tab_group of tab_groups ) {
+    for( const tab of tab_group.tabs ) {
+      if( selected_tab_ids_set.has( tab.id ) ) {
+        new_selected_tab_ids.push( tab.id )
+      }
+    }
+  }
+  return new_selected_tab_ids
+}
+
 /**
  * Get a markdown string rendering for a tab group
  * @param tab_group

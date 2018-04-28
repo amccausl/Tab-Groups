@@ -137,6 +137,28 @@
     }
   },
 
+  "matched_tabs_count_singular": {
+    "message": "$INDEX$ found",
+    "description": "This is used where tab count is displayed",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+
+  "matched_tabs_count_plural": {
+    "message": "$INDEX$ found",
+    "description": "This is used where tab count is displayed",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+
   "tab_search_placeholder": {
     "message": "Search tabs…",
     "description": "Placeholder for tab search field"

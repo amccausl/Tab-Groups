@@ -72,19 +72,19 @@
                 </div>
 
                 <svg v-if="tab_group.muted" :class="bem( `tab-groups-list-item-header--${ theme }__icon`, { 'audio-mute': true } )" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                  <g :fill="context_fill">
+                  <g>
                     <path d="M13 8a2.813 2.813 0 0 0-.465-1.535l-.744.744A1.785 1.785 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
                     <path d="M13.273 5.727A3.934 3.934 0 0 1 14 8a3.984 3.984 0 0 1-2.742 3.775.5.5 0 0 0 .316.949A4.985 4.985 0 0 0 15 8a4.93 4.93 0 0 0-1.012-2.988zm-4.603 7.99a.2.2 0 0 0 .33-.152V10l-2.154 2.154zm6.037-12.424a1 1 0 0 0-1.414 0L9 5.586V2.544a.25.25 0 0 0-.413-.19L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618a2.186 2.186 0 0 0 1.659 2.118l-2.366 2.366a1 1 0 1 0 1.414 1.414l12-12a1 1 0 0 0 0-1.414z"></path>
                   </g>
                 </svg>
                 <svg v-else-if="tab_group.audible" :class="bem( `tab-groups-list-item-header--${ theme }__icon`, { 'audio': true } )" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                  <g :fill="context_fill">
+                  <g>
                     <path d="M8.587 2.354L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618A2.191 2.191 0 0 0 4.191 11H5.5l3.17 2.717a.2.2 0 0 0 .33-.152V2.544a.25.25 0 0 0-.413-.19zm2.988.921a.5.5 0 0 0-.316.949 3.97 3.97 0 0 1 0 7.551.5.5 0 0 0 .316.949 4.971 4.971 0 0 0 0-9.449z"></path>
                     <path d="M13 8a3 3 0 0 0-2.056-2.787.5.5 0 1 0-.343.939A2.008 2.008 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
                   </g>
                 </svg>
 
-                <span v-if="show_tabs_count" :class="[ `tab-groups-list-item-header--${ theme }__tabs-count` ]">{{ getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
+                <span v-if="show_tabs_count" :class="[ `tab-groups-list-item-header--${ theme }__tabs-count` ]">{{ is_searching ? getCountMessage( 'matched_tabs', tab_group.search_matched_tabs_count ) : getCountMessage( 'tabs', tab_group.tabs_count ) }}</span>
               </div>
               <button :class="[ `tab-groups-list-item-header--${ theme }__more-button` ]" @click.stop="openTabGroupMore( $event, tab_group )">
                 <svg :class="[ `tab-groups-list-item-header--${ theme }__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -94,8 +94,8 @@
             </div>
           </div>
           <!-- <transition-group v-if="tab_group.open && show_tabs && ! isTabGroupDragSource( tab_group )" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]" tag="div" :name="`sidebar-tab-group-tabs-list--${ theme }__item--transition`"> -->
-          <div v-if="tab_group.open && show_tabs && tab_group.tabs.length" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]">
-            <div :class="bem( `sidebar-tab-group-tabs-list--${ theme }__item-container`, { 'drag-target':  ! isSelected( tab ) && drag_state.target.tab_id === tab.id, 'drag-source': isSelected( tab ) && is_dragging } )"
+          <div v-if="tab_group.open && show_tabs && tab_group.tabs.length" :class="bem( 'list-flex-col', { theme, 'is-dragging': is_dragging, 'is-searching': is_searching } )">
+            <div :class="bem( `list-flex-col__item`, { 'is-active': tab.active, 'drag-target-index': ! isSelected( tab ) && drag_state.target.tab_id === tab.id, 'drag-selected': isSelected( tab ), 'drag-source': isSelected( tab ) && is_dragging, 'search': getTabSearchState( tab ) } )"
                 v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
                 :title="tab.title"
                 @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab.id )" @click.middle="closeTab( tab )"
@@ -107,10 +107,8 @@
                 @dragstart="onTabDragStart( $event, tab )"
                 @dragend="onTabDragEnd( $event )"
             >
-              <div :class="[ `sidebar-tab-group-tabs-list--${ theme }__drag-target-ink` ]"></div>
-              <div class="sidebar-tab-view-item"
-                  :class="bem( `sidebar-tab-group-tabs-list--${ theme }__item`, { 'active': tab.active } )"
-              >
+              <div :class="[ `list-flex-col__drag-target-ink` ]"></div>
+              <div class="sidebar-tab-view-item">
                 <div class="sidebar-tab-view-item-icon"
                     :class="[ `sidebar-tab-group-tabs-list--${ theme }__item-icon` ]"
                 >
@@ -133,7 +131,7 @@
                 <div v-if="show_tab_context && tab.context_id" class="sidebar-tab-view-item-context" :style="context_styles[ tab.context_id ]"></div>
               </div>
             </div>
-            <div :class="[ `sidebar-tab-group-tabs-list--${ theme }__drag-target-ink--is-last` ]"></div>
+            <div class="list-flex-col__drag-target-ink--is-last"></div>
           </div>
           <!-- </transition-group> -->
         </div>
@@ -218,6 +216,7 @@ import {
   debounce,
   getCountMessage,
   getFriendlyUrlText,
+  getNewSelectedTabIds,
   getTabGroupCopyText,
   onStateChange,
 } from './helpers.mjs'
@@ -246,10 +245,13 @@ export default {
       active_tab_group_id: null,
       context_styles: {},
       is_dragging: false,
+      is_searching: false,
       is_tab_group_open: {},
       rename_tab_group_id: null,
       search_text: '',
       search_resolved: true,
+      search_matched_tab_ids: [],
+      search_missed_tab_ids: [],
       selected_tab_ids: [],
       show_header: true,
       show_tabs: true,
@@ -289,12 +291,19 @@ export default {
         // @todo if active_tab_group_id has changed, open the new active group
         this.active_tab_group_id = state_window.active_tab_group_id
 
-        // @todo only update if this doesn't have focus
-        // this.search_text = state_window.search_text
-        this.search_resolved = state_window.search_resolved
+        if( state_window.search != null ) {
+          this.is_searching = true
+          // @todo only update if this doesn't have focus
+          // this.search_text = state_window.search.text
+          this.search_resolved = state_window.search.resolved
+          Object.getPrototypeOf( this.search_matched_tab_ids ).splice.apply( this.search_matched_tab_ids, [ 0, this.search_matched_tab_ids.length, ...state_window.search.matched_tab_ids ] )
+        } else {
+          this.is_searching = false
+        }
 
         // @todo this could be done more efficiently
-        const new_selected_tab_ids = []
+        const new_selected_tab_ids = getNewSelectedTabIds( this.selected_tab_ids, state_window )
+        const search_missed_tab_ids = []
 
         // Need to deep clone the objects because Vue extends prototypes when state added to the vm
         let tab_groups = state_window.tab_groups.map( cloneTabGroup )
@@ -309,9 +318,17 @@ export default {
           }
 
           let is_group_audible = false
+          if( this.is_searching ) {
+            tab_group.search_matched_tabs_count = 0
+          }
           tab_group.tabs.forEach( tab => {
-            if( this.selected_tab_ids.includes( tab.id ) ) {
-              new_selected_tab_ids.push( tab.id )
+            if( this.is_searching ) {
+              if( this.search_matched_tab_ids.includes( tab.id ) ) {
+                tab_group.search_matched_tabs_count++
+              }
+              if( ! state_window.search.queued_tab_ids.includes( tab.id ) ) {
+                search_missed_tab_ids.push( tab.id )
+              }
             }
             if( tab.id === state_window.active_tab_id ) {
               tab.active = true
@@ -326,6 +343,7 @@ export default {
           }
         })
         // Use the extended splice to trigger change detection
+        Object.getPrototypeOf( this.search_missed_tab_ids ).splice.apply( this.search_missed_tab_ids, [ 0, this.search_missed_tab_ids.length, ...search_missed_tab_ids ] )
         Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...new_selected_tab_ids ] )
         Object.getPrototypeOf( this.pinned_tabs ).splice.apply( this.pinned_tabs, [ 0, this.pinned_tabs.length, ...tab_groups[ 0 ].tabs ] )
         Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length, ...tab_groups.slice( 1 ) ] )
@@ -473,6 +491,20 @@ export default {
       this.search_text = ""
       window.background.runTabSearch( window.store, this.window_id, this.search_text )
     },
+    getNewSelectedTabIds() {
+      return getNewSelectedTabIds( this.selected_tab_ids, this.tab_groups )
+    },
+    getTabSearchState( tab ) {
+      if( ! this.is_searching ) {
+        return false
+      }
+      if( this.search_matched_tab_ids.includes( tab.id ) ) {
+        return "matched"
+      }
+      if( this.search_missed_tab_ids.includes( tab.id ) ) {
+        return "missed"
+      }
+    },
     openOptionsPage() {
       window.background.openOptionsPage()
     },
@@ -557,6 +589,8 @@ $--theme-dark: (
     left: -6px;
   }
 }
+
+@import "../styles/list-flex-col";
 
 // =============================================================================
 // Sidebar
@@ -1206,16 +1240,16 @@ $sidebar-tab-group-tabs-list__themes: (
     &__item-close-icon {
       fill: map-get( $colors, --color );
     }
+  }
 
-    // @todo should clean up this cross-component rule
-    .sidebar-tab_groups-list--#{$theme}__item-container--drag-tab-target &__drag-target-ink--is-last {
-      @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
-      top: initial;
-      bottom: 0;
+  // @todo should clean up this cross-component rule
+  .sidebar-tab_groups-list--#{$theme}__item-container--drag-tab-target .list-flex-col__drag-target-ink--is-last {
+    @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
+    top: initial;
+    bottom: 0;
 
-      &::before {
-        border-bottom: none;
-      }
+    &::before {
+      border-bottom: none;
     }
   }
 }

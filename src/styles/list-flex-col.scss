@@ -1,0 +1,112 @@
+@import "./photon-motion";
+
+// @todo use default values for variables
+$__drag-target-ink--color: $purple-50;
+$__item--drag-selected--color: $purple-50;
+$__item--drag-source--opacity: 0.3;
+$__item--is-active--color: $blue-50;
+
+.list-flex-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  position: relative;
+
+  &__item {
+    position: relative;
+    flex: 0;
+
+    &::before {
+      @extend %fast-transition;
+      transition-property: height;
+      content: "";
+      position: absolute;
+      width: 2px;
+      left: 1px;
+      height: 0;
+    }
+
+    &--is-active {
+      &::before {
+        height: 100%;
+        background-color: $__item--is-active--color;
+      }
+    }
+
+    &--drag-selected {
+      &::before {
+        height: 100%;
+        background-color: $__item--drag-selected--color;
+      }
+    }
+
+    &--drag-source {
+      opacity: $__item--drag-source--opacity;
+
+      &::before {
+        height: 0;
+        opacity: 0;
+      }
+    }
+
+    &--search-missed {
+      display: none;
+    }
+
+    &--transition {
+      &-enter {
+        transform: translate3d(0, -100%, 0);
+        opacity: 0;
+        z-index: -1000;
+      }
+
+      &-enter-to {
+        transform: none;
+        opacity: 1;
+        z-index: 0;
+      }
+
+      &-leave {
+        opacity: 1;
+      }
+
+      &-leave-to {
+        max-height: 0;
+        opacity: 0;
+      }
+    }
+  }
+
+  &__drag-target-ink {
+    @extend %slow-transition;
+    transition-property: width;
+    position: absolute;
+    top: -1px;
+    height: 2px;
+    width: 0;
+    background-color: $__drag-target-ink--color;
+    z-index: 10;
+
+    &::before {
+      @extend %fast-transition;
+      transition-property: border-width;
+      content: "";
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      border: 0 solid $__drag-target-ink--color;
+      position: absolute;
+      top: -4px;
+      left: -6px;
+    }
+  }
+
+  &__item--drag-target-index > &__drag-target-ink {
+    width: 100%;
+
+    &::before {
+      border-width: 5px;
+    }
+  }
+}

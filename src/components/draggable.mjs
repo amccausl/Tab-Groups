@@ -164,7 +164,7 @@ export function onTabDragStart( event, tab ) {
   let drag_image = new Image()
   let tab_ids
   if( this.isSelected( tab ) ) {
-    tab_ids = [ ...this.selected_tab_ids ]
+    tab_ids = this.getNewSelectedTabIds()
   } else {
     this.selected_tab_ids.splice( 0, this.selected_tab_ids.length, tab.id )
     tab_ids = [ tab.id ]
