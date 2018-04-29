@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "__MSG_extension_name__",
   "description": "__MSG_extension_description__",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "applications": {
     "gecko": {
       "id": "{65afae73-8786-42d1-a6e7-95dc884dfb3a}"
