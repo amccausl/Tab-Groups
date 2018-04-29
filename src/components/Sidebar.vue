@@ -120,7 +120,7 @@
                 <div v-if="show_tab_context && tab.context_id" class="tab-list-item__context" :style="context_styles[ tab.context_id ]"></div>
               </div>
               <div v-else-if="tab_size === 'sm'" :class="bem( 'tab-list-item', { theme, size: 'sm', active: tab.active } )">
-                <div :class="bem( 'tab-list-item__icon', { 'show-background': show_tab_icon_background } )">
+                <div :class="bem( 'tab-list-item__icon', { 'show-background': show_tab_icon_background && tab.status !== 'loading' } )">
                   <!-- <div class="tab-list-item__icon-background"
                     v-if="show_tab_icon_background && tab.status !== 'loading'"
                   >

@@ -156,7 +156,7 @@ $tab-icon__state--size: 12px !default;
 
     @for $i from 0 through 11 {
       &--index-#{$i} {
-        transform: translateX(10px) translateY(9px) rotate($i * 30deg) translateY(-12px);
+        transform: translateX(6px) translateY(5px) rotate($i * 30deg) translateY(-10px);
         animation-delay: $i * 2s / 12;
       }
     }
