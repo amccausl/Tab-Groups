@@ -74,12 +74,6 @@
                 <span class="checkbox__icon"></span>
                 <span class="checkbox__label">{{ __MSG_options_sidebar_show_tab_icon_background__ }}</span>
               </label>
-
-              <label v-if="show_tabs && show_header && show_tabs_count" class="checkbox checkbox--nested checkbox--is-experimental">
-                <input class="checkbox__input" type="checkbox" v-model="show_search">
-                <span class="checkbox__icon"></span>
-                <span class="checkbox__label checkbox__label">{{ __MSG_options_sidebar_show_search__ }}</span>
-              </label>
             </fieldset>
           </form>
         </section>
@@ -120,7 +114,6 @@ export default {
         show_pinned_tabs: false,
         show_tab_context: false,
         show_tab_icon_background: false,
-        show_search: false,
       },
       selected_section: 'preferences',
     }
@@ -164,9 +157,6 @@ export default {
     },
     __MSG_options_sidebar_show_tab_icon_background__() {
       return window.background.getMessage( "options_sidebar_show_tab_icon_background" )
-    },
-    __MSG_options_sidebar_show_search__() {
-      return window.background.getMessage( "options_sidebar_show_search" )
     },
     show_header: {
       get() {
@@ -214,14 +204,6 @@ export default {
       },
       set( value ) {
         window.background.setConfig( 'show_tab_icon_background', value )
-      }
-    },
-    show_search: {
-      get() {
-        return this.preferences.show_search
-      },
-      set( value ) {
-        window.background.setConfig( 'show_search', value )
       }
     }
   },

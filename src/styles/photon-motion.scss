@@ -1,0 +1,12 @@
+
+$easing-function: cubic-bezier(.07,.95,0,1);
+
+%slow-transition {
+  transition-duration: 250ms;
+  transition-timing-function: $easing-function;
+}
+
+%fast-transition {
+  transition-duration: 150ms;
+  transition-timing-function: $easing-function;
+}

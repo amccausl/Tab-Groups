@@ -1,0 +1,97 @@
+@import "./photon";
+
+$tab-list-item--theme: (
+  light: (
+    --background-color: #e3e4e6,
+    --active--background-color: #f5f6f7,
+    --hover--background-color: #cccdcf,
+    __separator-ink--color: #9e9fa0,
+    __close-button--color: $grey-90,
+    __close-button--hover--background-color: $grey-90-a10,
+  ),
+  dark: (
+    --background-color: #0c0c0d,
+    --active--background-color: #323234,
+    --hover--background-color: #252526,
+    __separator-ink--color: #9e9fa0,
+    __close-button--color: #c3c3c4,
+    __close-button--hover--background-color: #666667,
+  )
+);
+
+.tab-list-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 1px;
+  padding-left: 8px;
+  position: relative;
+
+  &:not(#{&}--active) {
+    cursor: pointer;
+  }
+
+  &__icon {
+    height: 24px;
+    min-width: 24px;
+    padding: 4px;
+    border-radius: $border-radius;
+  }
+
+  &--theme-dark &__icon--show-background {
+    background-color: map-get( map-get( $tab-list-item--theme, dark ), __close-button--hover--background-color );
+    margin-right: 2px;
+  }
+
+  &__icon_img {
+    height: 16px;
+  }
+
+  &__close-button {
+    cursor: pointer;
+    height: 20px;
+    padding: 2px;
+    border-radius: $border-radius;
+  }
+
+  @each $theme, $colors in $tab-list-item--theme {
+    &--theme-#{$theme} {
+      background-color: map-get( $colors, --background-color );
+      border-bottom: solid 1px map-get( $colors, __separator-ink--color );
+    }
+
+    &--theme-#{$theme}#{&}--active {
+      background-color: map-get( $colors, --active--background-color );
+    }
+
+    &--theme-#{$theme}:not(#{&}--active):hover {
+      background-color: map-get( $colors, --hover--background-color );
+    }
+
+    &--theme-#{$theme} &__close-icon {
+      fill: map-get( $colors, __close-button--color );
+    }
+
+    &--theme-#{$theme} &__close-button:hover {
+      background-color: map-get( $colors, __close-button--hover--background-color );
+    }
+  }
+
+  &--size-sm {
+    padding: 8px;
+  }
+
+  &--size-sm &__text {
+    flex-grow: 1;
+    max-height: 24px;
+    padding: 4px;
+    white-space: nowrap;
+    text-overflow: clip;
+    overflow-x: hidden;
+    mask-image: linear-gradient( to right, rgba(0, 0, 0, 1.0), rgba(0, 0, 0, 1.0) calc(100% - 10px), transparent );
+  }
+
+  &--size-lg {
+  }
+}

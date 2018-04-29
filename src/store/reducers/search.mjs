@@ -7,18 +7,29 @@ export function startWindowSearch( state, { window_id, search_text } ) {
         return window
       }
 
+      let search_tabs = []
+      for( let tab_group of window.tab_groups ) {
+        search_tabs.push( ...tab_group.tabs )
+      }
+
+      // Can incrementally restrict search results
+      if( window.search != null && search_text.startsWith( window.search.text ) ) {
+        let search_tab_ids_set = new Set( window.search.matched_tab_ids.concat( window.search.queued_tab_ids || []) )
+        if( search_tab_ids_set.size > 0 ) {
+          search_tabs = search_tabs.filter( tab => search_tab_ids_set.has( tab.id ) )
+        }
+      }
+
+      const search_regex = new RegExp( `${ search_text }`, 'i' )
       const matched_tab_ids = []
       const queued_tab_ids = []
-      const search_regex = new RegExp( `${ search_text }`, 'i' )
-      for( let tab_group of window.tab_groups ) {
-        for( let tab of tab_group.tabs ) {
-          if( tab.title && search_regex.test( tab.title ) ) {
-            matched_tab_ids.push( tab.id )
-          } else if( tab.url && search_regex.test( tab.url ) ) {
-            matched_tab_ids.push( tab.id )
-          } else {
-            queued_tab_ids.push( tab.id )
-          }
+      for( let tab of search_tabs ) {
+        if( tab.title && search_regex.test( tab.title ) ) {
+          matched_tab_ids.push( tab.id )
+        } else if( tab.url && search_regex.test( tab.url ) ) {
+          matched_tab_ids.push( tab.id )
+        } else {
+          queued_tab_ids.push( tab.id )
         }
       }
 

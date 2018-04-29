@@ -1,6 +1,6 @@
 <template>
   <body :class="[ `sidebar--${ theme }`, theme ]">
-    <div v-if="show_search" :class="[ `action-strip--${ theme }` ]" @click.right.prevent>
+    <div v-if="show_header" :class="[ `action-strip--${ theme }` ]" @click.right.prevent>
       <div :class="[ `action-strip--${ theme }__search` ]">
         <label :class="[ `action-strip--${ theme }__search-label` ]">
           <svg :class="[ `action-strip--${ theme }__search-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -14,15 +14,6 @@
       </div>
       <div :class="[ bem( 'button', { 'theme': theme, 'color': 'ghost' } ), `action-strip--${ theme }__button-icon` ]" @click="openOptionsPage()">
         <svg :class="[ `button--color-ghost__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-          <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
-        </svg>
-      </div>
-    </div>
-    <div v-else-if="show_header" :class="[ `action-strip--${ theme }` ]" @click.right.prevent>
-      <input v-if="is_search_enabled" :class="[ `action-strip--${ theme }__search` ]" type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/>
-      <div v-else :class="[ `action-strip--${ theme }__spacer` ]"></div>
-      <div :class="bem( `action-strip--${ theme }__button`, { 'no-grow': true } )" @click="openOptionsPage()">
-        <svg :class="[ `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
         </svg>
       </div>
@@ -95,7 +86,7 @@
           </div>
           <!-- <transition-group v-if="tab_group.open && show_tabs && ! isTabGroupDragSource( tab_group )" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]" tag="div" :name="`sidebar-tab-group-tabs-list--${ theme }__item--transition`"> -->
           <div v-if="tab_group.open && show_tabs && tab_group.tabs.length" :class="bem( 'list-flex-col', { theme, 'is-dragging': is_dragging, 'is-searching': is_searching } )">
-            <div :class="bem( `list-flex-col__item`, { 'is-active': tab.active, 'drag-target-index': ! isSelected( tab ) && drag_state.target.tab_id === tab.id, 'drag-selected': isSelected( tab ), 'drag-source': isSelected( tab ) && is_dragging, 'search': getTabSearchState( tab ) } )"
+            <div :class="bem( `list-flex-col__item`, { 'active': tab.active, 'drag-target-index': drag_state.target.tab_id === tab.id && ! isSelected( tab ), 'drag-selected': isSelected( tab ), 'drag-source': is_dragging && isSelected( tab ), 'search': getTabSearchState( tab ) } )"
                 v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
                 :title="tab.title"
                 @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab.id )" @click.middle="closeTab( tab )"
@@ -108,30 +99,46 @@
                 @dragend="onTabDragEnd( $event )"
             >
               <div :class="[ `list-flex-col__drag-target-ink` ]"></div>
-              <div class="sidebar-tab-view-item">
-                <div class="sidebar-tab-view-item-icon"
-                    :class="[ `sidebar-tab-group-tabs-list--${ theme }__item-icon` ]"
-                >
-                  <div class="sidebar-tab-view-item-icon-background"
-                      :class="[ `sidebar-tab-group-tabs-list--${ theme }__item-icon-background` ]"
-                      v-if="show_tab_icon_background && tab.status !== 'loading'"
-                  ></div>
+              <div v-if="tab_size === 'lg'" :class="bem( 'tab-list-item', { theme, size: 'lg', active: tab.active } )">
+                <div class="tab-list-item__icon">
+                  <div class="tab-list-item__icon-background"
+                    v-if="show_tab_icon_background && tab.status !== 'loading'"
+                  >
+                  </div>
                   <tab-icon :theme="theme" :tab="tab" size="24"></tab-icon>
                 </div>
-                <div class="sidebar-tab-view-item-text">
-                  <span class="sidebar-tab-view-item-title">{{ tab.title }}</span>
+                <div class="tab-list-item__text">
+                  <span class="tab-list-item__title">{{ tab.title }}</span>
                   <br>
-                  <span class="sidebar-tab-view-item-url">{{ tab.url | url }}</span>
+                  <span class="tab-list-item__url">{{ tab.url | url }}</span>
                 </div>
-                <div :class="[ `sidebar-tab-group-tabs-list--${ theme }__item-close` ]" @click.stop="closeTab( tab )">
-                  <svg :class="[ `sidebar-tab-group-tabs-list--${ theme }__item-close-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                <div :class="[ `tab-list-item--${ theme }__close-button` ]" @click.stop="closeTab( tab )">
+                  <svg :class="[ `tab-list-item--${ theme }__close-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                     <path d="M9.061 8l3.47-3.47a.75.75 0 0 0-1.061-1.06L8 6.939 4.53 3.47a.75.75 0 1 0-1.06 1.06L6.939 8 3.47 11.47a.75.75 0 1 0 1.06 1.06L8 9.061l3.47 3.47a.75.75 0 0 0 1.06-1.061z"></path>
                   </svg>
                 </div>
-                <div v-if="show_tab_context && tab.context_id" class="sidebar-tab-view-item-context" :style="context_styles[ tab.context_id ]"></div>
+                <div v-if="show_tab_context && tab.context_id" class="tab-list-item__context" :style="context_styles[ tab.context_id ]"></div>
+              </div>
+              <div v-else-if="tab_size === 'sm'" :class="bem( 'tab-list-item', { theme, size: 'sm', active: tab.active } )">
+                <div :class="bem( 'tab-list-item__icon', { 'show-background': show_tab_icon_background } )">
+                  <!-- <div class="tab-list-item__icon-background"
+                    v-if="show_tab_icon_background && tab.status !== 'loading'"
+                  >
+                  </div> -->
+                  <tab-icon :theme="theme" :tab="tab" size="16"></tab-icon>
+                </div>
+                <div class="tab-list-item__text">
+                  <span class="tab-list-item__title">{{ tab.title }}</span>
+                </div>
+                <div class="tab-list-item__close-button" @click.stop="closeTab( tab )">
+                  <svg class="tab-list-item__close-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path d="M9.061 8l3.47-3.47a.75.75 0 0 0-1.061-1.06L8 6.939 4.53 3.47a.75.75 0 1 0-1.06 1.06L6.939 8 3.47 11.47a.75.75 0 1 0 1.06 1.06L8 9.061l3.47 3.47a.75.75 0 0 0 1.06-1.061z"></path>
+                  </svg>
+                </div>
+                <div v-if="show_tab_context && tab.context_id" class="tab-list-item__context" :style="context_styles[ tab.context_id ]"></div>
               </div>
             </div>
-            <div class="list-flex-col__drag-target-ink--is-last"></div>
+            <div class="list-flex-col__drag-target-ink list-flex-col__drag-target-ink--is-last"></div>
           </div>
           <!-- </transition-group> -->
         </div>
@@ -259,7 +266,7 @@ export default {
       show_pinned_tabs: true,
       show_tab_context: true,
       show_tab_icon_background: true,
-      show_search: true,
+      tab_size: "sm",
       pinned_tabs: [],
       tab_groups: [],
       drag_state: {
@@ -278,7 +285,6 @@ export default {
       this.show_pinned_tabs = false && this.show_tabs && state.config.show_pinned_tabs
       this.show_tab_context = this.show_tabs && state.config.show_tab_context
       this.show_tab_icon_background = this.show_tabs && state.config.show_tab_icon_background
-      this.show_search = this.show_tabs && state.config.show_search
 
       for( let context_id in state.contexts || {} ) {
         this.context_styles[ context_id ] = {
@@ -618,6 +624,7 @@ $sidebar__themes: (
     justify-content: flex-start;
     align-items: stretch;
     color: map-get( $colors, --color );
+    background-color: map-get( $colors, --background-color );
   }
 }
 
@@ -1081,6 +1088,7 @@ $tab-groups-list-item-header__themes: (
       white-space: nowrap;
       text-overflow: clip;
       overflow-x: hidden;
+      overflow-y: hidden;
       mask-image: linear-gradient( to right, rgba(0, 0, 0, 1.0), rgba(0, 0, 0, 1.0) calc(100% - 10px), transparent );
 
       // Reset the fade out while the field is editing to prevent odd gradient display on long titles (scrollable)
@@ -1095,6 +1103,7 @@ $tab-groups-list-item-header__themes: (
     }
 
     &__tabs-count {
+      max-height: 16px;
       padding-left: 4px;
       text-align: right;
       flex-grow: 0;
@@ -1321,6 +1330,8 @@ $sidebar-tab-group-tabs-list__themes: (
 // Tab List Item
 // =============================================================================
 
+@import "../styles/tab-list-item";
+
 .sidebar-tab-view-item {
   @extend %slow-transition;
   transition-property: margin-top, margin-left, background-color;
@@ -1330,6 +1341,7 @@ $sidebar-tab-group-tabs-list__themes: (
   white-space: nowrap;
   text-overflow: clip;
   position: relative;
+  padding-left: 4px;
   cursor: pointer;
 
   &::after {

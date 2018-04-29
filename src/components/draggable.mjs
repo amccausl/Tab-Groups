@@ -236,6 +236,7 @@ export function onTabGroupDragEnd( event, tab_group ) {
 }
 
 export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
+  clearTimeout( drag_target_timer )
   const event_data = getTransferData( event.dataTransfer )
   const transfer_type = getTransferType( event_data )
   if( transfer_type != null ) {

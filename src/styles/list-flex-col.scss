@@ -2,9 +2,10 @@
 
 // @todo use default values for variables
 $__drag-target-ink--color: $purple-50;
-$__item--drag-selected--color: $purple-50;
 $__item--drag-source--opacity: 0.3;
-$__item--is-active--color: $blue-50;
+$__item-ink--drag-selected--color: $purple-50;
+$__item-ink--active--color: $blue-50;
+$__item-ink--hover--color: $grey-50;
 
 .list-flex-col {
   display: flex;
@@ -22,22 +23,30 @@ $__item--is-active--color: $blue-50;
       transition-property: height;
       content: "";
       position: absolute;
-      width: 2px;
+      width: 4px;
       left: 1px;
       height: 0;
+      z-index: 1;
     }
 
-    &--is-active {
+    &:hover:not(#{&}--active):not(#{&}--drag-selected):not(#{&}--drag-selected) {
       &::before {
-        height: 100%;
-        background-color: $__item--is-active--color;
+        height: calc(100% - 1px);
+        background-color: $__item-ink--hover--color;
+      }
+    }
+
+    &--active {
+      &::before {
+        height: calc(100% - 1px);
+        background-color: $__item-ink--active--color;
       }
     }
 
     &--drag-selected {
       &::before {
-        height: 100%;
-        background-color: $__item--drag-selected--color;
+        height: calc(100% - 1px);
+        background-color: $__item-ink--drag-selected--color;
       }
     }
 
