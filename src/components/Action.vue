@@ -2,7 +2,7 @@
   <body class="action" :class="theme">
     <div class="panel">
       <div class="panel-section panel-section-search">
-        <input type="search" @input="onUpdateSearchText( search_text )" v-model="search_text" :placeholder="__MSG_tab_search_placeholder__"/>
+        <tab-search :theme="'light'"></tab-search>
       </div>
 
       <div class="panel-section panel-section-list panel-section-content">
@@ -21,7 +21,7 @@
         <div class="panel-section-footer-button" @click="openTabGroupsPage()">
           <!-- @todo hi-res, context colours -->
           <img class="icon" src="/icons/action.png"/>
-          <span class="text">{{ __MSG_tab_group_manage__ }}</span>
+          <span class="text" v-once>{{ __MSG_tab_group_manage__ }}</span>
         </div>
         <div class="panel-section-footer-separator"></div>
         <div class="panel-section-footer-button panel-section-footer-button-options" @click="openOptionsPage()">
@@ -34,21 +34,26 @@
 </template>
 
 <script>
-import { cloneTabGroup } from '../store/helpers.mjs'
 import {
-  getMessage,
-  openOptionsPage,
+  cloneTabGroup
+} from '../store/helpers.mjs'
+import {
   openTabGroupsPage,
-  runTabSearch,
 } from '../integrations/index.mjs'
 import {
+  bem,
   debounce,
   getCountMessage,
   onStateChange,
 } from './helpers.mjs'
 
+import TabSearch from './TabSearch.vue'
+
 export default {
   name: 'action',
+  components: {
+    TabSearch,
+  },
   data() {
     return {
       window_id: window.current_window_id,
@@ -83,11 +88,8 @@ export default {
   },
   computed: {
     __MSG_tab_group_manage__: function() {
-      return getMessage( "tab_group_manage" )
+      return window.background.getMessage( "tab_group_manage" )
     },
-    __MSG_tab_search_placeholder__: function() {
-      return getMessage( "tab_search_placeholder" )
-    }
   },
   methods: {
     getCountMessage,
@@ -96,7 +98,7 @@ export default {
       runTabSearch( window.store, this.window_id, search_text )
     }, 250 ),
     openOptionsPage() {
-      openOptionsPage()
+      window.background.openOptionsPage()
       window.close()
     },
     openTabGroupsPage() {

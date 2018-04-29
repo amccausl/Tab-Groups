@@ -13,13 +13,13 @@
       <nav class="sidenav">
         <ul>
           <li :class="{ 'active': selected_section === 'preferences' }">
-            <a href="javascript:void(0)" @click="selectSection( 'preferences' )">{{ __MSG_options_section_preferences__ }}</a>
+            <a href="javascript:void(0)" @click="selectSection( 'preferences' )" v-once>{{ __MSG_options_section_preferences__ }}</a>
           </li>
           <li :class="{ 'active': selected_section === 'data' }">
-            <a href="javascript:void(0)" @click="selectSection( 'data' )">{{ __MSG_options_section_data__ }}</a>
+            <a href="javascript:void(0)" @click="selectSection( 'data' )" v-once>{{ __MSG_options_section_data__ }}</a>
           </li>
           <li :class="{ 'active': selected_section === 'debug' }">
-            <a href="javascript:void(0)" @click="selectSection( 'debug' )">{{ __MSG_options_section_debug__ }}</a>
+            <a href="javascript:void(0)" @click="selectSection( 'debug' )" v-once>{{ __MSG_options_section_debug__ }}</a>
           </li>
         </ul>
       </nav>
@@ -29,50 +29,50 @@
             {{ __MSG_options_theme__ }}:
             <div class="browser-style">
               <input type="radio" id="theme_light" value="light" v-model="preferences.theme" @input="selectTheme( 'light' )">
-              <label for="theme_light">{{ __MSG_options_theme_light__ }}</label>
+              <label for="theme_light" v-once>{{ __MSG_options_theme_light__ }}</label>
             </div>
             <div class="browser-style">
               <input type="radio" id="theme_dark" value="dark" v-model="preferences.theme" @input="selectTheme( 'dark' )">
-              <label for="theme_dark">{{ __MSG_options_theme_dark__ }}</label>
+              <label for="theme_dark" v-once>{{ __MSG_options_theme_dark__ }}</label>
             </div>
 
             <fieldset>
-              <legend>{{ __MSG_options_sidebar_legend__ }}</legend>
+              <legend v-once>{{ __MSG_options_sidebar_legend__ }}</legend>
 
               <label class="checkbox">
                 <input class="checkbox__input" type="checkbox" v-model="show_header">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label">{{ __MSG_options_sidebar_show_header__ }}</span>
+                <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_header__ }}</span>
               </label>
 
               <label class="checkbox">
                 <input class="checkbox__input" type="checkbox" v-model="show_tabs_count">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label">{{ __MSG_options_sidebar_show_tabs_count__ }}</span>
+                <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_tabs_count__ }}</span>
               </label>
 
               <label class="checkbox">
                 <input class="checkbox__input" type="checkbox" v-model="show_tabs">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label">{{ __MSG_options_sidebar_show_tabs__ }}</span>
+                <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_tabs__ }}</span>
               </label>
 
               <!-- <label v-if="show_tabs" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_pinned_tabs">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label">{{ __MSG_options_sidebar_show_pinned_tabs__ }}</span>
+                <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_pinned_tabs__ }}</span>
               </label> -->
 
               <label v-if="show_tabs && contexual_identities_enabled" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_tab_context">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label">{{ __MSG_options_sidebar_show_tab_context__ }}</span>
+                <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_tab_context__ }}</span>
               </label>
 
               <label v-if="show_tabs && preferences.theme === 'dark'" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_tab_icon_background">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label">{{ __MSG_options_sidebar_show_tab_icon_background__ }}</span>
+                <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_tab_icon_background__ }}</span>
               </label>
             </fieldset>
           </form>
