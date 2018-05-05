@@ -15,6 +15,7 @@ import {
   findTabGroup,
   getNewTabGroupId,
   getTabMoveData,
+  getWindow,
 } from '../../store/helpers.mjs'
 
 import {
@@ -603,6 +604,8 @@ export function moveTabGroup( store, source_data, target_data ) {
  * @param store
  * @param window_id
  * @param search_text
+ *
+ * @todo consider storing window => search info map locally
  */
 export function runTabSearch( store, window_id, search_text ) {
   console.info('runSearch', window_id, search_text)
@@ -614,8 +617,7 @@ export function runTabSearch( store, window_id, search_text ) {
   // Update the store with the search
   store.dispatch( startSearchAction( window_id, search_text ) )
 
-  const state = store.getState()
-  const window = state.windows.find( _window => _window.id === window_id )
+  let window = getWindow( store.getState(), window_id )
   if( ! window ) {
     // @todo error
     return
@@ -628,6 +630,11 @@ export function runTabSearch( store, window_id, search_text ) {
 
   const nextFind = () => {
     if( queued_tab_ids.length > 0 ) {
+      window = getWindow( store.getState(), window_id )
+      // Abort if search is no longer active
+      if( window.search == null || window.search.text !== search.text ) {
+        return Promise.reject()
+      }
       const tab_id = queued_tab_ids.shift()
       // @todo skip tabs "about:addons", "about:debugging"
       console.info(`browser.find.find( "${ search.text }", { tabId: ${ tab_id } } )`)
@@ -640,7 +647,7 @@ export function runTabSearch( store, window_id, search_text ) {
           },
           ( err ) => {
             // @todo handling
-            console.info('browser.find.find error', err, tab_id)
+            console.error('browser.find.find error', err, tab_id)
           }
         )
         .finally( nextFind )

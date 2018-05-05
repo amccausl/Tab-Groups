@@ -164,6 +164,10 @@ export function getNewTabGroupId( state ) {
   return new_tab_group_id
 }
 
+export function getWindow( state, window_id ) {
+  return state.windows.find( _window => _window.id === window_id )
+}
+
 export function getTargetIndex( target_window, target_data, ignored_tabs ) {
   function isIncludedGroup( tab ) {
     return ! ignored_tabs.includes( tab )

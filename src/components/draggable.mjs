@@ -2,10 +2,15 @@
 let drag_target = null
 let drag_target_timer
 
-function setTabTransferData( data_transfer, window_id, tab_ids ) {
+function setTabTransferData( data_transfer, window_id, tabs ) {
+  const tab_ids = tabs.map( tab => tab.id )
   const event_data = { window_id, tab_ids }
   data_transfer.effectAllowed = 'move'
-  data_transfer.setData( 'application/json', JSON.stringify( event_data ) )
+  data_transfer.setData( "application/json", JSON.stringify( event_data ) )
+
+  const text_data = tabs.map( tab => tab.url ).join( "\n" )
+  data_transfer.setData( "text/uri-list", text_data )
+  data_transfer.setData( "text/plain", text_data )
 }
 
 function setTabGroupTransferData( data_transfer, window_id, tab_group ) {
@@ -162,14 +167,15 @@ export function onTabDragStart( event, tab ) {
 
   // Use the selected tabs if the tab is selected
   let drag_image = new Image()
-  let tab_ids
+  let tabs
   if( this.isSelected( tab ) ) {
-    tab_ids = this.getNewSelectedTabIds()
+    tabs = this.getNewSelectedTabs()
   } else {
     this.selected_tab_ids.splice( 0, this.selected_tab_ids.length, tab.id )
-    tab_ids = [ tab.id ]
+    tabs = [ tab ]
   }
-  setTabTransferData( event.dataTransfer, this.window_id, tab_ids )
+  const tab_ids = tabs.map( tab => tab.id )
+  setTabTransferData( event.dataTransfer, this.window_id, tabs )
   event.dataTransfer.setDragImage( drag_image, 10, 10 )
 
   this.drag_state.source = {
