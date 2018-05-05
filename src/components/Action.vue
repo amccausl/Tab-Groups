@@ -35,7 +35,8 @@
 
 <script>
 import {
-  cloneTabGroup
+  cloneTabGroup,
+  getWindow,
 } from '../store/helpers.mjs'
 import {
   openTabGroupsPage,
@@ -67,7 +68,7 @@ export default {
   },
   created() {
     onStateChange( state => {
-      const state_window = state.windows.find( ( window ) => window.id === this.window_id )
+      const state_window = getWindow( state, this.window_id )
       if( state_window ) {
         this.active_tab_group_id = state_window.active_tab_group_id
 

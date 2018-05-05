@@ -190,6 +190,7 @@ import {
 } from '../store/actions.mjs'
 import {
   cloneTabGroup,
+  getWindow,
 } from '../store/helpers.mjs'
 import {
   onTabDragStart,
@@ -278,7 +279,7 @@ export default {
         }
       }
 
-      const state_window = state.windows.find( window => window.id === this.window_id )
+      const state_window = getWindow( state, this.window_id )
       if( state_window ) {
         // @todo if active_tab_group_id has changed, open the new active group
         this.active_tab_group_id = state_window.active_tab_group_id

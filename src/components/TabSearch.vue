@@ -14,6 +14,9 @@
 
 <script>
 import {
+  getWindow,
+} from '../store/helpers.mjs'
+import {
   bem,
   debounce,
   onStateChange,
@@ -36,7 +39,7 @@ export default {
   },
   created() {
     onStateChange( state => {
-      const state_window = state.windows.find( window => window.id === this.window_id )
+      const state_window = getWindow( state, this.window_id )
       if( state_window.search != null ) {
         this.search_text = state_window.search.text
         this.search_resolved = state_window.search.resolved
