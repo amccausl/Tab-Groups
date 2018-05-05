@@ -37,8 +37,13 @@ export default {
   created() {
     onStateChange( state => {
       const state_window = state.windows.find( window => window.id === this.window_id )
-      this.search_text = state_window.search.text
-      this.search_resolved = state_window.search.resolved
+      if( state_window.search != null ) {
+        this.search_text = state_window.search.text
+        this.search_resolved = state_window.search.resolved
+      } else {
+        this.search_text = ""
+        this.search_resolved = true
+      }
     })
   },
   methods: {

@@ -1,8 +1,8 @@
 <template>
   <body :class="[ `sidebar--${ theme }`, theme ]">
-    <div v-if="show_header" :class="[ `action-strip--${ theme }` ]" @click.right.prevent>
+    <div v-if="show_header" :class="bem( 'action-strip', { theme } )" @click.right.prevent>
       <tab-search :theme="theme"></tab-search>
-      <div :class="[ bem( 'button', { 'theme': theme, 'color': 'ghost' } ), `action-strip--${ theme }__button-icon` ]" @click="openOptionsPage()">
+      <div :class="[ bem( 'button', { theme, 'color': 'ghost' } ), `action-strip__button-icon` ]" @click="openOptionsPage()">
         <svg :class="[ `button--color-ghost__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
         </svg>
@@ -144,8 +144,8 @@
         <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
       </svg>
     </div>
-    <div :class="[ `action-strip--${ theme }` ]">
-      <div :class="bem( `action-strip--${ theme }__button`, { 'drag-target': drag_state.target.tab_group_new && drag_state.source.type !== 'tab_group' } )"
+    <div :class="bem( 'action-strip', { theme } )">
+      <div :class="bem( `action-strip__button`, { 'drag-target': drag_state.target.tab_group_new && drag_state.source.type !== 'tab_group' } )"
           @click.left="createTabGroup()"
           @click.right.prevent
           @dragenter="onTabGroupDragEnter"
@@ -154,10 +154,10 @@
           @drop="onTabGroupDrop"
           @dragend="onTabDragEnd"
       >
-        <svg :class="[ `action-strip--${ theme }__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+        <svg :class="[ `action-strip__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
         </svg>
-        <span :class="[ `action-strip--${ theme }__button-text` ]" v-once>{{ __MSG_tab_group_new__ }}</span>
+        <span :class="[ `action-strip__button-text` ]" v-once>{{ __MSG_tab_group_new__ }}</span>
       </div>
     </div>
     <div v-if="tab_group_context_menu.open" class="context-menu__ctx" @click="closeTabGroupMore" @click.right="closeTabGroupMore"></div>
@@ -662,28 +662,56 @@ $action-strip__themes: (
   )
 );
 
-@each $theme, $colors in $action-strip__themes {
-  .action-strip--#{$theme} {
+.action-strip {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  &__button {
+    @extend %slow-transition;
+    transition-property: background-color;
+    flex: 1;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
     align-items: center;
-    background-color: map-get( $colors, --background-color );
+    padding: 0 8px;
+    height: 32px;
+    cursor: pointer;
 
-    &__button {
-      @extend %slow-transition;
-      transition-property: background-color;
-      flex: 1;
-      display: flex;
-      align-items: center;
-      padding: 0 8px;
-      height: 32px;
-      cursor: pointer;
+    &--no-grow {
+      flex: 0;
+    }
+  }
 
-      &--no-grow {
-        flex: 0;
-      }
+  &__button-text {
+    padding-left: 4px;
+  }
 
+  &__button--drag-target &__button-text {
+    color: $white-100;
+  }
+
+  &__button-icon {
+    margin: 4px;
+  }
+
+  &__button--drag-target &__button-icon {
+    fill: $white-100;
+  }
+
+  &__spacer {
+    flex: 1;
+    height: 32px;
+  }
+}
+
+@each $theme, $colors in $action-strip__themes {
+  .action-strip {
+    &--theme-#{$theme} {
+      background-color: map-get( $colors, --background-color );
+    }
+
+    &--theme-#{$theme} &__button {
       &--drag-target {
         background-color: map-get( $colors, __button--drag-target--background-color );
       }
@@ -693,27 +721,15 @@ $action-strip__themes: (
       }
     }
 
-    &__button-text {
-      padding-left: 4px;
+    &--theme-#{$theme} &__button-text {
       color: map-get( $colors, __text--color );
     }
 
-    &__button--drag-target &__button-text {
-      color: $white-100;
-    }
-
-    &__button-icon {
-      margin: 4px;
+    &--theme-#{$theme} &__button-icon {
       fill: map-get( $colors, __text--color );
     }
 
-    &__button--drag-target &__button-icon {
-      fill: $white-100;
-    }
-
-    &__spacer {
-      flex: 1;
-      height: 32px;
+    &--theme-#{$theme} &__spacer {
       background-color: map-get( $colors, __button--background-color );
     }
   }
