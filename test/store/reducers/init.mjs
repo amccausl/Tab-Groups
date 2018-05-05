@@ -13,6 +13,13 @@ function freshInitWithSingleWindow( t ) {
     createBrowserTab({
       id: 2,
       index: 1,
+      windowId: 1,
+      highlighted: true,
+      active: true
+    }),
+    createBrowserTab({
+      id: 3,
+      index: 2,
       windowId: 1
     })
   ]
@@ -25,8 +32,7 @@ function freshInitWithSingleWindow( t ) {
   t.equal( initial_state.windows[ 0 ].tab_groups.length, 2 )
   t.equal( initial_state.windows[ 0 ].tab_groups[ 1 ].id, 1 )
   t.equal( initial_state.windows[ 0 ].tab_groups[ 1 ].title, "Group 1" )
-  t.equal( initial_state.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
-  t.equal( initial_state.windows[ 0 ].tab_groups[ 1 ].tabs_count, initial_state.windows[ 0 ].tab_groups[ 1 ].tabs.length )
+  t.equal( initial_state.windows[ 0 ].tab_groups[ 1 ].tabs.length, 3 )
   t.equal( initial_state.windows.length, 1 )
   t.equal( initial_state.windows[ 0 ].active_tab_group_id, initial_state.windows[ 0 ].tab_groups[ 1 ].id )
   t.end()

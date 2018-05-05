@@ -74,11 +74,14 @@ export default {
         this.search_text = state_window.search_text
         this.search_resolved = state_window.search_resolved
 
-        // Need to deep clone the objects because Vue extends prototypes when state added to the vm
-        let tab_groups = state_window.tab_groups.map( cloneTabGroup )
-
         // Use the extended splice to trigger change detection
-        Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length, ...tab_groups ] )
+        Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length ] )
+
+        // Need to deep clone the objects because Vue extends prototypes when state added to the vm
+        const tab_groups_length = state_window.tab_groups.length
+        for( let i = 1; i < tab_groups_length; i++ ) {
+          this.tab_groups.push( cloneTabGroup( state_window.tab_groups[ i ] ) )
+        }
 
         this.theme = state.config.theme
       } else {

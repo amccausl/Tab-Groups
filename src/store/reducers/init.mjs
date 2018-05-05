@@ -105,7 +105,7 @@ export default function init( state, { browser_tabs, config, contextual_identiti
       }
     } else {
       // No state, assign all tabs to new groups
-      window_tab_groups.push( createTabGroup( new_tab_group_id, ungrouped_tabs ) )
+      window_tab_groups.push( createTabGroup( new_tab_group_id, ungrouped_tabs, active_tab_id ) )
       new_tab_group_id++
     }
 
