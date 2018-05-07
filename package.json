@@ -40,7 +40,6 @@
     "rollup-plugin-replace": "2.0.0",
     "rollup-plugin-vue": "3.0.0",
     "tap": "11.1.4",
-    "typescript": "2.8.3",
     "vue-template-compiler": "2.5.16",
     "web-ext": "2.6.0"
   }
