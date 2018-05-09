@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-// import Action from './components/Action.vue'
+import Action from './components/Action.vue'
 import Onboarding from './components/Onboarding.vue'
 import Options from './components/Options.vue'
 // import TabGroups from './components/TabGroups.vue'
@@ -19,12 +19,12 @@ Promise.all([
   window.current_window_id = current_window.id
   window.store = store
 
-  // if( window.document.getElementById( 'action' ) ) {
-  //   new Vue({
-  //     el: '#action',
-  //     render: ( h ) => h( Action )
-  //   })
-  // }
+  if( window.document.getElementById( 'action' ) ) {
+    new Vue({
+      el: '#action',
+      render: ( h ) => h( Action )
+    })
+  }
 
   if( window.document.getElementById( 'onboarding' ) ) {
     new Vue({
