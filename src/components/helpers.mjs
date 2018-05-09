@@ -77,7 +77,6 @@ export function getFriendlyUrlText( uri_string ) {
   }
 }
 
-
 export function getNewSelectedTabs( old_selected_tab_ids, tab_groups ) {
   if( old_selected_tab_ids.length === 0 ) {
     return []

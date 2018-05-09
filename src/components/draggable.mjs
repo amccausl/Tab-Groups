@@ -1,4 +1,8 @@
 
+import {
+  getNewSelectedTabs,
+} from "./helpers.mjs"
+
 let drag_target = null
 let drag_target_timer
 
@@ -169,7 +173,7 @@ export function onTabDragStart( event, tab ) {
   let drag_image = new Image()
   let tabs
   if( this.isSelected( tab ) ) {
-    tabs = this.getNewSelectedTabs()
+    tabs = getNewSelectedTabs( this.selected_tab_ids, this.tab_groups )
   } else {
     this.selected_tab_ids.splice( 0, this.selected_tab_ids.length, tab.id )
     tabs = [ tab ]
