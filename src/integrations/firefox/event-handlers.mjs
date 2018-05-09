@@ -32,10 +32,20 @@ export function ignorePendingMove( tab_ids ) {
  * Bind change events for the browser to dispatch operations on the store
  * @param store The redux store
  */
-export function bindBrowserEvents( browser, store ) {
+export function bindBrowserEvents( browser, browser_state, store ) {
   // @todo need way to turn off console
   const hide_tab_ids = new Set()
   const show_tab_ids = new Set()
+
+  if( browser_state.features.tabhide.enabled ) {
+    for( const browser_tab of browser_state.browser_tabs ) {
+      if( browser_tab.hidden ) {
+        hide_tab_ids.add( browser_tab.id )
+      } else {
+        show_tab_ids.add( browser_tab.id )
+      }
+    }
+  }
 
   // This would be required for integration with other extensions
   // browser.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {

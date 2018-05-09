@@ -15,7 +15,8 @@ export default function( tap ) {
   let state = getInitialState()
   const browser = getMockBrowser( emitter )
   const store = createStore( App, state )
-  bindBrowserEvents( browser, store )
+  const browser_state = {}
+  bindBrowserEvents( browser, browser_state, store )
 
   // @todo Run browser events
 
