@@ -1,3 +1,14 @@
+### v0.0.4
+
+#### Features
+- add support for multi-account containers
+- search styling updates and performance improvements
+- allow dragging to url bar, native tabs, library, and bookmarks
+
+#### Bugs
+- fix search clear error
+- consistency improvements to state load on browser launch
+
 ### v0.0.3
 
 #### Features
