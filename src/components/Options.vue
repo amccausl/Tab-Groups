@@ -63,10 +63,10 @@
                 <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_pinned_tabs__ }}</span>
               </label> -->
 
-              <label v-if="show_tabs && contexual_identities_enabled" class="checkbox checkbox--nested">
+              <label v-if="show_tabs && features_contexual_identities_enabled" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_tab_context">
                 <span class="checkbox__icon"></span>
-                <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_tab_context__ }}</span>
+                <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_tab_context__ }} <a :href="__MSG_container_tabs_info_url__">{{ __MSG_learn_more__ }}</a></span>
               </label>
 
               <label v-if="show_tabs && preferences.theme === 'dark'" class="checkbox checkbox--nested">
@@ -119,6 +119,12 @@ export default {
     }
   },
   computed: {
+    __MSG_container_tabs_info_url__() {
+      return window.background.getMessage( "container_tabs_info_url" )
+    },
+    __MSG_learn_more__() {
+      return window.background.getMessage( "learn_more" )
+    },
     __MSG_options_section_preferences__() {
       return window.background.getMessage( "options_section_preferences" )
     },

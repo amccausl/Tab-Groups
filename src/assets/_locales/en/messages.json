@@ -19,6 +19,16 @@
     "description": ""
   },
 
+  "learn_more": {
+    "message": "Learn More",
+    "description": ""
+  },
+
+  "container_tabs_info_url": {
+    "message": "https://support.mozilla.org/en-US/kb/containers",
+    "description": ""
+  },
+
   "options_section_preferences": {
     "message": "Preferences",
     "description": ""
@@ -75,7 +85,7 @@
   },
 
   "options_sidebar_show_tab_context": {
-    "message": "Show tab context",
+    "message": "Show Multi-Account Containers",
     "description": ""
   },
 
