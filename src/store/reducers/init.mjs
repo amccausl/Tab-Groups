@@ -27,10 +27,10 @@ export default function init( state, { browser_tabs, config, contextual_identiti
     window_tabs.push( browser_tab )
   })
 
-  const contexts = {}
+  const contextual_identities_data = {}
   if( contextual_identities ) {
     contextual_identities.forEach( contextual_identity => {
-      contexts[ contextual_identity.cookieStoreId ] = {
+      contextual_identities_data[ contextual_identity.cookieStoreId ] = {
         color: contextual_identity.colorCode,
         name: contextual_identity.name,
       }
@@ -120,7 +120,7 @@ export default function init( state, { browser_tabs, config, contextual_identiti
 
   const init_state = {
     config,
-    contexts,
+    contextual_identities_data,
     features,
     windows
   }

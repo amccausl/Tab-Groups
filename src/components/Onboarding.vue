@@ -63,9 +63,9 @@ export default {
       this.show_tab_context = this.show_tabs && state.config.show_tab_context
       this.show_tab_icon_background = this.show_tabs && state.config.show_tab_icon_background
 
-      for( let context_id in state.contexts || {} ) {
+      for( let context_id in state.contextual_identities_data || {} ) {
         this.context_styles[ context_id ] = {
-          "background-color": state.contexts[ context_id ].color
+          "background-color": state.contextual_identities_data[ context_id ].color
         }
       }
     })

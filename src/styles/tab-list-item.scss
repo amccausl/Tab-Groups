@@ -55,6 +55,13 @@ $tab-list-item--theme: (
     border-radius: $border-radius;
   }
 
+  &__context {
+    position: absolute;
+    right: 0;
+    height: 40px;
+    width: 4px;
+  }
+
   @each $theme, $colors in $tab-list-item--theme {
     &--theme-#{$theme} {
       background-color: map-get( $colors, --background-color );

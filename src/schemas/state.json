@@ -89,7 +89,7 @@
         }
       }
     },
-    "contexts": {
+    "contextual_identities_data": {
       "type": "object"
     },
     "features": {
