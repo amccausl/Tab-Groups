@@ -1,7 +1,10 @@
 
 .button {
   border: none;
-  cursor: pointer;
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
 
   &--size {
     &-default {

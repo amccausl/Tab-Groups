@@ -3,7 +3,6 @@ import vue from 'rollup-plugin-vue'
 import buble from 'rollup-plugin-buble'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
-import nodeGlobals from 'rollup-plugin-node-globals'
 import replace from 'rollup-plugin-replace'
 
 let plugins = [
@@ -35,7 +34,6 @@ let plugins = [
     browser: true
   }),
   commonjs(),
-  nodeGlobals()
 ]
 
 let config = {

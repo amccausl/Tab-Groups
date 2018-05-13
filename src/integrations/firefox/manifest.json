@@ -26,12 +26,12 @@
   },
   "browser_action": {
     "browser_style": true,
-    "default_icon": "icons/action-inverted.png",
+    "default_icon": "icons/tabulate.svg",
     "default_title": "__MSG_extension_name__",
     "default_popup": "action.html"
   },
   "sidebar_action": {
-    "default_icon": "icons/tab-groups.svg",
+    "default_icon": "icons/tabulate.svg",
     "default_title": "__MSG_sidebar_name__",
     "default_panel": "sidebar.html"
   },

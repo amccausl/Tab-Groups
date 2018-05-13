@@ -7,10 +7,10 @@
 
       <div class="panel-section panel-section-list panel-section-content">
         <div class="panel-list-item" v-for="tab_group in tab_groups" :key="tab_group.id" :class="{ 'active': tab_group.id === active_tab_group_id }">
-          <div class="text" @click="selectTabGroup( tab_group )">
+          <div class="text" @click="onTabGroupClick( tab_group )">
             {{ tab_group.title }}
           </div>
-          <div @click="viewTabGroupTabs( tab_group )">
+          <div @click="onTabGroupClick( tab_group )">
             <!-- @todo hover effect -->
             {{ getCountMessage( 'tabs', tab_group.tabs_count ) }}
           </div>
@@ -109,8 +109,19 @@ export default {
       openTabGroupsPage()
       window.close()
     },
+    openTab( tab_id ) {
+      console.info('openTab', tab_id)
+      window.background.setTabActive( window.store, this.window_id, tab_id )
+    },
     selectTabGroup( tab_group ) {
       console.info('@todo selectTabGroup')
+      window.close()
+    },
+    onTabGroupClick( tab_group ) {
+      if( tab_group.active_tab_id && tab_group.tabs.length ) {
+        this.openTab( tab_group.active_tab_id || tab_group.tabs[ 0 ].id )
+      }
+      console.info('tab_group', tab_group.active_tab_id)
       window.close()
     },
     viewTabGroupTabs( tab_group ) {
@@ -131,7 +142,7 @@ export default {
 }
 
 .panel-section-search {
-  padding: 5px;
+  padding: 3px 8px 5px 5px;
 }
 
 .panel-section-search > input {

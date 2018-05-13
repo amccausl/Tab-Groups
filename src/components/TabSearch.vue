@@ -1,11 +1,11 @@
 <template>
   <div :class="bem( `tab-search`, { theme } )">
-    <label :class="[ `tab-search__label` ]">
-      <svg :class="[ `tab-search__icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+    <label class="tab-search__label">
+      <svg class="tab-search__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
         <path d="M15.707 14.293l-4.822-4.822a6.019 6.019 0 1 0-1.414 1.414l4.822 4.822a1 1 0 0 0 1.414-1.414zM6 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"></path>
       </svg>
-      <input :class="[ `tab-search__input` ]" type="search" v-model="search_text" @input="onUpdateSearchText" :placeholder="__MSG_tab_search_placeholder__"/>
-      <svg :class="[ `tab-search__clear-icon` ]" @click="clearSearchText()" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+      <input class="tab-search__input" type="search" v-model="search_text" @input="onUpdateSearchText" :placeholder="__MSG_tab_search_placeholder__"/>
+      <svg class="tab-search__clear-icon" @click="clearSearchText()" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
         <path fill-rule="evenodd" d="M6.586 8l-2.293 2.293a1 1 0 0 0 1.414 1.414L8 9.414l2.293 2.293a1 1 0 0 0 1.414-1.414L9.414 8l2.293-2.293a1 1 0 1 0-1.414-1.414L8 6.586 5.707 4.293a1 1 0 0 0-1.414 1.414L6.586 8zM8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0z"></path>
       </svg>
     </label>
@@ -69,6 +69,14 @@ export default {
 
 $dark-awesome-bar-background: #474749;
 
+%tab-search__icon {
+  position: absolute;
+  top: 11px;
+  height: 16px;
+  width: 16px;
+  opacity: 0.4;
+}
+
 $tab-search__theme: (
   light: (
     --background-color: $white-100,
@@ -85,10 +93,7 @@ $tab-search__theme: (
 .tab-search {
   flex: 1;
   padding: 4px 0 4px 4px;
-
-  &__label {
-    position: relative;
-  }
+  position: relative;
 
   &__input {
     @extend %text-body-10;
@@ -108,23 +113,15 @@ $tab-search__theme: (
   }
 
   &__icon {
-    opacity: 0.4;
-    height: 16px;
-    width: 16px;
-    position: absolute;
-    left: 8px;
-    top: 0;
+    @extend %tab-search__icon;
+    left: 11px;
   }
 
   &__clear-icon {
+    @extend %tab-search__icon;
     @extend %slow-transition;
     transition-property: opacity;
-    opacity: 0.4;
-    height: 16px;
-    width: 16px;
-    position: absolute;
     right: 8px;
-    top: 0;
     cursor: pointer;
   }
 
