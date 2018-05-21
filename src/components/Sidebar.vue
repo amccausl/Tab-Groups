@@ -75,7 +75,7 @@
             </div>
           </div>
           <!-- <transition-group v-if="tab_group.open && show_tabs && ! isTabGroupDragSource( tab_group )" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]" tag="div" :name="`sidebar-tab-group-tabs-list--${ theme }__item--transition`"> -->
-          <div v-if="tab_group.open && show_tabs && tab_group.tabs.length" :class="bem( 'list-flex-col', { theme, 'is-dragging': is_dragging, 'is-searching': is_searching } )">
+          <div v-if="tab_group.open && show_tabs && tab_group.tabs.length" :class="[ bem( 'list-flex-col', { theme, 'is-dragging': is_dragging, 'is-searching': is_searching, 'is-max-height': true } ) ]">
             <div :class="bem( `list-flex-col__item`, { 'active': tab.active, 'drag-target-index': drag_state.target.tab_id === tab.id && ! isSelected( tab ), 'drag-selected': isSelected( tab ), 'drag-source': is_dragging && isSelected( tab ), 'search': getTabSearchState( tab ) } )"
                 v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
                 :title="tab.title"

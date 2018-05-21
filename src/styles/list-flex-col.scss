@@ -14,6 +14,11 @@ $__item-ink--hover--color: $grey-50;
   align-items: stretch;
   position: relative;
 
+  &--is-max-height {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
   &__item {
     position: relative;
     flex: 0;
