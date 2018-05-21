@@ -110,7 +110,7 @@
                 <div v-if="show_tab_context && tab.context_id" class="tab-list-item__context" :style="context_styles[ tab.context_id ]"></div>
               </div>
               <div v-else-if="tab_size === 'sm'" :class="bem( 'tab-list-item', { theme, size: 'sm', active: tab.active } )">
-                <div :class="bem( 'tab-list-item__icon', { 'show-background': show_tab_icon_background && tab.status !== 'loading' } )">
+                <div :class="bem( 'tab-list-item__icon', { 'show-background': show_tab_icon_background, 'loading': tab.status === 'loading' } )">
                   <tab-icon :theme="theme" :tab="tab" size="16"></tab-icon>
                 </div>
                 <div class="tab-list-item__text">
@@ -1284,12 +1284,6 @@ $sidebar-tab-group-tabs-list__themes: (
   height: 32px;
   margin: 0 4px;
 
-  > .sidebar-tab-view-item-icon-background {
-    position: absolute;
-    padding: 16px;
-    border-radius: 16px;
-  }
-
   > .tab-icon {
     position: absolute;
     width: 24px;
@@ -1336,10 +1330,6 @@ $sidebar-tab-group-tabs-list__themes: (
 }
 
 .dark {
-  .sidebar-tab-view-item-icon > .sidebar-tab-view-item-icon-background {
-    background-color: $grey-50;
-  }
-
   .sidebar-tab-view-item-title {
     color: $white-100;
   }

@@ -40,8 +40,11 @@ $tab-list-item--theme: (
   }
 
   &--theme-dark &__icon--show-background {
-    background-color: map-get( map-get( $tab-list-item--theme, dark ), __close-button--hover--background-color );
     margin-right: 2px;
+  }
+
+  &--theme-dark &__icon--show-background:not(#{&}__icon--loading) {
+    background-color: map-get( map-get( $tab-list-item--theme, dark ), __close-button--hover--background-color );
   }
 
   &__icon_img {
