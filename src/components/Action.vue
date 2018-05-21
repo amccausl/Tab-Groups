@@ -1,8 +1,8 @@
 <template>
-  <body class="action" :class="theme">
+  <body :class="bem( 'action-panel', { theme } )">
     <div class="panel">
       <div class="panel-section panel-section-search">
-        <tab-search :theme="'light'"></tab-search>
+        <tab-search :theme="theme"></tab-search>
       </div>
 
       <div class="panel-section panel-section-list panel-section-content">
@@ -19,14 +19,14 @@
 
       <div class="panel-section panel-section-footer">
         <div class="panel-section-footer-button" @click="openTabGroupsPage()">
-          <!-- @todo hi-res, context colours -->
-          <img class="icon" src="/icons/action.png"/>
+          <img class="icon" src="/icons/tabulate.svg"/>
           <span class="text" v-once>{{ __MSG_tab_group_manage__ }}</span>
         </div>
         <div class="panel-section-footer-separator"></div>
         <div class="panel-section-footer-button panel-section-footer-button-options" @click="openOptionsPage()">
-          <!-- @todo hi-res, context colours -->
-          <img class="icon" src="/icons/options.png"/>
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M15 7h-2.1a4.967 4.967 0 0 0-.732-1.753l1.49-1.49a1 1 0 0 0-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 9 3.1V1a1 1 0 0 0-2 0v2.1a4.968 4.968 0 0 0-1.753.732l-1.49-1.49a1 1 0 0 0-1.414 1.415l1.49 1.49A4.967 4.967 0 0 0 3.1 7H1a1 1 0 0 0 0 2h2.1a4.968 4.968 0 0 0 .737 1.763c-.014.013-.032.017-.045.03l-1.45 1.45a1 1 0 1 0 1.414 1.414l1.45-1.45c.013-.013.018-.031.03-.045A4.968 4.968 0 0 0 7 12.9V15a1 1 0 0 0 2 0v-2.1a4.968 4.968 0 0 0 1.753-.732l1.49 1.49a1 1 0 0 0 1.414-1.414l-1.49-1.49A4.967 4.967 0 0 0 12.9 9H15a1 1 0 0 0 0-2zM5 8a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
+          </svg>
         </div>
       </div>
     </div>
@@ -96,6 +96,7 @@ export default {
     },
   },
   methods: {
+    bem,
     getCountMessage,
     onUpdateSearchText: debounce( function( search_text ) {
       console.info('runSearch', search_text)
@@ -131,56 +132,101 @@ export default {
 }
 </script>
 
-<style scoped>
-/* @todo which of these styles are required? */
+<style lang="scss" scoped>
+@import "../styles/photon-colors";
+
 .panel {
   overflow-x: hidden;
   width: 350px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+
+  &-section-search {
+    padding: 3px 8px 5px 5px;
+  }
+
+  &-section-content {
+    min-height: 100px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  &-list-item {
+    min-height: 24px;
+    max-height: 32px;
+  }
+
+  &-section-footer-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  &-section-footer-button-options {
+    flex: 0;
+  }
 }
 
-.panel-section-search {
-  padding: 3px 8px 5px 5px;
-}
-
-.panel-section-search > input {
-  width: 100%;
-}
-
-.panel-section-content {
-  min-height: 100px;
-  max-height: 200px;
-  overflow: -moz-scrollbars-none;
-}
-
-.panel-list-item {
-  min-height: 24px;
-  max-height: 32px;
-}
-
-.light .panel-list-item.active {
-  background-color: rgba(0, 0, 0, 0.06);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.panel-section-footer-button {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.panel-section-footer-button-options {
-  flex: 0;
-}
-
-/* @todo should be moved to common css */
 .icon {
   height: 16px;
   width: 16px;
   margin-right: 4px;
+}
+
+$action__theme: (
+  dark: (
+    --background-color: $grey-60,
+    --primary-color: $grey-10,
+    --secondary-color: #76767a,
+    __ink--color: #76767a,
+    __list-item--hover--background-color: white,
+  ),
+  light: (
+    --background-color: #ffffff,
+    --primary-color: $grey-90,
+    --secondary-color: $grey-50,
+    __ink--color: #76767a,
+    __list-item--hover--background-color: black,
+  ),
+);
+
+@each $theme, $colors in $action__theme {
+  .action-panel--theme-#{$theme} {
+    background-color: map-get( $colors, --background-color );
+
+    .panel {
+      color: map-get( $colors, --primary-color );
+    }
+
+    .panel-section-footer-separator {
+      background-color: map-get( $colors, __ink--color );
+    }
+
+    .panel-section-footer {
+      border-top: 1px solid rgba( map-get( $colors, __ink--color ), 0.1 );
+      border-color: rgba( map-get( $colors, __ink--color ), 0.1 );
+    }
+
+    .panel-section-footer-button {
+      color: map-get( $colors, --primary-color );
+      fill: map-get( $colors, --primary-color );
+    }
+
+    .panel-list-item:not(.disabled):hover {
+      background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
+      border-bottom: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+      border-top: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+    }
+
+    .panel-list-item:not(.disabled):hover:active {
+      background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+    }
+
+    .panel-section-footer-button:hover {
+      background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
+    }
+  }
 }
 </style>
