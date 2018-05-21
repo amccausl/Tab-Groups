@@ -81,13 +81,11 @@ $tab-search__theme: (
   light: (
     --background-color: $white-100,
     --color: $grey-90,
-    --border-color: #ccc,
   ),
   dark: (
     --background-color: $dark-awesome-bar-background,
     --color: $white-100,
-    --border-color: $dark-awesome-bar-background,
-  )
+  ),
 );
 
 .tab-search {
@@ -136,10 +134,15 @@ $tab-search__theme: (
     &--theme-#{$theme} &__input {
       background-color: map-get( $colors, --background-color );
       color: map-get( $colors, --color );
+      border: 1px solid rgba( map-get( $colors, --color ), 0.3 );
 
       &::-moz-placeholder {
-        color: map-get( $colors, -icon--color );
+        color: map-get( $colors, --color );
       }
+    }
+
+    &--theme-#{$theme} &__label:hover &__input {
+      border-color: rgba( map-get( $colors, --color ), 0.5 );
     }
 
     &--theme-#{$theme} &__icon {
