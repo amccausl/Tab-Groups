@@ -264,6 +264,7 @@ export default {
     }
   },
   created() {
+    let state0_window;
     onStateChange( state => {
       this.theme = ( state.config.theme === 'dark' ? 'dark' : 'light' )
       this.show_header = state.config.show_header
@@ -280,68 +281,81 @@ export default {
       }
 
       const state_window = getWindow( state, this.window_id )
-      if( state_window ) {
-        // @todo if active_tab_group_id has changed, open the new active group
-        this.active_tab_group_id = state_window.active_tab_group_id
 
-        if( state_window.search != null ) {
-          this.is_searching = true
-          // @todo only update if this doesn't have focus
-          this.search_resolved = state_window.search.resolved
-          Object.getPrototypeOf( this.search_matched_tab_ids ).splice.apply( this.search_matched_tab_ids, [ 0, this.search_matched_tab_ids.length, ...state_window.search.matched_tab_ids ] )
+      if( ! state_window ) {
+        // @todo error
+        return
+      }
+
+      if( state_window === state0_window ) {
+        return
+      }
+
+      // @todo if active_tab_group_id has changed, open the new active group
+      this.active_tab_group_id = state_window.active_tab_group_id
+
+      if( state_window.search != null ) {
+        this.is_searching = true
+        // @todo only update if this doesn't have focus
+        this.search_resolved = state_window.search.resolved
+        Object.getPrototypeOf( this.search_matched_tab_ids ).splice.apply( this.search_matched_tab_ids, [ 0, this.search_matched_tab_ids.length, ...state_window.search.matched_tab_ids ] )
+      } else {
+        this.is_searching = false
+      }
+
+      // @todo translate from search
+      // @todo add matched tabs to selected
+      // @todo bind styles
+      // @todo optimize translation
+
+      // @todo this could be done more efficiently
+      const new_selected_tab_ids = getNewSelectedTabIds( this.selected_tab_ids, state_window )
+      const search_missed_tab_ids = []
+
+      // Need to deep clone the objects because Vue extends prototypes when state added to the vm
+      let tab_groups = state_window.tab_groups.map( cloneTabGroup )
+      // Use the extended splice to trigger change detection
+      tab_groups.forEach( tab_group => {
+        // Copy the `open` flag from original data
+        const orig_tab_group = this.tab_groups.find( _tab_group => _tab_group.id === tab_group.id )
+        if( orig_tab_group ) {
+          tab_group.open = orig_tab_group.open
         } else {
-          this.is_searching = false
+          tab_group.open = ( tab_group.id === state_window.active_tab_group_id )
         }
 
-        // @todo this could be done more efficiently
-        const new_selected_tab_ids = getNewSelectedTabIds( this.selected_tab_ids, state_window )
-        const search_missed_tab_ids = []
-
-        // Need to deep clone the objects because Vue extends prototypes when state added to the vm
-        let tab_groups = state_window.tab_groups.map( cloneTabGroup )
-        // Use the extended splice to trigger change detection
-        tab_groups.forEach( tab_group => {
-          // Copy the `open` flag from original data
-          const orig_tab_group = this.tab_groups.find( _tab_group => _tab_group.id === tab_group.id )
-          if( orig_tab_group ) {
-            tab_group.open = orig_tab_group.open
-          } else {
-            tab_group.open = ( tab_group.id === state_window.active_tab_group_id )
-          }
-
-          let is_group_audible = false
+        let is_group_audible = false
+        if( this.is_searching ) {
+          tab_group.search_matched_tabs_count = 0
+        }
+        tab_group.tabs.forEach( tab => {
           if( this.is_searching ) {
-            tab_group.search_matched_tabs_count = 0
+            if( this.search_matched_tab_ids.includes( tab.id ) ) {
+              tab_group.search_matched_tabs_count++
+            }
+            if( ! state_window.search.queued_tab_ids.includes( tab.id ) ) {
+              search_missed_tab_ids.push( tab.id )
+            }
           }
-          tab_group.tabs.forEach( tab => {
-            if( this.is_searching ) {
-              if( this.search_matched_tab_ids.includes( tab.id ) ) {
-                tab_group.search_matched_tabs_count++
-              }
-              if( ! state_window.search.queued_tab_ids.includes( tab.id ) ) {
-                search_missed_tab_ids.push( tab.id )
-              }
-            }
-            if( tab.id === state_window.active_tab_id ) {
-              tab.active = true
-            }
-            if( tab.audible && ! tab.muted ) {
-              is_group_audible = true
-            }
-          })
-
-          if( is_group_audible ) {
-            tab_group.audible = true
+          if( tab.id === state_window.active_tab_id ) {
+            tab.active = true
+          }
+          if( tab.audible && ! tab.muted ) {
+            is_group_audible = true
           }
         })
-        // Use the extended splice to trigger change detection
-        Object.getPrototypeOf( this.search_missed_tab_ids ).splice.apply( this.search_missed_tab_ids, [ 0, this.search_missed_tab_ids.length, ...search_missed_tab_ids ] )
-        Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...new_selected_tab_ids ] )
-        Object.getPrototypeOf( this.pinned_tabs ).splice.apply( this.pinned_tabs, [ 0, this.pinned_tabs.length, ...tab_groups[ 0 ].tabs ] )
-        Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length, ...tab_groups.slice( 1 ) ] )
-      } else {
-        // @todo error
-      }
+
+        if( is_group_audible ) {
+          tab_group.audible = true
+        }
+      })
+      // Use the extended splice to trigger change detection
+      Object.getPrototypeOf( this.search_missed_tab_ids ).splice.apply( this.search_missed_tab_ids, [ 0, this.search_missed_tab_ids.length, ...search_missed_tab_ids ] )
+      Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...new_selected_tab_ids ] )
+      // Object.getPrototypeOf( this.pinned_tabs ).splice.apply( this.pinned_tabs, [ 0, this.pinned_tabs.length, ...tab_groups[ 0 ].tabs ] )
+      Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length, ...tab_groups.slice( 1 ) ] )
+
+      state0_window = state_window
     })
   },
   computed: {
@@ -516,7 +530,7 @@ $light-border-color: #e0e0e1;
 $--theme-light: (
   __primary-text--color: $grey-90,
   __secondary-text--color: $grey-50,
-  --border-color: #e0e0e1,
+  --border-color: $light-border-color,
   --drag-target--background-color: $purple-50,
   --drag-target--color: $white-100,
   --drag-target--ink-color: $purple-50,
@@ -525,7 +539,7 @@ $--theme-light: (
 $--theme-dark: (
   __primary-text--color: $white-100,
   __secondary-text--color: $grey-10,
-  --border-color: #e0e0e1,
+  --border-color: $light-border-color,
   --drag-target--background-color: $purple-50,
   --drag-target--color: $white-100,
   --drag-target--ink-color: $purple-50,
@@ -856,44 +870,34 @@ $sidebar-tab_groups-list__themes: (
       transition-property: padding-top, padding-bottom, transform;
       flex: 0;
 
-      &--transition-enter {
-        // max-height: 0;
-        transform: translate3d(0,-100%,0);
-        opacity: 0;
-        z-index: -1000;
-      }
+      /*
+      &--transition {
+        &-enter {
+          // max-height: 0;
+          transform: translate3d(0,-100%,0);
+          opacity: 0;
+          z-index: -1000;
+        }
 
-      &--transition-enter-to {
-        transform: none;
-        opacity: 1;
-        z-index: 0;
-      }
+        &-enter-to {
+          transform: none;
+          opacity: 1;
+          z-index: 0;
+        }
 
-      &--transition-leave {
-        opacity: 1;
-      }
+        &-leave {
+          opacity: 1;
+        }
 
-      &--transition-leave-to {
-        max-height: 0;
-        opacity: 0;
+        &-leave-to {
+          max-height: 0;
+          opacity: 0;
+        }
       }
-
-      // &--drag-tab_group-target {
-      //   padding-top: 32px;
-      // }
-
-      &--drag-tab-target {
-        // padding-bottom: 54px;
-      }
+      */
 
       &--drag-source {
         opacity: $--drag-source--opacity;
-        // transform: translate3d(0,-100%,0);
-
-        // Adjusting the height on the last child with transition, causes the sidebar to scroll
-        // &:not(:last-child) {
-        //   max-height: 0;
-        // }
       }
     }
 
