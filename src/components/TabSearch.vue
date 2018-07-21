@@ -40,7 +40,7 @@ export default {
   created() {
     onStateChange( state => {
       const state_window = getWindow( state, this.window_id )
-      if( state_window.search != null ) {
+      if( state_window && state_window.search != null ) {
         this.search_text = state_window.search.text
         this.search_resolved = state_window.search.resolved
       } else {
