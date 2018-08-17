@@ -15,7 +15,8 @@ $__item-ink--hover--color: $grey-50;
   position: relative;
 
   &--is-max-height {
-    max-height: 60vh;
+    // @todo this may change if header is disabled
+    max-height: calc(100vh - 170px);
     overflow-y: auto;
   }
 
