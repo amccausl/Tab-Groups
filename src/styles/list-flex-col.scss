@@ -6,6 +6,7 @@ $__item--drag-source--opacity: 0.3;
 $__item-ink--drag-selected--color: $purple-50;
 $__item-ink--active--color: $blue-50;
 $__item-ink--hover--color: $grey-50;
+$__item-ink--width: 4px;
 
 .list-flex-col {
   display: flex;
@@ -25,33 +26,33 @@ $__item-ink--hover--color: $grey-50;
     flex: 0;
 
     &::before {
-      @extend %fast-transition;
-      transition-property: height;
+      @extend %slow-transition;
+      transition-property: width;
       content: "";
       position: absolute;
-      width: 4px;
+      width: 0;
       left: 1px;
-      height: 0;
+      height: calc(100% - 1px);
       z-index: 1;
     }
 
     &:hover:not(#{&}--active):not(#{&}--drag-selected):not(#{&}--drag-selected) {
       &::before {
-        height: calc(100% - 1px);
+        width: $__item-ink--width;
         background-color: $__item-ink--hover--color;
       }
     }
 
     &--active {
       &::before {
-        height: calc(100% - 1px);
+        width: $__item-ink--width;
         background-color: $__item-ink--active--color;
       }
     }
 
     &--drag-selected {
       &::before {
-        height: calc(100% - 1px);
+        width: $__item-ink--width;
         background-color: $__item-ink--drag-selected--color;
       }
     }
