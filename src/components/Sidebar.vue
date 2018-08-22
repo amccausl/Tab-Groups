@@ -79,7 +79,7 @@
             <div :class="bem( `list-flex-col__item`, { 'active': tab.active, 'drag-target-index': drag_state.target.tab_id === tab.id && ! isSelected( tab ), 'drag-selected': isSelected( tab ), 'drag-source': is_dragging && isSelected( tab ), 'search': getTabSearchState( tab ) } )"
                 v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
                 :title="tab.title"
-                @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab.id )" @click.middle="closeTab( tab )"
+                @click.ctrl="toggleTabSelection( tab )" @click.shift="toggleTabBatchSelection( tab )" @click.middle="closeTab( tab )" @click.exact="openTab( tab.id )"
                 @dragenter="onTabDragEnter( $event, tab_group, tab )"
                 @dragover.prevent
                 @dragleave="onTabDragLeave( $event, tab_group, tab )"
@@ -203,7 +203,7 @@ import {
   onTabGroupDragEnter,
   onTabGroupDragLeave,
   onTabGroupDrop,
-} from './draggable.mjs'
+} from './tab-draggable.mjs'
 import {
   bem,
   debounce,
@@ -216,6 +216,10 @@ import {
 import {
   INK_90,
 } from './photon-colors'
+import {
+  toggleTabSelection,
+  toggleTabBatchSelection,
+} from './tab-selectable.mjs'
 
 import Editable from './Editable.vue'
 import TabIcon from './TabIcon.vue'
@@ -493,15 +497,15 @@ export default {
       window.background.openOptionsPage()
     },
     toggleTabSelection( tab ) {
-      console.info('toggleTabSelection', tab)
-      const tab_index = this.selected_tab_ids.indexOf( tab.id )
-      if( tab_index > -1 ) {
-        this.selected_tab_ids.splice( tab_index, 1 )
-      } else {
-        this.selected_tab_ids.push( tab.id )
-      }
+      console.info('toggleTabSelection', tab.id)
+      toggleTabSelection.call( this, tab.id )
       console.info('selected_tab_ids', this.selected_tab_ids)
-    }
+    },
+    toggleTabBatchSelection( tab ) {
+      console.info('toggleTabBatchSelection', tab)
+      toggleTabBatchSelection.call( this, tab.id )
+      console.info('selected_tab_ids', this.selected_tab_ids)
+    },
   }
 }
 </script>

@@ -189,7 +189,7 @@ export function onTabDragStart( event, tab ) {
   }
 }
 
-export function onTabDragEnd( event ) {
+export function onTabDragEnd() {
   resetDragState.call( this )
 }
 
@@ -209,7 +209,7 @@ export function onTabDragEnter( event, tab_group, tab ) {
   }
 }
 
-export function onTabDragLeave( event, tab_group, tab ) {
+export function onTabDragLeave( event ) {
   // Leave is fired after the new enter, so detect if this is still the active group
   if( drag_target === event.target ) {
     this.drag_state.target = {}
@@ -241,7 +241,7 @@ export function onTabGroupDragStart( event, tab_group ) {
   setTabGroupTransferData( event.dataTransfer, this.window_id, tab_group )
 }
 
-export function onTabGroupDragEnd( event, tab_group ) {
+export function onTabGroupDragEnd() {
   resetDragState.call( this )
 }
 
@@ -275,7 +275,7 @@ export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
   }
 }
 
-export function onTabGroupDragLeave( event, tab_group, tab_group_index ) {
+export function onTabGroupDragLeave( event ) {
   // Leave is fired after the new enter, so detect if this is still the active group
   if( drag_target === event.target ) {
     clearTimeout( drag_target_timer )

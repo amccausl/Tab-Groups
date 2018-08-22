@@ -3,7 +3,7 @@ import {
   getTransferData,
   onTabDragStart,
   onTabDragEnter,
-} from '../../src/components/draggable.mjs'
+} from '../../src/components/tab-draggable.mjs'
 import {
   createTabGroup,
 } from '../../src/store/helpers.mjs'
