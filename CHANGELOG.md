@@ -1,3 +1,11 @@
+### v0.0.5
+
+#### Features
+- add browser action with group list
+- add icon
+- shift-click for multiple select drag
+- minor UI improvements
+
 ### v0.0.4
 
 #### Features
