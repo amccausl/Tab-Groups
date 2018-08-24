@@ -10,7 +10,7 @@ let plugins = [
     vue$: 'vue/dist/vue.common.js'
   }),
   vue({
-    css: './dist/assets/css/app.css'
+    css: './dist/css/app.css'
   }),
   buble({
     objectAssign: 'Object.assign',
@@ -39,7 +39,7 @@ let plugins = [
 let config = {
   input: './src/main.mjs',
   output: {
-    file: './dist/assets/js/app.js',
+    file: './dist/js/app.js',
     format: 'umd',
     sourcemap: true
   },

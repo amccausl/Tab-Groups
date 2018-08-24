@@ -5,12 +5,25 @@
  */
 
 export function toggleTabSelection( tab_id ) {
-  const tab_index = this.selected_tab_ids.indexOf( tab_id )
-  if( tab_index > -1 ) {
-    this.selected_tab_ids.splice( tab_index, 1 )
-  } else {
-    this.selected_tab_ids.push( tab_id )
+  let selected_tab_index = 0
+  for( const tab_group of this.tab_groups ) {
+    for( const tab of tab_group.tabs ) {
+      if( tab.id === tab_id ) {
+        if( this.selected_tab_ids[ selected_tab_index ] === tab_id ) {
+          this.selected_tab_ids.splice( selected_tab_index, 1 )
+        } else {
+          this.selected_tab_ids.splice( selected_tab_index, 0, tab_id )
+        }
+        // No further action needed
+        return
+      }
+      if( tab.id === this.selected_tab_ids[ selected_tab_index ] ) {
+        selected_tab_index++
+      }
+    }
   }
+
+  // @todo error
 }
 
 export function toggleTabBatchSelection( tab_id ) {
