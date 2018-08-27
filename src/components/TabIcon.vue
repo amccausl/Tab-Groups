@@ -1,6 +1,6 @@
 <template>
   <div :class="bem( 'tab-icon', { 'is-loading': tab.status === 'loading' } )">
-    <img class="tab-icon__img" :src="icon_url" :style="{ height: `${ size }px`, width: `${ size }px` }" @error="onIconLoadError"/>
+    <img v-if="error_url !== icon_url" class="tab-icon__img" :src="icon_url" :style="{ height: `${ size }px`, width: `${ size }px` }" @error="onIconLoadError"/>
     <svg v-if="tab.muted" class="tab-icon__state audio-mute-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
         @click.prevent="unmuteTab( $event, tab.id )"
     >
@@ -47,6 +47,7 @@ export default {
   props: [ "theme", "tab", "size" ],
   data() {
     return {
+      error_url: null,
       window_id: window.current_window_id,
     }
   },
@@ -68,6 +69,7 @@ export default {
             return `/favicons/firefox-logo-glyph.svg`
           }
       }
+
       // Add mapping for icons blocked by tracking protection
       // Twitter
       if( this.tab.url.startsWith( "https://twitter.com" ) ) {
@@ -110,6 +112,7 @@ export default {
     },
     onIconLoadError( event ) {
       console.info('onIconLoadError', event, this.tab.id, this.tab.icon_url)
+      this.error_url = this.tab.icon_url
     }
   }
 }
