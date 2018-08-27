@@ -186,6 +186,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
     // @todo
   })
 
+  let last_change = null
   function onTabUpdated( store, tab_id, change_info, browser_tab ) {
     const state = store.getState()
     // If change_info.audible && tab_group.muted, mute tab
@@ -216,8 +217,14 @@ export function bindBrowserEvents( browser, browser_state, store ) {
     if( change_info.hasOwnProperty( 'sharingState' ) ) {
       return
     }
+    const change_info_json = JSON.stringify( change_info )
+    if( last_change && last_change.tab_id === tab_id && last_change.change_info_json === change_info_json ) {
+      console.info(`onTabUpdated skipping duplicate change`)
+      return
+    }
+    last_change = { tab_id, change_info_json }
     if( change_info.hasOwnProperty( 'hidden' ) ) {
-      console.info(`onTabUpdated( tab_id=${ tab_id }, change_info=${ JSON.stringify( change_info ) } )`, browser_tab)
+      console.info(`onTabUpdated( tab_id=${ tab_id }, change_info=${ change_info_json } )`, browser_tab)
       if( change_info.hidden ) {
         hide_tab_ids.add( tab_id )
         show_tab_ids.delete( tab_id )
@@ -230,7 +237,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       }
       return
     }
-    console.info(`onTabUpdated( tab_id=${ tab_id }, change_info=${ JSON.stringify( change_info ) } )`, browser_tab)
+    console.info(`onTabUpdated( tab_id=${ tab_id }, change_info=${ change_info_json } )`, browser_tab)
     store.dispatch( updateTabAction( browser_tab, change_info ) )
   }
 

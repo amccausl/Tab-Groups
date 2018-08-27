@@ -62,16 +62,32 @@ export default {
     icon_url() {
       switch( this.tab.icon_url ) {
         case "chrome://mozapps/skin/extensions/extensionGeneric-16.svg":
-          return "/icons/extensionGeneric.svg"
+          return "/favicons/extensionGeneric.svg"
         case "chrome://branding/content/icon32.png":
           if( this.theme === "dark" ) {
-            return `/icons/firefox-logo-glyph.svg`
+            return `/favicons/firefox-logo-glyph.svg`
           }
       }
+      // Add mapping for icons blocked by tracking protection
+      // Twitter
+      if( this.tab.url.startsWith( "https://twitter.com" ) ) {
+        return `/favicons/twitter.svg`
+      }
+      // Google
+      if( this.tab.url.startsWith( "https://mail.google.com" ) ) {
+        return `/favicons/google/mail.ico`
+      }
+      if( this.tab.url.startsWith( "https://docs.google.com/document" ) ) {
+        return `/favicons/google/document.ico`
+      }
+      if( this.tab.url.startsWith( "https://docs.google.com/presentation" ) ) {
+        return `/favicons/google/presentation.ico`
+      }
+
       if( this.tab.url.startsWith( "about:" ) ) {
         if( this.tab.url === 'about:debugging' || this.tab.url === 'about:config' || this.tab.url === 'about:newtab' ) {
           if( this.theme === "dark" ) {
-            return `/icons/firefox-logo-glyph.svg`
+            return `/favicons/firefox-logo-glyph.svg`
           }
         }
       }
