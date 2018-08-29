@@ -1,3 +1,14 @@
+### v0.0.6
+
+#### Features
+- improve search interactions
+- add handling for favicons blocked by tracking protection
+- styling improvements to browser action
+- sidebar closed on launch
+
+#### Bugs
+- fix selection bug for drag & drop
+
 ### v0.0.5
 
 #### Features

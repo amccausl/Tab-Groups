@@ -1,6 +1,6 @@
 {
   "name": "tabulate",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A web-extensions port for Tab Groups",
   "scripts": {
     "build": "./build.sh",
