@@ -30,6 +30,7 @@ export default {
       search_text: '',
       search_resolved: true,
       window_id: window.current_window_id,
+      search_history: []
     }
   },
   computed: {
@@ -41,7 +42,12 @@ export default {
     onStateChange( state => {
       const state_window = getWindow( state, this.window_id )
       if( state_window && state_window.search != null ) {
-        this.search_text = state_window.search.text
+        const index = this.search_history.indexOf( state_window.search.text )
+        if( index > -1 ) {
+          this.search_history.splice( index, 1 )
+        } else {
+          this.search_text = state_window.search.text
+        }
         this.search_resolved = state_window.search.resolved
       } else {
         this.search_text = ""
@@ -53,6 +59,7 @@ export default {
     bem,
     onUpdateSearchText: debounce( function() {
       console.info('runSearch', this.search_text)
+      this.search_history.push( this.search_text )
       window.background.runTabSearch( window.store, this.window_id, this.search_text )
     }, 250 ),
     clearSearchText() {
