@@ -6,13 +6,12 @@
       </div>
 
       <div class="panel-section panel-section-list panel-section-content">
-        <div class="panel-list-item" v-for="tab_group in tab_groups" :key="tab_group.id" :class="{ 'active': tab_group.id === active_tab_group_id }">
+        <div :class="[ bem( 'panel-list-item', { 'active': tab_group.id === active_tab_group_id } ) ]" v-for="tab_group in tab_groups" :key="tab_group.id">
           <div class="text" @click="onTabGroupClick( tab_group )">
             {{ tab_group.title }}
           </div>
           <div @click="onTabGroupClick( tab_group )">
-            <!-- @todo hover effect -->
-            {{ getCountMessage( 'tabs', tab_group.tabs_count ) }}
+            {{ is_searching ? getCountMessage( 'matched_tabs', tab_group.search_matched_tabs_count ) : getCountMessage( 'tabs', tab_group.tabs_count ) }}
           </div>
         </div>
       </div>
@@ -45,6 +44,7 @@ import {
   bem,
   debounce,
   getCountMessage,
+  getNewSelectedTabIds,
   onStateChange,
 } from './helpers.mjs'
 
@@ -59,35 +59,104 @@ export default {
     return {
       window_id: window.current_window_id,
       active_tab_group_id: null,
-      search_text: '',
+      is_searching: false,
+      is_tab_group_open: {},
+      rename_tab_group_id: null,
       search_resolved: true,
-      tab_groups: [
-      ],
+      search_matched_tab_ids: [],
+      search_missed_tab_ids: [],
+      selected_tab_ids: [],
+      show_tabs: true,
+      show_tabs_count: true,
+      tab_size: "sm",
+      pinned_tabs: [],
+      tab_groups: [],
       theme: null
     }
   },
   created() {
+    let state0_window;
     onStateChange( state => {
+      this.theme = ( state.config.theme === 'dark' ? 'dark' : 'light' )
+      this.show_tabs_count = state.config.show_tabs_count
+      this.show_tabs = state.config.show_tabs
+
       const state_window = getWindow( state, this.window_id )
-      if( state_window ) {
-        this.active_tab_group_id = state_window.active_tab_group_id
 
-        this.search_text = state_window.search_text
-        this.search_resolved = state_window.search_resolved
+      if( ! state_window ) {
+        // @todo error
+        return
+      }
 
-        // Use the extended splice to trigger change detection
-        Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length ] )
+      if( state_window === state0_window ) {
+        return
+      }
 
-        // Need to deep clone the objects because Vue extends prototypes when state added to the vm
-        const tab_groups_length = state_window.tab_groups.length
-        for( let i = 1; i < tab_groups_length; i++ ) {
-          this.tab_groups.push( cloneTabGroup( state_window.tab_groups[ i ] ) )
+      // @todo if active_tab_group_id has changed, open the new active group
+      this.active_tab_group_id = state_window.active_tab_group_id
+
+      if( state_window.search != null ) {
+        this.is_searching = true
+        // @todo only update if this doesn't have focus
+        this.search_resolved = state_window.search.resolved
+        Object.getPrototypeOf( this.search_matched_tab_ids ).splice.apply( this.search_matched_tab_ids, [ 0, this.search_matched_tab_ids.length, ...state_window.search.matched_tab_ids ] )
+      } else {
+        this.is_searching = false
+      }
+
+      // @todo translate from search
+      // @todo add matched tabs to selected
+      // @todo bind styles
+      // @todo optimize translation
+
+      // @todo this could be done more efficiently
+      const new_selected_tab_ids = getNewSelectedTabIds( this.selected_tab_ids, state_window )
+      const search_missed_tab_ids = []
+
+      // Need to deep clone the objects because Vue extends prototypes when state added to the vm
+      let tab_groups = state_window.tab_groups.map( cloneTabGroup )
+      // Use the extended splice to trigger change detection
+      tab_groups.forEach( tab_group => {
+        // Copy the `open` flag from original data
+        const orig_tab_group = this.tab_groups.find( _tab_group => _tab_group.id === tab_group.id )
+        if( orig_tab_group ) {
+          tab_group.open = orig_tab_group.open
+        } else {
+          tab_group.open = ( tab_group.id === state_window.active_tab_group_id )
         }
 
-        this.theme = state.config.theme
-      } else {
-        // @todo error
-      }
+        let is_group_audible = false
+        if( this.is_searching ) {
+          tab_group.search_matched_tabs_count = 0
+        }
+        tab_group.tabs.forEach( tab => {
+          if( this.is_searching ) {
+            if( this.search_matched_tab_ids.includes( tab.id ) ) {
+              tab_group.search_matched_tabs_count++
+            }
+            if( ! state_window.search.queued_tab_ids.includes( tab.id ) ) {
+              search_missed_tab_ids.push( tab.id )
+            }
+          }
+          if( tab.id === state_window.active_tab_id ) {
+            tab.active = true
+          }
+          if( tab.audible && ! tab.muted ) {
+            is_group_audible = true
+          }
+        })
+
+        if( is_group_audible ) {
+          tab_group.audible = true
+        }
+      })
+      // Use the extended splice to trigger change detection
+      Object.getPrototypeOf( this.search_missed_tab_ids ).splice.apply( this.search_missed_tab_ids, [ 0, this.search_missed_tab_ids.length, ...search_missed_tab_ids ] )
+      Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...new_selected_tab_ids ] )
+      // Object.getPrototypeOf( this.pinned_tabs ).splice.apply( this.pinned_tabs, [ 0, this.pinned_tabs.length, ...tab_groups[ 0 ].tabs ] )
+      Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length, ...tab_groups.slice( 1 ) ] )
+
+      state0_window = state_window
     })
   },
   computed: {
@@ -107,7 +176,8 @@ export default {
       window.close()
     },
     openTabGroupsPage() {
-      openTabGroupsPage()
+      // @todo only show if browser.sidebarAction.isOpen({})
+      browser.sidebarAction.open()
       window.close()
     },
     openTab( tab_id ) {
@@ -221,6 +291,10 @@ $action__theme: (
     }
 
     .panel-list-item:not(.disabled):hover:active {
+      background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+    }
+
+    .panel-list-item--active {
       background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
     }
 
