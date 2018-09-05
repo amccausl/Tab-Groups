@@ -10,6 +10,12 @@
           <div class="text" @click="onTabGroupClick( tab_group )">
             {{ tab_group.title }}
           </div>
+          <svg v-if="tab_group.audible" :class="bem( `panel-list-item__icon`, { 'audio': true } )" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <g>
+              <path d="M8.587 2.354L5.5 5H4.191A2.191 2.191 0 0 0 2 7.191v1.618A2.191 2.191 0 0 0 4.191 11H5.5l3.17 2.717a.2.2 0 0 0 .33-.152V2.544a.25.25 0 0 0-.413-.19zm2.988.921a.5.5 0 0 0-.316.949 3.97 3.97 0 0 1 0 7.551.5.5 0 0 0 .316.949 4.971 4.971 0 0 0 0-9.449z"></path>
+              <path d="M13 8a3 3 0 0 0-2.056-2.787.5.5 0 1 0-.343.939A2.008 2.008 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
+            </g>
+          </svg>
           <div @click="onTabGroupClick( tab_group )">
             {{ is_searching ? getCountMessage( 'matched_tabs', tab_group.search_matched_tabs_count ) : getCountMessage( 'tabs', tab_group.tabs_count ) }}
           </div>
@@ -284,18 +290,28 @@ $action__theme: (
       fill: map-get( $colors, --primary-color );
     }
 
-    .panel-list-item:not(.disabled):hover {
-      background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
-      border-bottom: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
-      border-top: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
-    }
+    .panel-list-item {
+      &:not(.disabled):hover {
+        background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
+        border-bottom: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+        border-top: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+      }
 
-    .panel-list-item:not(.disabled):hover:active {
-      background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
-    }
+      &:not(.disabled):hover:active {
+        background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+      }
 
-    .panel-list-item--active {
-      background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+      &--active {
+        background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+      }
+
+      &__icon {
+        height: 16px;
+        width: 16px;
+        margin-right: 4px;
+        color: map-get( $colors, --primary-color );
+        fill: map-get( $colors, --primary-color );
+      }
     }
 
     .panel-section-footer-button:hover {
