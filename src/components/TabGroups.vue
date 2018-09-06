@@ -7,12 +7,12 @@
 <script>
 import {
   onStateChange,
-} from './helpers.mjs'
+} from "./helpers.mjs"
 
-import TabGroupsSingleView from './TabGroupsSingleView.vue'
+import TabGroupsSingleView from "./TabGroupsSingleView.vue"
 
 export default {
-  name: 'tab-groups',
+  name: "tab-groups",
   components: {
     TabGroupsSingleView
   },

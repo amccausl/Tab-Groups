@@ -8,6 +8,7 @@ import testTabAdd from "./reducers/tab-add.mjs"
 import testTabAttach from "./reducers/tab-attach.mjs"
 import testTabMove from "./reducers/tab-move.mjs"
 import testTabsMove from "./reducers/tabs-move.mjs"
+import testGroupActivate from "./reducers/group-activate.mjs"
 import testGroupAdd from "./reducers/group-add.mjs"
 import testGroupMove from "./reducers/group-move.mjs"
 import testInit from "./reducers/init.mjs"
@@ -24,6 +25,7 @@ export default function testStore( tap ) {
   tap.test( "./store/reducers/window-add.mjs", testWindowAdd )
   tap.test( "./store/reducers/search.mjs", testSearch )
   tap.test( "./store/pinned-tabs.mjs", testPinnedTabs )
+  tap.test( "./store/reducers/group-activate.mjs", testGroupActivate )
   tap.test( "./store/reducers/group-add.mjs", testGroupAdd )
   tap.test( "./store/reducers/group-move.mjs", testGroupMove )
   tap.test( "./store/reducers/init.mjs", testInit )

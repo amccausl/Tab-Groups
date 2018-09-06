@@ -2,13 +2,13 @@
 import {
   toggleTabSelection,
   toggleTabBatchSelection,
-} from '../../src/components/tab-selectable.mjs'
+} from "../../src/components/tab-selectable.mjs"
 import {
   createTabGroup,
-} from '../../src/store/helpers.mjs'
+} from "../../src/store/helpers.mjs"
 import {
   createTestTab,
-} from '../store/helpers.mjs'
+} from "../store/helpers.mjs"
 
 function createContext( tab_groups ) {
   const context = {

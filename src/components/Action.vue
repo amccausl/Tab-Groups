@@ -195,10 +195,7 @@ export default {
       window.close()
     },
     onTabGroupClick( tab_group ) {
-      if( tab_group.active_tab_id && tab_group.tabs.length ) {
-        this.openTab( tab_group.active_tab_id || tab_group.tabs[ 0 ].id )
-      }
-      console.info('tab_group', tab_group.active_tab_id)
+      window.background.openTabGroup( window.store, this.window_id, tab_group.id )
       window.close()
     },
     viewTabGroupTabs( tab_group ) {

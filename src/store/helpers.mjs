@@ -66,7 +66,6 @@ export function cloneTab( tab ) {
 
 /**
  * Find a tab in the state
- * @param state
  */
 export function findTab( state, window_id, tab_id ) {
   for( let window of state.windows ) {
@@ -102,6 +101,13 @@ export function getCreateTabTarget( state, browser_tab ) {
     return {
       index: browser_tab.index,
       tab_group_id: 0
+    }
+  }
+
+  if( browser_tab.session != null && browser_tab.session.tab_group_id != null ) {
+    return {
+      index: browser_tab.index,
+      tab_group_id: browser_tab.session.tab_group_id
     }
   }
 

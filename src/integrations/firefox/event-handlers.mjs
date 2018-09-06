@@ -19,6 +19,9 @@ import {
   default_config,
   getCreateTabTarget,
 } from "../../store/helpers.mjs"
+import {
+  getTabGroupId,
+} from "./helpers.mjs"
 
 // @todo pull to shared file
 const LOCAL_CONFIG_KEY = "config"
@@ -30,7 +33,6 @@ export function ignorePendingMove( tab_ids ) {
 
 /**
  * Bind change events for the browser to dispatch operations on the store
- * @param store The redux store
  */
 export function bindBrowserEvents( browser, browser_state, store ) {
   // @todo need way to turn off console
@@ -121,23 +123,32 @@ export function bindBrowserEvents( browser, browser_state, store ) {
 
   function onTabCreated( store, browser_tab ) {
     const state = store.getState()
-    const { index } = getCreateTabTarget( state, browser_tab )
-    if( browser_tab.index !== index ) {
-      console.info('browser.tabs.move', [ browser_tab.id ], { index })
-      browser.tabs.move( [ browser_tab.id ], { index } )
-    }
+    getTabGroupId( browser_tab.id )
+      .then( tab_group_id => {
+        if( tab_group_id != null ) {
+          browser_tab.session = {
+            tab_group_id: tab_group_id,
+          }
+        } else {
+          const { index } = getCreateTabTarget( state, browser_tab )
+          if( browser_tab.index !== index ) {
+            console.info('browser.tabs.move', [ browser_tab.id ], { index })
+            browser.tabs.move( [ browser_tab.id ], { index } )
+          }
+        }
 
-    if( browser_tab.hidden ) {
-      hide_tab_ids.add( browser_tab.id )
-    } else {
-      show_tab_ids.add( browser_tab.id )
-    }
+        if( browser_tab.hidden ) {
+          hide_tab_ids.add( browser_tab.id )
+        } else {
+          show_tab_ids.add( browser_tab.id )
+        }
 
-    if( browser_tab.cookieStoreId != null && browser_tab.cookieStoreId !== "firefox-default" && ! state.features.contextual_identities.enabled ) {
-      return store.dispatch( updateFeaturesAction( { contextual_identities: { enabled: true } } ) )
-    }
+        if( browser_tab.cookieStoreId != null && browser_tab.cookieStoreId !== "firefox-default" && ! state.features.contextual_identities.enabled ) {
+          store.dispatch( updateFeaturesAction( { contextual_identities: { enabled: true } } ) )
+        }
 
-    return store.dispatch( addTabAction( browser_tab ) )
+        return store.dispatch( addTabAction( browser_tab ) )
+      })
   }
 
   browser.tabs.onCreated.addListener( ( browser_tab ) => {

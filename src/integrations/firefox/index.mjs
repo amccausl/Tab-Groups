@@ -1,5 +1,6 @@
 import {
   moveTabsAction,
+  activateGroupAction,
   createGroupAction,
   removeGroupAction,
   moveGroupAction,
@@ -21,10 +22,14 @@ import {
 import {
   ignorePendingMove,
 } from "./event-handlers.mjs"
+import {
+  TAB_GROUP_ID_KEY,
+  getTabGroupId,
+  setTabGroupId,
+} from "./helpers.mjs"
 
 export const LOCAL_CONFIG_KEY = 'config'
 export const WINDOW_TAB_GROUPS_KEY = 'tab_groups'
-export const TAB_GROUP_ID_KEY = 'group_id'
 export const TAB_PREVIEW_IMAGE_KEY = 'preview_image'
 
 const EMPTY = {}
@@ -176,8 +181,6 @@ export function getTabState( browser_tab ) {
 
 /**
  * Save value to the window session
- * @param window_id
- * @param tab_groups_state
  */
 export function setWindowTabGroupsState( window_id, tab_groups_state ) {
   return browser.sessions.setWindowValue( window_id, WINDOW_TAB_GROUPS_KEY, tab_groups_state )
@@ -185,26 +188,6 @@ export function setWindowTabGroupsState( window_id, tab_groups_state ) {
 
 /**
  * Fetch the preview image for a tab from session storage
- * @param tab_id
- */
-function getTabGroupId( tab_id ) {
-  console.info(`browser.sessions.getTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY } )`)
-  return browser.sessions.getTabValue( tab_id, TAB_GROUP_ID_KEY )
-}
-
-/**
- * Save the tab preview image and details to the
- * @param tab_id
- * @param group_id
- */
-function setTabGroupId( tab_id, group_id ) {
-  console.info(`browser.sessions.setTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY }, ${ group_id } )`)
-  return browser.sessions.setTabValue( tab_id, TAB_GROUP_ID_KEY, group_id )
-}
-
-/**
- * Fetch the preview image for a tab from session storage
- * @param tab_id
  */
 function getTabPreviewState( tab_id ) {
   return browser.sessions.getTabValue( tab_id, TAB_PREVIEW_IMAGE_KEY )
@@ -212,8 +195,6 @@ function getTabPreviewState( tab_id ) {
 
 /**
  * Save the tab preview image and details to the
- * @param tab_id
- * @param preview_image
  */
 function setTabPreviewState( tab_id, preview_image ) {
   return browser.sessions.setTabValue( tab_id, TAB_PREVIEW_IMAGE_KEY, preview_image )
@@ -229,8 +210,6 @@ function getConfig() {
 
 /**
  * Set the value for a key in the config
- * @param key
- * @param value
  * @todo should allow multiple key/value pairs
  * @todo is there a better async way of doing this?
  */
@@ -265,7 +244,6 @@ function moveBrowserTabs( tab_ids, move_properties ) {
 
 /**
  * Remove all values stored in the browser
- * @param store
  * @todo should this return a promise?
  */
 export function resetBrowserState( store ) {
@@ -326,11 +304,64 @@ export function openTabGroupsPage() {
     })
 }
 
+/**
+ * Open a given tab group
+ */
+export function openTabGroup( store, window_id, target_tab_group_id ) {
+  const state0 = store.getState()
+  const window0 = getWindow( state0, window_id )
+  const target_tab_group = window0.tab_groups.find( tab_group => tab_group.id === target_tab_group_id )
+  if( ! target_tab_group ) {
+    // @todo error
+    console.error( "Attempt to open tab group that doesn't exist", target_tab_group_id )
+    return
+  }
+
+  const is_pinned_tab_active = window0.tab_groups[ 0 ].tabs.find( tab => tab.id === window.active_tab_id )
+  if( is_pinned_tab_active ) {
+    // Change active group without changing active tab
+    store.dispatch( activateGroupAction( target_tab_group_id, window_id ) )
+    return
+  }
+
+  if( window0.search && window0.search.matched_tab_ids ) {
+    // Switching group while search active opens first match in group
+    const tab = target_tab_group.tabs.find( tab => window0.search.matched_tab_ids.includes( tab.id ) )
+    if( tab ) {
+      setTabActive( window.store, window_id, tab.id )
+      return
+    }
+  }
+
+  if( target_tab_group.tabs.length === 0 ) {
+    // If switching to empty group, create new tab
+    let index = 0
+    for( const tab_group of window0.tab_groups ) {
+      if( tab_group.id === target_tab_group.id ) {
+        break
+      }
+      index += tab_group.tabs_count
+    }
+
+    return browser.tabs.create({
+      active: true,
+      windowId: window_id,
+      index,
+    })
+      .then( browser_tab => {
+        setTabGroupId( browser_tab.id, target_tab_group_id )
+      })
+  }
+
+  if( target_tab_group.active_tab_id ) {
+    setTabActive( window.store, window_id, target_tab_group.active_tab_id )
+  }
+}
+
 // TABS
 
 /**
  * Activate the given tab in the window
- * @param tab_id
  * @todo should this include the window_id?
  */
 export function setTabActive( store, window_id, tab_id ) {
@@ -339,7 +370,6 @@ export function setTabActive( store, window_id, tab_id ) {
 
 /**
  * Close the given tab
- * @param tab_id
  */
 export function closeTab( store, tab_id ) {
   console.info('browser.tabs.remove', [ tab_id ])
@@ -601,10 +631,6 @@ export function moveTabGroup( store, source_data, target_data ) {
 
 /**
  * Run a text search for tabs in a window and dispatch start and finish to the store
- * @param store
- * @param window_id
- * @param search_text
- *
  * @todo consider storing window => search info map locally
  */
 export function runTabSearch( store, window_id, search_text ) {

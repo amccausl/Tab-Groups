@@ -1,6 +1,6 @@
 import {
   validateState
-} from './validators.mjs'
+} from "./validators.mjs"
 
 export function createStore( reducer, initial_state ) {
   const listeners = []

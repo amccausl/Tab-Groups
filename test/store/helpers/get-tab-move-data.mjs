@@ -196,7 +196,7 @@ function testMoveFromUrl( t ) {
 
   let source_data = {
     type: "moz-url",
-    url: 'https://google.ca'
+    url: "https://google.ca"
   }
   let target_data = {
     window_id: 1,

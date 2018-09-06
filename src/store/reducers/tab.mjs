@@ -20,13 +20,13 @@ export function addTab( state, { browser_tab } ) {
   if( target_window ) {
     if( target_info.tab_group_id != null ) {
       return Object.assign( {}, state, {
-        windows: state.windows.map( window => {
-          if( window.id !== browser_tab.windowId ) {
-            return window
+        windows: state.windows.map( window0 => {
+          if( window0.id !== browser_tab.windowId ) {
+            return window0
           }
           let index_offset = 0
-          return Object.assign( {}, window, {
-            tab_groups: window.tab_groups.map( tab_group => {
+          const window1 = Object.assign( {}, window0, {
+            tab_groups: window0.tab_groups.map( tab_group => {
               // We know what group we're targeting
               if( tab_group.id === target_info.tab_group_id ) {
                 let tabs
@@ -42,11 +42,21 @@ export function addTab( state, { browser_tab } ) {
                   tabs,
                   tabs_count: tab_group.tabs_count + 1
                 })
+                if( browser_tab.active ) {
+                  tab_group.active_tab_id = browser_tab.id
+                }
               }
               index_offset += tab_group.tabs_count
               return tab_group
             })
           })
+
+          if( browser_tab.active && browser_tab.session != null && browser_tab.session.tab_group_id ) {
+            window1.active_tab_group_id = browser_tab.session.tab_group_id
+            window1.active_tab_id = browser_tab.id
+          }
+
+          return window1
         })
       })
     } else {
@@ -143,7 +153,7 @@ export function activateTab( state, { tab_id, window_id } ) {
 }
 
 export function updateTab( state, { browser_tab, change_info } ) {
-  if( change_info.hasOwnProperty( 'pinned' ) ) {
+  if( change_info.hasOwnProperty( "pinned" ) ) {
     const window_id = browser_tab.windowId
     const target_window = state.windows.find( window => window.id === window_id )
     const tab_group_id = change_info.pinned ? 0 : target_window.active_tab_group_id

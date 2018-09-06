@@ -1,11 +1,11 @@
 import {
   createTestTab,
   getInitialState,
-} from './helpers.mjs'
+} from "./helpers.mjs"
 
-import { createTabGroup } from '../../src/store/helpers.mjs'
-import { activateTab } from '../../src/store/reducers/tab.mjs'
-import { validateState } from '../../src/store/validators.mjs'
+import { createTabGroup } from "../../src/store/helpers.mjs"
+import { activateTab } from "../../src/store/reducers/tab.mjs"
+import { validateState } from "../../src/store/validators.mjs"
 
 function testSingleWindowSingleGroupActivateTab( t ) {
   const state = getInitialState()

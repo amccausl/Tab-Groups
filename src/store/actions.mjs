@@ -26,7 +26,7 @@ import {
   WINDOW_SEARCH_START,
   WINDOW_SEARCH_FINISH,
   WINDOW_SEARCH_RESET,
-} from './action-types.mjs'
+} from "./action-types.mjs"
 
 export function initAction({ browser_tabs, config, contextual_identities, theme, window_tab_groups_map }) {
   return {

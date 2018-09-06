@@ -15,7 +15,7 @@
 <script>
 import {
   getWindow,
-} from '../store/helpers.mjs'
+} from "../store/helpers.mjs"
 import {
   bem,
   debounce,
@@ -27,7 +27,7 @@ export default {
   props: [ "theme" ],
   data() {
     return {
-      search_text: '',
+      search_text: "",
       search_resolved: true,
       window_id: window.current_window_id,
       search_history: []

@@ -1,9 +1,9 @@
-import { createStore } from './store/dispatcher.mjs'
+import { createStore } from "./store/dispatcher.mjs"
 
-import { initAction } from './store/actions.mjs'
+import { initAction } from "./store/actions.mjs"
 import init from "./store/reducers/init.mjs"
-import App from './store/reducers.mjs'
-import { getTabGroupsPersistState } from './store/helpers.mjs'
+import App from "./store/reducers.mjs"
+import { getTabGroupsPersistState } from "./store/helpers.mjs"
 import {
   bindBrowserEvents,
   closeTab,
@@ -19,12 +19,13 @@ import {
   moveTabGroup,
   openOptionsPage,
   openSidebarPage,
+  openTabGroup,
   resetBrowserState,
   runTabSearch,
   setConfig,
   setTabActive,
   setWindowTabGroupsState,
-} from './integrations/index.mjs'
+} from "./integrations/index.mjs"
 
 function onError( error ) {
   console.error( error )
@@ -86,6 +87,7 @@ window.unmuteTabGroup = unmuteTabGroup
 window.getMessage = getMessage
 window.openOptionsPage = openOptionsPage
 window.openSidebarPage = openSidebarPage
+window.openTabGroup = openTabGroup
 window.resetBrowserState = resetBrowserState
 window.runTabSearch = runTabSearch
 window.setConfig = setConfig

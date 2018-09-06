@@ -22,6 +22,19 @@ function mapTabGroup( state, window_id, tab_group_id, fn ) {
   })
 }
 
+export function activateGroup( state, { window_id, tab_group_id } ) {
+  return Object.assign( {}, state, {
+    windows: state.windows.map( window => {
+      if( window.id !== window_id ) {
+        return window
+      }
+      return Object.assign( {}, window, {
+        active_tab_group_id: tab_group_id,
+      })
+    })
+  })
+}
+
 export function addGroup( state, { window_id, new_tab_group } ) {
   if( ! new_tab_group ) {
     new_tab_group = createTabGroup( getNewTabGroupId( state ), [] )
@@ -109,6 +122,6 @@ export function muteGroup( state, { tab_group_id, window_id } ) {
 
 export function unmuteGroup( state, { tab_group_id, window_id } ) {
   return mapTabGroup( state, window_id, tab_group_id,
-    tab_group => omit( tab_group, 'muted')
+    tab_group => omit( tab_group, "muted")
   )
 }

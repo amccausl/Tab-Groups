@@ -45,7 +45,6 @@ export function getCountMessage( key, count ) {
 
 /**
  * Helper to get a more user-friendly url
- * @param uri_string
  */
 export function getFriendlyUrlText( uri_string ) {
   try {
@@ -99,7 +98,6 @@ export function getNewSelectedTabIds( old_selected_tab_ids, tab_groups ) {
 
 /**
  * Get a markdown string rendering for a tab group
- * @param tab_group
  */
 export function getTabGroupCopyText( tab_group ) {
   let copy_text = `## ${ tab_group.title }`
@@ -111,7 +109,6 @@ export function getTabGroupCopyText( tab_group ) {
 
 /**
  * Subscribe to changes from the store and add cleanup on window
- * @param fn
  */
 export function onStateChange( fn ) {
   fn( window.store.getState() )

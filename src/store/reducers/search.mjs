@@ -20,7 +20,7 @@ export function startWindowSearch( state, { window_id, search_text } ) {
         }
       }
 
-      const search_regex = new RegExp( `${ search_text }`, 'i' )
+      const search_regex = new RegExp( `${ search_text }`, "i" )
       const matched_tab_ids = []
       const queued_tab_ids = []
       for( let tab of search_tabs ) {
@@ -78,7 +78,7 @@ export function resetWindowSearch( state0, { window_id } ) {
         return window
       }
       is_updated = true
-      return omit( window, 'search' )
+      return omit( window, "search" )
     })
   })
 

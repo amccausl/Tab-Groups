@@ -1,4 +1,4 @@
-import { getTabState } from '../../src/integrations/index.mjs'
+import { getTabState } from "../../src/integrations/index.mjs"
 import {
   createWindow,
   createTabGroup,
@@ -7,7 +7,7 @@ import {
   getTabGroupsPersistState,
   getTabMoveData,
   getTargetIndex,
-} from '../../src/store/helpers.mjs'
+} from "../../src/store/helpers.mjs"
 
 export const base_new_browser_tab = {
   id: null,
@@ -250,7 +250,7 @@ function testPersistence( t ) {
   t.same( tab_groups_state, [
     {
       id: 1,
-      title: 'Group 1',
+      title: "Group 1",
       active: true,
       active_tab_id: 1,
       tabs_count: 2

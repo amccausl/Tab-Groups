@@ -2,15 +2,15 @@ import {
   createPinnedTabGroup,
   createTabGroup,
   createWindow,
-} from '../../../src/store/helpers.mjs'
+} from "../../../src/store/helpers.mjs"
 import {
   startWindowSearch,
   finishWindowSearch,
   resetWindowSearch,
-} from '../../../src/store/reducers/search.mjs'
+} from "../../../src/store/reducers/search.mjs"
 import {
   createTestTab,
-} from '../helpers.mjs'
+} from "../helpers.mjs"
 
 function testSingleWindowSearch( t ) {
   const window_id = 1
@@ -32,7 +32,7 @@ function testSingleWindowSearch( t ) {
     ]
   }
 
-  let search_text = 'test'
+  let search_text = "test"
   const state1 = startWindowSearch( state0, { window_id, search_text } )
 
   t.same( state1.windows[ 0 ].search, { text: search_text, resolved: false, matched_tab_ids: [ 4, 6, 7 ], queued_tab_ids: [ 5, 8 ] })
