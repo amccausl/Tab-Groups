@@ -33,6 +33,7 @@
       >
         <div :class="[ `sidebar-tab_groups-list--${ theme }__item` ]">
           <div :class="bem( `tab-groups-list-item-header--${ theme }`, { 'active': active_tab_group_id === tab_group.id, 'open': show_tabs && tab_group.open, 'drag-source': isTabGroupDragSource( tab_group ), [`drag-${ drag_state.source.type }-target`]: ! isTabGroupDragSource( tab_group ) && isTabGroupDragTarget( tab_group ) } )"
+              :title="tab_group.title"
               @dragenter="onTabGroupDragEnter( $event, tab_group, tab_group_index + 1 )"
               @dragover.prevent
               @dragleave="onTabGroupDragLeave( $event, tab_group, tab_group_index + 1 )"
