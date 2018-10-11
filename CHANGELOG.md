@@ -1,3 +1,10 @@
+### v0.0.7
+
+#### Features
+- action tab group open improvements
+- hover for full group name
+- audible icon for tab group in action
+
 ### v0.0.6
 
 #### Features
