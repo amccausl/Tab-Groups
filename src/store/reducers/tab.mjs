@@ -51,8 +51,10 @@ export function addTab( state, { browser_tab } ) {
             })
           })
 
-          if( browser_tab.active && browser_tab.session != null && browser_tab.session.tab_group_id ) {
-            window1.active_tab_group_id = browser_tab.session.tab_group_id
+          if( browser_tab.active ) {
+            if( browser_tab.session != null && browser_tab.session.tab_group_id ) {
+              window1.active_tab_group_id = browser_tab.session.tab_group_id
+            }
             window1.active_tab_id = browser_tab.id
           }
 

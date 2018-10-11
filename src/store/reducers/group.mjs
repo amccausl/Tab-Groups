@@ -25,12 +25,16 @@ function mapTabGroup( state, window_id, tab_group_id, fn ) {
 export function activateGroup( state, { window_id, tab_group_id } ) {
   return Object.assign( {}, state, {
     windows: state.windows.map( window => {
-      if( window.id !== window_id ) {
-        return window
+      if( window.id === window_id ) {
+        const tab_group = window.tab_groups.find( tab_group => tab_group.id === tab_group_id )
+        if( tab_group ) {
+          return Object.assign( {}, window, {
+            active_tab_group_id: tab_group_id,
+            active_tab_id: tab_group.active_tab_id,
+          })
+        }
       }
-      return Object.assign( {}, window, {
-        active_tab_group_id: tab_group_id,
-      })
+      return window
     })
   })
 }
