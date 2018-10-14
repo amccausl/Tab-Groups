@@ -100,6 +100,7 @@ export default function init( state, { browser_tabs, config, contextual_identiti
         tab_group.tabs.push( ...ungrouped_tabs )
         tab_group.tabs_count = tab_group.tabs.length
         if( tab_group.tabs.some( tab => tab.id === active_tab_id ) ) {
+          tab_group.active_tab_id = active_tab_id
           active_tab_group_id = tab_group.id
         }
       }

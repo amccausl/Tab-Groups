@@ -204,6 +204,45 @@ function testSingleWindowSessionLoad( t ) {
   t.end()
 }
 
+function testUnsetActiveTab( t ) {
+  const browser_tabs = [
+    createBrowserTab({
+      id: 1,
+      index: 0,
+      windowId: 1
+    }),
+    createBrowserTab({
+      id: 2,
+      index: 1,
+      windowId: 1
+    }),
+    createBrowserTab({
+      id: 3,
+      index: 2,
+      windowId: 1,
+      highlighted: true,
+      active: true,
+    })
+  ]
+  const window_tab_groups_map = new Map()
+  window_tab_groups_map.set( 1, [
+    {
+      active: true,
+      active_tab_id: null,
+      id: 10,
+      tabs_count: 2,
+      title: "Group",
+    }
+  ])
+
+  let initial_state = init( null, { browser_tabs, config: {}, window_tab_groups_map })
+
+  t.ok( validateState( initial_state ), "initial state validates", validateState.errors )
+  // console.info( initial_state.windows[ 0 ] )
+
+  t.end()
+}
+
 // @todo if one window not included in saved state, ensure IDs not duplicated
 
 export default function testInit( tap ) {
@@ -211,5 +250,6 @@ export default function testInit( tap ) {
   tap.test( freshInitWithMultipleWindows )
   tap.test( testSingleWindowMultiGroupDetectActive )
   tap.test( testSingleWindowSessionLoad )
+  tap.test( testUnsetActiveTab )
   tap.end()
 }
