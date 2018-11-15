@@ -1,3 +1,13 @@
+
+- add audible icon for action groups
+- update behaviour for open tab group from action
+- clickable audible icon
+
+- action icon to match theme
+
+#### Planned
+- onboarding page
+
 ### v0.0.7
 
 #### Features

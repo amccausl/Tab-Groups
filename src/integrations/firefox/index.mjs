@@ -54,6 +54,13 @@ export function loadBrowserState() {
   const window_ids = []
   let browser_tabs, config, contextual_identities, theme
 
+  // @todo special handling if
+  /*
+    status: "complete"
+    title: "Restore Session"
+    url: "about:sessionrestore"
+  */
+
   return Promise.all([
     browser.storage ? browser.storage.local.get( LOCAL_CONFIG_KEY ) : null,
     browser.tabs.query( EMPTY ),

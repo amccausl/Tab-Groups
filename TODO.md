@@ -1,260 +1,346 @@
+# Done
+  - move remaining reducers
+  - group move indexing issue
+    - disable tabhide
+    - open 2 groups
+      - 1: 6 tabs
+      - 2: 1 tab
+    - move group 1 to end
+    - group 2 tabs should be at the beginning
+  - drag from bookmark folder should use folder name for group
+  - init should validate active tab & group
+  - add config flag to enable experimental search
+  - feature detection for contextual identities
+  - update feature detection on tabhide change
+  - drag over group to open
+  - search: fix dark theme icons
+  - this.getNewSelectedTabs is not a function
+  - init should populate hidden properly to optimize update calls
+  - ignore `{"discarded":false}` tab update
+  - disable doorhanger options need UI styling
+  - contexts broken
+  - add UI for ctrl-click drag
+  - add updates for contextual identities
+  - v0.0.4: upload build & changelog
+  - favicon background should consume space during load to prevent jittery title
+  - add icon
+
+# Bugs
+  - fix state reload issues with tab grouping
+  - init should validate group count
+  - drag from native to new group doesn't trigger group rename
+  - investigate performance issues
+  - broken favicons should display a placeholder
+  - test out-of-order multi-drag
+  - should have error if activate triggered on tab that doesn't exist
+  - rename doesn't trigger
+
+# Regressions
+  - max height on group tabs
+  - tab_groups is not iterable
+
+# Performance
+  - "TAB_REMOVE" event should also remove empty windows to prevent duplicate event
+  - change detection shouldn't trigger on windows / groups that aren't updated
+  - remove and activate can be moved into 1 event
+  - ignore `{"status":"complete","url":"about:blank"}` tab update
+
+### Improvements
+  - add check on events that produce a browser_tab to ensure state matches properly
+  - on move active tab to other closed group, open that group
+  - when closing tab should add placeholder at the end, with trigger to update height when mouse is out of box for more consistent close experience
+
+#### Refactoring
+  - pull CSS variables to separate include to isolate BEM-module CSS isolation
+  - refactor drag target styles to list helper, reduce duplication
+  - remove unused styles, amalgamate CSS
+
+#### Tasks
+  - message Adam about new version changes
+  - check @todos
+
+#### p0
+  - search
+    - add "running" style to search bar
+    - style update to tabs & count while searching
+  - onboarding screens
+    - add warning notification on settings icon on first launch
+    - screen-cap GIFs, investigate firefox tooling
+  - muting
+    - click to mute
+  - options page
+    - fix vertical alignment for items
+    - copy onboarding style
+  - finish action
+    - open group with click
+    - open sidebar
+    - stream search updates if field not focused
+    - toggle footer if sidebar open in window
+  - v0.0.5: upload build & changelog
+    - determine min version
+  - review backlog
+
 #### p1
-- shim around native drags
-- add flags to state for feature detection
-- styling for pinned
-  - background
-  - active indicator on pinned tabs
-  - sizing, spacing & separator
-  - contexts
-  - notifications & audio
-- bugs
-  - hide/show
-    - pin if can't hide
-    - closing all tabs in group and new tab
-    - reopen closed tab should activate the group that contains it
-    - should toggle states on launch
-    - open config when config is already open in another group will add to current (same for other "open tab")
-      tab bar, but activate the other group
-    - application drag from another window to inactive group adds to tab strip
-  - pinned
-    - reopen closed pinned tab, not added to pinned
-  - audio
-    - on close tab playing, group still audible
-  - context broken
-    - testing on main browser
-    - use https://developer.mozilla.org/en-US/docs/Web/CSS/attr for styles
-  - target after start issue
-    - could fix with style change
-  - when transitioning from discarded, if update clears favicon, keep open one
-  - "new group" should open new tab in group, group should open
-  - moving to same group should be noop
-  - drag and drop
-    - pinned tab drag
-    - from 1 window to another loses favicon
-    - dragging from new doesn't clear the target class
-    - styling is weird when dragging to a sticky tab
-    - preview placeholder
-    - drag below the fold to trigger timer scroll
-    - drag over collapsed group should open after 1s
-    - drag image
-      - experiment with svg content
-    - from app to native tab bar
-    - dragging many tabs to a later group sometimes misses target
-  - native drag
-    - swap for first tabs after pinned has no affect
-    - drag from new window to existing
-  - sidebar
-    - bind right click for empty space
-    - group toggle is odd if group moves above the fold, should scroll container so both headers visible
-    - active style should only be displayed if group also active
-    - drag preview image issue
-    - context display is broken
-    - icons
-      - better handling for broken icons
-- watch task with compile / tests
-- sidebar improvements
-  - add process to suspend tabs
-  - tab context menu
-    - move to group
-  - group header
-    - group header shouldn't wrap
-  - rename
-    - opening new group should focus the name for edit
-    - should select text on focus
-  - pinned tabs
-    - icon sizing should match native for consistency
-    - update styling to match tab bar
-    - open new tab from pinned tab while in long group scrolls to beginning and adds to end in native bar
-  - tab item
-    - visual style for suspend
-    - loading indicator
-    - status indication and bubbling
-      - audio playing, muted
-      - pinned
-      - loading
-      - notifications?
-    - ensure new tab is visible (scroll, open group)
-      - sometimes not clear there are more items under stick header
-    - text overflow gradient
-    - copy tab bar active style with blue bar
-  - favicon scan for context styles
-  - drag and drop
-    - index based tab dragging
-      - style cleanup
-      - drop animation looks janky
-      - drag over last item moves to the wrong index
-    - index based group dragging
-    - between pinned tabs
-  - native drag
-    - drag from native tab to sidebar
-    - drag from bookmarks to sidebar
-    - drag from link to sidebar
-    - [Recommended drag types](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types)
-      - drag tab to bookmark
-      - drag group to bookmarks
-  - navigation
-    - scroll to active tab
-    - new group should scroll to group
-    - arrow key navigation with selected state
-    - add handling for native change tab: none, visible, group-wrap
-    - tab wheel scroll
-    - command to toggle group sidebar
-    - j+k hotkeys to change group selection
-- options
-  - base styling
-  - toggles
-    - features
-      - search
-      - sync
-  - fix field tabbing
-  - open tools on debug
-- validation
-  - add sync check after validation failure
-  - store failed validations in log, surface on options page
-  - validate audible flag
-- private browsing
-- publish
-  - setup self-hosted with unique id on github
-  - clean up console messaging
-  - clear out repo
-  - review @todos
-  - determine min version
-  - turn on vuejs production mode
-  - fix id
+  - add error logging
+  - UI animation for active
+  - add shift-click drag
+  - UI style for suspend/restore
+  - shim around native drags
+  - only update tab show state if required
+  - only dispatch update if required
+  - fork web-extensions node lib to add event emulation
+  - improve pinned handling
+  - add last accessed timestamp to groups for auto-suspend
+  - merge tasks from other list
+  - configurable text format
+  - styling for pinned
+    - background
+    - active indicator on pinned tabs
+    - sizing, spacing & separator
+    - contexts
+    - notifications
+  - bugs
+    - hide/show
+      - pin if can't hide
+      - closing all tabs in group and new tab
+      - reopen closed tab should activate the group that contains it
+      - should toggle states on launch
+      - open config when config is already open in another group will add to current (same for other "open tab")
+        tab bar, but activate the other group
+      - application drag from another window to inactive group adds to tab strip
+    - pinned
+      - reopen closed pinned tab, not added to pinned
+    - audio
+      - on close tab playing, group still audible
+    - context broken
+      - testing on main browser
+      - use https://developer.mozilla.org/en-US/docs/Web/CSS/attr for styles
+    - target after start issue
+      - could fix with style change
+    - when transitioning from discarded, if update clears favicon, keep open one
+    - "new group" should open new tab in group, group should open
+    - moving to same group should be noop
+    - drag and drop
+      - pinned tab drag
+      - from 1 window to another loses favicon
+      - dragging from new doesn't clear the target class
+      - styling is weird when dragging to a sticky tab
+      - preview placeholder
+      - drag below the fold to trigger timer scroll
+      - drag over collapsed group should open after 1s
+      - drag image
+        - experiment with svg content
+      - from app to native tab bar
+    - native drag
+      - swap for first tabs after pinned has no affect
+      - drag from new window to existing
+    - sidebar
+      - bind right click for empty space
+      - group toggle is odd if group moves above the fold, should scroll container so both headers visible
+      - active style should only be displayed if group also active
+      - drag preview image issue
+      - context display is broken
+      - icons
+        - better handling for broken icons
+  - watch task with compile / tests
+  - sidebar improvements
+    - add process to suspend tabs
+    - tab context menu
+      - move to group
+    - group header
+      - group header shouldn't wrap
+    - rename
+      - opening new group should focus the name for edit
+      - should select text on focus
+    - pinned tabs
+      - icon sizing should match native for consistency
+      - update styling to match tab bar
+      - open new tab from pinned tab while in long group scrolls to beginning and adds to end in native bar
+    - tab item
+      - visual style for suspend
+      - loading indicator
+      - status indication and bubbling
+        - audio playing, muted
+        - pinned
+        - loading
+        - notifications?
+      - ensure new tab is visible (scroll, open group)
+        - sometimes not clear there are more items under stick header
+      - text overflow gradient
+      - copy tab bar active style with blue bar
+    - favicon scan for context styles
+    - drag and drop
+      - index based tab dragging
+        - style cleanup
+        - drop animation looks janky
+        - drag over last item moves to the wrong index
+      - index based group dragging
+      - between pinned tabs
+    - native drag
+      - drag from native tab to sidebar
+      - drag from bookmarks to sidebar
+      - drag from link to sidebar
+      - [Recommended drag types](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types)
+        - drag tab to bookmark
+        - drag group to bookmarks
+    - navigation
+      - scroll to active tab
+      - new group should scroll to group
+      - arrow key navigation with selected state
+      - add handling for native change tab: none, visible, group-wrap
+      - tab wheel scroll
+      - command to toggle group sidebar
+      - j+k hotkeys to change group selection
+  - options
+    - base styling
+    - toggles
+      - features
+        - search
+        - sync
+    - fix field tabbing
+    - open tools on debug
+  - validation
+    - add sync check after validation failure
+    - store failed validations in log, surface on options page
+    - validate audible flag
+  - private browsing
+  - publish
+    - clean up console messaging
+    - review @todos
 
 #### p2
-- testing
-  - reproduce all bugs as integration tests
-  - add library for web-extension browser mocking
-  - add testing for vue components
-  - investigate nodejs es6 dependency mocking
-  - investigate typescript for tests
-  - VScode integration (running, linking errors & debugging)
-  - file based execution
-  - watch
-  - coverage
-  - suspend and replace
-  - url serialization
-- investigate vuejs change detection alternatives
-- store ancestor list to tab state
-- context menu improvements
-  - fade in
-  - add more items
-  - button hover effect
-  - mute based on state
-  - keyboard navigation (arrows, hotkeys & enter)
-- integration with time tracker API
-- bugs
-  - search text weirdness
+  - testing
+    - reproduce all bugs as integration tests
+    - add library for web-extension browser mocking
+    - add testing for vue components
+    - investigate nodejs es6 dependency mocking
+    - investigate typescript for tests
+    - VScode integration (running, linking errors & debugging)
+    - file based execution
+    - watch
+    - coverage
+    - suspend and replace
+    - url serialization
+  - investigate vuejs change detection alternatives
+  - store ancestor list to tab state
+  - context menu improvements
+    - fade in
+    - add more items
+    - button hover effect
+    - mute based on state
+    - keyboard navigation (arrows, hotkeys & enter)
+  - integration with time tracker API
+  - bugs
+    - search text weirdness
+    - action
+      - fix icon theming
+      - groups should be selectable
+      - pinned tab rendering
+  - archived groups
+  - test with typescript
+    - pull in types for redux, web-extensions
+    - refactor includes from components as methods on background window
+  - revisit tab design
+    - with mobile and new tab page layouts
   - action
-    - fix icon theming
-    - groups should be selectable
-    - pinned tab rendering
-- archived groups
-- test with typescript
-  - pull in types for redux, web-extensions
-  - refactor includes from components as methods on background window
-- revisit tab design
-  - with mobile and new tab page layouts
-- action
-  - update icons for dynamic colours
-  - 2nd screen for open tabs
-  - 2nd screen for config
-  - scrollable
-  - dark theme
-- replace tab navigation hotkeys for more consistent group handling
-- investigate mobile version
-- sync
-- load/save backup
-- update tests for new state schema
-- drag and drop
-  - groups in sidebar
-  - between windows
-  - handle external url list drop
-- sidebar
-  - detect if favicons require background
-  - bubbling audio indicator
-  - tab search clear
-  - tab close button
-  - fade for overflow
-  - out of window drop target makes new window?
-- open main tab groups page with hotkey
-- add interval to detect state drift
+    - update icons for dynamic colours
+    - 2nd screen for open tabs
+    - 2nd screen for config
+    - scrollable
+    - dark theme
+  - replace tab navigation hotkeys for more consistent group handling
+  - investigate mobile version
+  - sync
+  - load/save backup
+  - update tests for new state schema
+  - drag and drop
+    - groups in sidebar
+    - between windows
+    - handle external url list drop
+  - sidebar
+    - detect if favicons require background
+    - bubbling audio indicator
+    - tab search clear
+    - tab close button
+    - fade for overflow
+    - out of window drop target makes new window?
+  - open main tab groups page with hotkey
+  - add interval to detect state drift
 
 #### p3
-- add wiki with screenshots
-- common css rules
-- bugs
-  - tab group page
-    - fix rendering when preview images aren't available
-    - fix title text truncation sizing
-    - tab group name edit
-      - right side artifact
-      - enter should exit
-      - select text on focus
-      - visual indication for edit
-- tab groups page - 1st layout
-  - visual indicator for editable text
-    - enter should finish edit
-  - min height for cards based on current window size to prevent layout issues
-  - rescale images based on resize
-  - tab group list
-    - close group
-    - add new group icon, droppable
-  - tab group header
-    - tab count
-    - add configure option
-  - tabs list
-    - loading indicator
-      - https://365webresources.com/10-best-pure-css-loading-spinners-front-end-developers/
-      - https://matejkustec.github.io/SpinThatShit/
-    - placeholder icon
-    - if dragging, don't set active tag
-  - shouldn't be included as tab in tab group
-  - preview image
-    - add debounce task after transition to complete if active
-- save settings and tabs to sync
-  - synced groups
-  - options
-  - determine what current sync format is, can leverage for shared structure?
-- styling
-  - http://design.firefox.com/photon/visuals/color.html
-  - pull css styles into shared file
-- localization
-  - https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Internationalization
-  - investigate cleaner way to map localizations in components
-- light and dark themes for actions
-- filter for playing audio
-- recover with history
-- tour & upgrade features
+  - add wiki with screenshots
+  - common css rules
+  - bugs
+    - tab group page
+      - fix rendering when preview images aren't available
+      - fix title text truncation sizing
+      - tab group name edit
+        - right side artifact
+        - enter should exit
+        - select text on focus
+        - visual indication for edit
+  - tab groups page - 1st layout
+    - visual indicator for editable text
+      - enter should finish edit
+    - min height for cards based on current window size to prevent layout issues
+    - rescale images based on resize
+    - tab group list
+      - close group
+      - add new group icon, droppable
+    - tab group header
+      - tab count
+      - add configure option
+    - tabs list
+      - loading indicator
+        - https://365webresources.com/10-best-pure-css-loading-spinners-front-end-developers/
+        - https://matejkustec.github.io/SpinThatShit/
+      - placeholder icon
+      - if dragging, don't set active tag
+    - shouldn't be included as tab in tab group
+    - preview image
+      - add debounce task after transition to complete if active
+  - save settings and tabs to sync
+    - synced groups
+    - options
+    - determine what current sync format is, can leverage for shared structure?
+  - styling
+    - http://design.firefox.com/photon/visuals/color.html
+    - pull css styles into shared file
+  - localization
+    - https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Internationalization
+    - investigate cleaner way to map localizations in components
+  - light and dark themes for actions
+  - filter for playing audio
+  - recover with history
+  - tour & upgrade features
 
 #### p4
-- save group to pocket?
-- VueJS unit testing
-  - https://vuejs.org/v2/guide/unit-testing.html
-- integration tests
-- documentation
-- test rollup & typescript integration
-  - https://vuejs.org/v2/guide/typescript.html
-- chrome testing
-  - shared data?
-- animations
-  - tab group page list scroll
-  - sidebar list actions
-- is bookmark folder option possible?
-- investigate plugin for vscode debugging
-- investigate placeholder thumbnails on mobile new tab page
-- 3rd party api documentation
+  - save group to pocket?
+  - VueJS unit testing
+    - https://vuejs.org/v2/guide/unit-testing.html
+  - integration tests
+  - documentation
+  - test rollup & typescript integration
+    - https://vuejs.org/v2/guide/typescript.html
+  - chrome testing
+    - shared data?
+  - animations
+    - tab group page list scroll
+    - sidebar list actions
+  - is bookmark folder option possible?
+  - investigate plugin for vscode debugging
+  - investigate placeholder thumbnails on mobile new tab page
+  - 3rd party api documentation
 
 #### p5
-- performance testing
-  - virtual scroll
-- interaction with containers
-- audio actions (play, pause)
+  - performance testing
+    - virtual scroll
+  - interaction with containers
+  - audio actions (play, pause)
 
 #### other
-- investigate weh
-  - https://github.com/mi-g/weh
-  - should use standard form spec for preferences
-- page visibility
-- webvr
+  - investigate weh
+    - https://github.com/mi-g/weh
+    - should use standard form spec for preferences
+  - page visibility
+  - webvr

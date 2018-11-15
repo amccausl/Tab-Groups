@@ -183,8 +183,9 @@ export default {
     },
     openTabGroupsPage() {
       // @todo only show if browser.sidebarAction.isOpen({})
-      browser.sidebarAction.open()
-      window.close()
+      openTabGroupsPage()
+      // browser.sidebarAction.open()
+      // window.close()
     },
     openTab( tab_id ) {
       console.info('openTab', tab_id)
