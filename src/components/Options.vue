@@ -217,6 +217,7 @@ export default {
     onStateChange( state => {
       console.info('loadState', state)
       Object.assign( this.preferences, state.config )
+      // @todo state.features undefined
       this.features_contexual_identities_enabled = state.features.contextual_identities.enabled
       this.features_tabhide_enabled = state.features.tabhide.enabled
     })

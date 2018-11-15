@@ -1,3 +1,11 @@
+### v0.0.8
+
+#### Features
+- favicon display improvements
+- handling for unexpected crash recovery
+- matching dynamic themes
+- action icon update to match theme
+
 ### v0.0.7
 
 #### Features

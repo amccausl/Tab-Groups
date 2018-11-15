@@ -64,6 +64,8 @@ export function loadBrowserState() {
     ( [ storage, _browser_tabs, _theme, _contextual_identities ] ) => {
       browser_tabs = _browser_tabs
       config = storage[ LOCAL_CONFIG_KEY ] || {}
+      console.info( 'loadBrowserState: browser_tabs', browser_tabs )
+      console.info( 'loadBrowserState: config', config )
       for( const [ key, value ] of Object.entries( default_config ) ) {
         if( ! config.hasOwnProperty( key ) ) {
           config[ key ] = value
@@ -71,6 +73,7 @@ export function loadBrowserState() {
       }
 
       contextual_identities = _contextual_identities || []
+      console.info( 'loadBrowserState: contextual_identities', contextual_identities )
       theme = _theme || {}
 
       const browser_tab_group_ids = []
@@ -90,6 +93,10 @@ export function loadBrowserState() {
     }
   ).then(
     ( [ tab_group_ids, tab_preview_images, window_tab_groups, tabhide_enabled ] ) => {
+      console.info( 'loadBrowserState: tab_group_ids', tab_group_ids )
+      console.info( 'loadBrowserState: tab_preview_images', tab_preview_images )
+      console.info( 'loadBrowserState: window_tab_groups', window_tab_groups )
+      console.info( 'loadBrowserState: tabhide_enabled', tabhide_enabled )
       const window_tab_groups_map = new Map()
       for( let i = 0; i < window_ids.length; i++ ) {
         window_tab_groups_map.set( window_ids[ i ], window_tab_groups[ i ] )

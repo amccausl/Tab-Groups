@@ -1,4 +1,74 @@
+#### p0
+- shift click before active tab should reverse select
+- investigate using awesome bar for search interactions
+- version-based builds
+- search
+  - research UX, talk to Adam
+- test re-open closed
+- action improvements
+  - add audio status to groups
+  - group switch
+    - switching group while pinned tab is selected shouldn't change active tab
+    - switching group while search active opens first match in group
+    - if group empty, new tab
+  - top border for bottom bar
+  - trigger with hotkey (Ctrl-Shift-e)
+  - keyboard navigation
+    - up & down to switch groups
+    - ctrl-f for focus search field?
+      - possible to toggle search field on entry (slide down)
+    - enter switches browser to group
+    - right slides to group contents
+- debugging helper
+  - store all actions dispatched with before / after
+  - sync check on interval
+    - check against state
+    - if matches
+      - clear all but 1 from actions log
+    - else
+      - launch error with debugging
+  - add lastError to debug
+    - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/extension/lastError
+- add new group interaction to action group
+
+#### Bugs
+- state recovery not functioning properly if firefox has issues recovering state
+- fix indexing issues in latest firefox
+  - caused by interaction with pinned tabs
+- loading spinner + muted is awkward
+- doorhanger on last item causes scroll
+- fix stylesheet linking
+
+#### UI
+- add top border for dark action footer
+- style improvements to search
+- should not clear favicon during reload process
+
+#### Performance
+- performance optimizations to dispatch cycle
+- package only used fonts
+
+#### Hotkeys
+- add hotkeys to doc
+- in sidebar
+  - shift-click to block select
+  - ctrl-click to toggle select
+  - future
+    - in tab context
+      - up, down to move focus
+      - left to close group
+      - ctrl-a to select all
+      - enter activate focus
+      - space to toggle select
+        - maybe ctrl-space?
+    - in group context
+      - up, down to move focus
+      - right to enter group
+      - enter activate focus
+  - need UI style for focus
+
 #### p1
+- delayed collapse on close with animation
 - shim around native drags
 - add flags to state for feature detection
 - styling for pinned
@@ -123,6 +193,11 @@
   - fix id
 
 #### p2
+- pageAction for move to group
+  - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/pageAction
+- handling for incognito
+  - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/extension/inIncognitoContext
+- max-height for sidebar group dynamic based on size of header and container to display 1 extra item only
 - testing
   - reproduce all bugs as integration tests
   - add library for web-extension browser mocking

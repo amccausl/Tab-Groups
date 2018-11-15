@@ -258,6 +258,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
 
   function onThemeUpdated( store, theme, window_id ) {
     console.info('onThemeUpdated', window_id, theme)
+    // @todo set action icon
     store.dispatch( updateThemeAction( theme ) )
   }
 
