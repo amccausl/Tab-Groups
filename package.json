@@ -22,17 +22,17 @@
     "url": "https://github.com/amccausl/tabulate/issues"
   },
   "dependencies": {
-    "debug": "^4.1.0",
+    "debug": "4.1.0",
     "vue": "2.5.17"
   },
   "devDependencies": {
-    "ajv": "6.5.4",
+    "ajv": "6.6.1",
     "ajv-cli": "3.0.0",
     "babel-core": "6.26.3",
     "bower": "1.8.4",
     "cross-env": "5.2.0",
-    "node-sass": "4.9.3",
-    "rollup": "0.66.6",
+    "node-sass": "4.10.0",
+    "rollup": "0.67.3",
     "rollup-plugin-alias": "1.4.0",
     "rollup-plugin-async": "1.2.0",
     "rollup-plugin-buble": "0.19.4",
@@ -41,8 +41,8 @@
     "rollup-plugin-node-resolve": "3.4.0",
     "rollup-plugin-replace": "2.1.0",
     "rollup-plugin-vue": "4.3.2",
-    "tap": "12.0.1",
+    "tap": "12.1.0",
     "vue-template-compiler": "2.5.17",
-    "web-ext": "2.9.1"
+    "web-ext": "2.9.2"
   }
 }
