@@ -1,3 +1,5 @@
+import tap from "tap"
+
 import {
   createTestTab
 } from "../helpers.mjs"
@@ -75,8 +77,5 @@ function testActivateMissingGroup(t) {
   t.end()
 }
 
-export default function testGroupActivate( tap ) {
-  tap.test( testNormalActivate )
-  tap.test( testActivateMissingGroup )
-  tap.end()
-}
+tap.test( testNormalActivate )
+tap.test( testActivateMissingGroup )

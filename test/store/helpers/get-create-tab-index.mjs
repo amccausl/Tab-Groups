@@ -1,3 +1,5 @@
+import tap from "tap"
+
 import {
   createWindow,
   createTabGroup,
@@ -8,7 +10,6 @@ import {
   createBrowserTab,
   createTestTab,
 } from "../helpers.mjs"
-
 
 function testGetCreateTabIndexNewTabEnd( t ) {
   const state0 = {
@@ -100,9 +101,6 @@ function testGetCreateTabIndexNewFromPinned( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testGetCreateTabIndexNewTabEnd )
-  tap.test( testGetCreateTabIndexNewTabMiddle )
-  tap.test( testGetCreateTabIndexNewFromPinned )
-  tap.end()
-}
+tap.test( testGetCreateTabIndexNewTabEnd )
+tap.test( testGetCreateTabIndexNewTabMiddle )
+tap.test( testGetCreateTabIndexNewFromPinned )

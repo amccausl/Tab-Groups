@@ -1,3 +1,5 @@
+import tap from 'tap'
+
 import {
   createTabGroup,
   createPinnedTabGroup,
@@ -57,8 +59,5 @@ function shouldFailWhenActiveTabNotInActiveGroup( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testStateValidation )
-  tap.test( shouldFailWhenActiveTabNotInActiveGroup )
-  tap.end()
-}
+tap.test( testStateValidation )
+tap.test( shouldFailWhenActiveTabNotInActiveGroup )

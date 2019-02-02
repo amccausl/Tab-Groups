@@ -1,3 +1,5 @@
+import tap from "tap"
+
 import {
   attachTab
 } from "../../../src/store/reducers/tab.mjs"
@@ -40,7 +42,4 @@ function shouldValidateNativeTabDragToNativeTabBar( t ) {
   t.end()
 }
 
-export default function testTabAttach( tap ) {
-  tap.test( shouldValidateNativeTabDragToNativeTabBar )
-  tap.end()
-}
+tap.test( shouldValidateNativeTabDragToNativeTabBar )

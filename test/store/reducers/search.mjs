@@ -1,3 +1,5 @@
+import tap from "tap"
+
 import {
   createPinnedTabGroup,
   createTabGroup,
@@ -45,7 +47,4 @@ function testSingleWindowSearch( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testSingleWindowSearch )
-  tap.end()
-}
+tap.test( testSingleWindowSearch )

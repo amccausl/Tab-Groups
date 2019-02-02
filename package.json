@@ -6,7 +6,7 @@
     "build": "./build.sh",
     "build-windows": "build.bat",
     "dev": "./node_modules/.bin/cross-env NODE_ENV=development ./build.sh",
-    "test": "node --experimental-modules test/index.mjs | ./node_modules/.bin/tap -",
+    "test": "./node_modules/.bin/tap test | ./node_modules/.bin/tap -",
     "debug": "./node_modules/.bin/web-ext --source-dir dist run --verbose",
     "debug-de": "./node_modules/.bin/web-ext --source-dir dist run --verbose --firefox firefox-de",
     "postinstall": "./node_modules/.bin/bower install",
@@ -41,7 +41,7 @@
     "rollup-plugin-node-resolve": "4.0.0",
     "rollup-plugin-replace": "2.1.0",
     "rollup-plugin-vue": "4.3.2",
-    "tap": "12.1.1",
+    "tap": "12.5.0",
     "vue-template-compiler": "2.5.17",
     "web-ext": "2.9.3"
   }

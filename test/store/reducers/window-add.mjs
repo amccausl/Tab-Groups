@@ -1,3 +1,5 @@
+import tap from 'tap'
+
 import {
   getInitialState,
   getMultiWindowInitialState,
@@ -22,7 +24,4 @@ function testSingleWindowAdd( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testSingleWindowAdd )
-  tap.end()
-}
+tap.test( testSingleWindowAdd )

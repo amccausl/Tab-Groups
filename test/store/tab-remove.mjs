@@ -1,3 +1,5 @@
+import tap from 'tap'
+
 import {
   createTestTab,
 } from "./helpers.mjs"
@@ -109,9 +111,6 @@ function testRemoveLastTab( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testRemoveFirstTab )
-  tap.test( testRemoveMiddleTab )
-  tap.test( testRemoveLastTab )
-  tap.end()
-}
+tap.test( testRemoveFirstTab )
+tap.test( testRemoveMiddleTab )
+tap.test( testRemoveLastTab )

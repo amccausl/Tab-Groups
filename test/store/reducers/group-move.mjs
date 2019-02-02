@@ -1,3 +1,5 @@
+import tap from "tap"
+
 import {
   moveGroup
 } from "../../../src/store/reducers/group.mjs"
@@ -115,9 +117,6 @@ function toDifferentWindow( t ) {
   t.end()
 }
 
-export default function testGroupMove( tap ) {
-  tap.test( toSameWindow )
-  tap.test( toSameWindowDropZone )
-  tap.test( toDifferentWindow )
-  tap.end()
-}
+tap.test( toSameWindow )
+tap.test( toSameWindowDropZone )
+tap.test( toDifferentWindow )

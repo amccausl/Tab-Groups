@@ -1,3 +1,4 @@
+import tap from "tap"
 
 import {
   getTransferData,
@@ -120,9 +121,6 @@ function getTransferDataFromLink( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  // tap.test( draggingLocalTab )
-  tap.test( getTransferDataFromBookmark )
-  tap.test( getTransferDataFromBookmarkFolder )
-  tap.end()
-}
+// tap.test( draggingLocalTab )
+tap.test( getTransferDataFromBookmark )
+tap.test( getTransferDataFromBookmarkFolder )

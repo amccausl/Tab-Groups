@@ -1,3 +1,5 @@
+import tap from "tap"
+
 import {
   createBrowserTab,
   createTestTab,
@@ -209,13 +211,10 @@ function testOpenActiveTabUndefinedGroup( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testSingleWindowAdd )
-  tap.test( testMultiWindowAdd )
-  tap.test( testAddToNewWindow )
-  tap.test( testReopenClosedPinnedTab )
-  tap.test( testOpenNewTabWithOpenerId )
-  tap.test( testOpenNewTabInOtherGroup )
-  tap.test( testOpenActiveTabUndefinedGroup )
-  tap.end()
-}
+tap.test( testSingleWindowAdd )
+tap.test( testMultiWindowAdd )
+tap.test( testAddToNewWindow )
+tap.test( testReopenClosedPinnedTab )
+tap.test( testOpenNewTabWithOpenerId )
+tap.test( testOpenNewTabInOtherGroup )
+tap.test( testOpenActiveTabUndefinedGroup )

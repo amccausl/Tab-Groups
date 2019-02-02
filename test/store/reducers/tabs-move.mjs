@@ -1,3 +1,5 @@
+import tap from "tap"
+
 import { createTestTab } from "../helpers"
 import {
   createPinnedTabGroup,
@@ -129,9 +131,6 @@ function testMoveTabsToNewGroup( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testSingleWindowMoveOne )
-  tap.test( testMoveActiveTab )
-  tap.test( testMoveTabsToNewGroup )
-  tap.end()
-}
+tap.test( testSingleWindowMoveOne )
+tap.test( testMoveActiveTab )
+tap.test( testMoveTabsToNewGroup )

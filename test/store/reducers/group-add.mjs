@@ -1,3 +1,5 @@
+import tap from "tap"
+
 import {
   getInitialState,
 } from "../helpers.mjs"
@@ -15,7 +17,4 @@ function testNormalCreate( t ) {
   t.end()
 }
 
-export default function testGroupCreate( tap ) {
-  tap.test( testNormalCreate )
-  tap.end()
-}
+tap.test( testNormalCreate )

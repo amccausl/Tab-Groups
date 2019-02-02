@@ -1,3 +1,5 @@
+import tap from 'tap'
+
 import {
   createTestTab,
   getInitialState,
@@ -50,8 +52,5 @@ function testSingleWindowMultiGroupActivateTab( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testSingleWindowSingleGroupActivateTab )
-  tap.test( testSingleWindowMultiGroupActivateTab )
-  tap.end()
-}
+tap.test( testSingleWindowSingleGroupActivateTab )
+tap.test( testSingleWindowMultiGroupActivateTab )

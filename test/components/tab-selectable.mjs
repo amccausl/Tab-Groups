@@ -1,3 +1,4 @@
+import tap from 'tap'
 
 import {
   toggleTabSelection,
@@ -95,8 +96,5 @@ function testToggleTabBatchSelection( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testToggleTabSelection )
-  tap.test( testToggleTabBatchSelection )
-  tap.end()
-}
+tap.test( testToggleTabSelection )
+tap.test( testToggleTabBatchSelection )

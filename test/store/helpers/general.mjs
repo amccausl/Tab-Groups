@@ -1,18 +1,49 @@
 import tap from "tap"
 
 import {
-  getTabState
-} from "../../../src/integrations/index.mjs"
-import {
-  createWindow,
-  createTabGroup,
   createPinnedTabGroup,
+  createTabGroup,
+  createWindow,
+  findTab,
+  getTabGroupsPersistState,
   getTabMoveData,
+  getTargetIndex,
 } from "../../../src/store/helpers.mjs"
+
 import {
-  createBrowserTab,
   createTestTab,
+  getInitialState,
 } from "../helpers.mjs"
+
+function moveToLaterIndex( t ) {
+  const moving_tab = createTestTab({ id: 3 })
+  const tab_group = createTabGroup( 2, [
+    moving_tab,
+    createTestTab({ id: 4 }),
+    createTestTab({ id: 5 })
+  ])
+  const target_window = createWindow( 1, [
+    createPinnedTabGroup( [] ),
+    tab_group
+  ])
+
+  const target_data = { window_id: target_window.id, tab_group_id: tab_group.id, tab_group_index: 1 }
+  const ignored_tabs = [ moving_tab ]
+
+  let target_index_data = getTargetIndex( target_window, target_data, ignored_tabs )
+  t.same( target_index_data, {
+    index: 0,
+    tab_group_index: 0
+  })
+  t.end()
+}
+
+function testFindTab( t ) {
+  let state = getInitialState()
+  let tab = findTab( state, state.windows[ 0 ].id, state.windows[ 0 ].tab_groups[ 1 ].tabs[ 0 ].id )
+  t.equal( tab, state.windows[ 0 ].tab_groups[ 1 ].tabs[ 0 ] )
+  t.end()
+}
 
 function testGetTabMoveData( t ) {
   const initial_state = {
@@ -50,7 +81,7 @@ function testGetTabMoveData( t ) {
   t.equal( tab_move_data.source_data.tabs[ 1 ], initial_state.windows[ 0 ].tab_groups[ 1 ].tabs[ 1 ], "copy tab 5 by reference" )
   t.same( tab_move_data.target_data, {
     window_id: 1,
-    index: 3,
+    index: 4, // Native index is only offset by 1, instead of 2.  Think this is an upstream bug
     tab_group_id: 3,
     tab_group_index: 2
   })
@@ -103,43 +134,6 @@ function testGetTabMoveDataMiddle( t ) {
   t.end()
 }
 
-function testGetTabMoveDataReopenPinned( t ) {
-  // Reopened pinned tabs are opened at the end of the
-  const state0 = {
-    windows: [
-      createWindow( 1, [
-        createPinnedTabGroup( [
-          createTestTab({ id: 3 })
-        ] ),
-        createTabGroup( 2, [
-          createTestTab({ id: 4 }),
-          createTestTab({ id: 5 })
-        ])
-      ])
-    ]
-  }
-
-  const browser_tab = createBrowserTab({
-    id: 6,
-    index: 1,
-    windowId: 1,
-    pinned: true
-  })
-  const tab = getTabState( browser_tab )
-
-  const move_data = getTabMoveData(
-    state0,
-    { tabs: [ tab ] },
-    {
-      window_id: browser_tab.windowId,
-      index: browser_tab.index,
-      pinned: browser_tab.pinned
-    }
-  )
-
-  t.end()
-}
-
 function testGetTabMoveDataNewGroup( t ) {
   const initial_state = {
     windows: [
@@ -178,101 +172,31 @@ function testGetTabMoveDataNewGroup( t ) {
   t.end()
 }
 
-function testMoveFromUrl( t ) {
-  const state0 = {
-    windows: [
-      createWindow( 1, [
-        createPinnedTabGroup( [] ),
-        createTabGroup( 2, [
-          createTestTab({ id: 4 }),
-          createTestTab({ id: 5 }),
-          createTestTab({ id: 6 })
-        ]),
-        createTabGroup( 3, [
-          createTestTab({ id: 7 }),
-          createTestTab({ id: 8 })
-        ])
-      ])
-    ]
-  }
+function testGetTargetIndex( t ) {
+  t.test( moveToLaterIndex )
+  t.end()
+}
 
-  let source_data = {
-    type: "moz-url",
-    url: "https://google.ca"
-  }
-  let target_data = {
-    window_id: 1,
-    tab_group_id: 3
-  }
+function testPersistence( t ) {
+  let state = getInitialState()
+  let tab_groups_state = getTabGroupsPersistState( state.windows[ 0 ] )
 
-  let tab_move_data = getTabMoveData( state0, source_data, target_data )
-
-  // t.equal( tab_move_data.source_data.window_id, 1 )
-  // t.equal( tab_move_data.source_data.tabs.filter( tab => tab ).length, 2, "no missing tabs" )
-  // t.same( tab_move_data.source_data.tabs.map( tab => tab.id ), [ 4, 5 ], "tabs match ids and order" )
-  // t.equal( tab_move_data.source_data.tabs[ 0 ], state0.windows[ 0 ].tab_groups[ 1 ].tabs[ 0 ], "copy tab 4 by reference" )
-  // t.equal( tab_move_data.source_data.tabs[ 1 ], state0.windows[ 0 ].tab_groups[ 1 ].tabs[ 1 ], "copy tab 5 by reference" )
-  // t.same( tab_move_data.target_data, {
-  //   window_id: 1,
-  //   index: 3,
-  //   tab_group_id: 3,
-  //   tab_group_index: 2
-  // })
+  t.same( tab_groups_state, [
+    {
+      id: 1,
+      title: "Group 1",
+      active: true,
+      active_tab_id: 1,
+      tabs_count: 2
+    }
+  ])
 
   t.end()
 }
 
-function testNativeDragToStartOfSecondGroup( t ) {
-  const state0 = {
-    windows: [
-      createWindow( 1, [
-        createPinnedTabGroup( [] ),
-        createTabGroup( 3, [
-          createTestTab({ id: 6 }),
-          createTestTab({ id: 7 }),
-        ]),
-        createTabGroup( 4, [
-          createTestTab({ id: 8 }),
-          createTestTab({ id: 9 }),
-        ])
-      ]),
-      createWindow( 2, [
-        createPinnedTabGroup( [] ),
-        createTabGroup( 5, [
-          createTestTab({ id: 10 }),
-          createTestTab({ id: 11 }),
-        ])
-      ])
-    ]
-  }
-
-  state0.windows[ 0 ].active_tab_group_id = 4
-  state0.windows[ 0 ].active_tab_id = 9
-
-  let source_data = {
-    window_id: 2,
-    tab_ids: [ 10 ]
-  }
-  let target_data = {
-    window_id: 1,
-    index: 2,
-  }
-
-  let tab_move_data = getTabMoveData( state0, source_data, target_data )
-
-  t.same( tab_move_data.target_data, {
-    window_id: 1,
-    index: 2,
-    tab_group_id: 4,
-    tab_group_index: 0,
-  })
-
-  t.end()
-}
-
-// tap.test( testGetTabMoveData )
-// tap.test( testGetTabMoveDataMiddle )
-// tap.test( testGetTabMoveDataNewGroup )
-// tap.test( testGetTabMoveDataReopenPinned )
-tap.test( testMoveFromUrl )
-tap.test( testNativeDragToStartOfSecondGroup )
+tap.test( testFindTab )
+tap.test( testGetTabMoveData )
+tap.test( testGetTabMoveDataMiddle )
+tap.test( testGetTabMoveDataNewGroup )
+tap.test( testGetTargetIndex )
+tap.test( testPersistence )

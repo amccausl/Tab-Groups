@@ -1,3 +1,5 @@
+import tap from "tap"
+
 import init from "../../../src/store/reducers/init.mjs"
 import { validateState } from "../../../src/store/validators.mjs"
 
@@ -245,11 +247,8 @@ function testUnsetActiveTab( t ) {
 
 // @todo if one window not included in saved state, ensure IDs not duplicated
 
-export default function testInit( tap ) {
-  tap.test( freshInitWithSingleWindow )
-  tap.test( freshInitWithMultipleWindows )
-  tap.test( testSingleWindowMultiGroupDetectActive )
-  tap.test( testSingleWindowSessionLoad )
-  tap.test( testUnsetActiveTab )
-  tap.end()
-}
+tap.test( freshInitWithSingleWindow )
+tap.test( freshInitWithMultipleWindows )
+tap.test( testSingleWindowMultiGroupDetectActive )
+tap.test( testSingleWindowSessionLoad )
+tap.test( testUnsetActiveTab )
