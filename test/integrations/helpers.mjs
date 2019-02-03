@@ -1,3 +1,4 @@
+import tap from "tap"
 
 export function getMockBrowser( emitter ) {
   const getEmitter = ( event ) => {
@@ -12,6 +13,7 @@ export function getMockBrowser( emitter ) {
       getMessage: ( key ) => ""
     },
     sessions: {
+      onChanged: getEmitter( "sessions.onChanged" ),
       setTabValue( tab_id, key, value ) {
         return new Promise( ( resolve, reject ) => {
           resolve()
@@ -41,4 +43,8 @@ export function getMockBrowser( emitter ) {
       },
     }
   }
+}
+
+if( process.argv[ 1 ].endsWith( "test/integrations/helpers.mjs" ) ) {
+  tap.pass()
 }

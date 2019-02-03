@@ -1,3 +1,5 @@
+import tap from "tap"
+
 import { getTabState } from "../../src/integrations/index.mjs"
 import {
   createWindow,
@@ -75,4 +77,8 @@ export function getMultiWindowInitialState() {
   )
 
   return initial_state
+}
+
+if( process.argv[ 1 ].endsWith( "test/store/helpers.mjs" ) ) {
+  tap.pass()
 }

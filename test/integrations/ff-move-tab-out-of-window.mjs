@@ -1,6 +1,7 @@
-/*
-import tap from "tap"
 import EventEmitter from "events"
+import tap from "tap"
+
+/*
 import {
   bindBrowserEvents,
 } from "../../src/integrations/index.mjs"
@@ -16,7 +17,14 @@ const emitter = new EventEmitter()
 let state = getInitialState()
 const browser = getMockBrowser( emitter )
 const store = createStore( App, state )
-const browser_state = {}
+const browser_state = {
+  browser_tabs: [],
+  features: {
+    tabhide: {
+      enabled: true,
+    },
+  },
+}
 bindBrowserEvents( browser, browser_state, store )
 
 // @todo Run browser events
@@ -36,5 +44,6 @@ emitter.emit( "tabs.onActivated", { tabId: moving_tab.id, windowId: new_window_i
 
 state = store.getState()
 // console.info( 'state', state )
-
 */
+
+tap.pass()
