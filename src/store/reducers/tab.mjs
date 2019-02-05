@@ -434,3 +434,20 @@ export function removeTab( state, { tab_id, window_id } ) {
 
   return new_state
 }
+
+export function highlightTabs( state, { window_id, tab_ids } ) {
+  const windows = state.windows.map( window => {
+    if( window.id !== window_id ) {
+      return window
+    }
+    return Object.assign( {}, window, {
+      highlighted_tab_ids: tab_ids,
+    })
+  })
+
+  const new_state = Object.assign( {}, state, {
+    windows
+  })
+
+  return new_state
+}

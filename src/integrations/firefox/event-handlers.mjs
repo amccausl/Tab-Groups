@@ -12,6 +12,7 @@ import {
   removeTabAction,
   updateTabAction,
   // updateTabImageAction,
+  highlightTabsAction,
   moveTabAction,
   attachTabAction,
 } from "../../store/actions.mjs"
@@ -120,6 +121,17 @@ export function bindBrowserEvents( browser, browser_state, store ) {
     console.info('tabs.onActivated', tabId, windowId)
     onTabActivated( store, tabId, windowId )
   })
+
+  function onTabHighlighted( store, window_id, tab_ids ) {
+    return store.dispatch( highlightTabsAction( window_id, tab_ids ) )
+  }
+
+  if( browser.tabs.onHighlighted != null ) {
+    browser.tabs.onHighlighted.addListener( ( { windowId, tabIds } ) => {
+      console.info('onHighlighted', { windowId, tabIds })
+      onTabHighlighted( store, windowId, tabIds )
+    })
+  }
 
   function onTabCreated( store, browser_tab ) {
     const state = store.getState()

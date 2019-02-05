@@ -12,6 +12,7 @@ import {
   GROUP_MOVE,
   GROUP_MUTE,
   GROUP_UNMUTE,
+  TABS_HIGHLIGHT,
   TABS_MOVE,
   TAB_ACTIVATE,
   TAB_ADD,
@@ -44,6 +45,7 @@ import {
   addTab,
   activateTab,
   attachTab,
+  highlightTabs,
   updateTab,
   updateTabImage,
   moveTab,
@@ -98,6 +100,8 @@ export default function App( state, action ) {
       return muteGroup( state, action )
     case GROUP_UNMUTE:
       return unmuteGroup( state, action )
+    case TABS_HIGHLIGHT:
+      return highlightTabs( state, action )
     case TABS_MOVE:
       return moveTabs( state, action )
     case TAB_ACTIVATE:

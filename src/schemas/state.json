@@ -141,6 +141,12 @@
               }
             ]
           },
+          "highlighted_tab_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
           "tab_groups": {
             "type": "array",
             "minItems": 2,

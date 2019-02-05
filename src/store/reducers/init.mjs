@@ -64,6 +64,7 @@ export default function init( state, { browser_tabs, config, contextual_identiti
 
     let pinned_tabs = []
     let ungrouped_tabs = []
+    const highlighted_tab_ids = []
     for( let browser_tab of window_tabs ) {
       if( browser_tab.active ) {
         active_tab_id = browser_tab.id
@@ -75,6 +76,10 @@ export default function init( state, { browser_tabs, config, contextual_identiti
         window_tab_group_map.get( browser_tab.session[ TAB_GROUP_ID_KEY ] ).tabs.push( tab )
       } else {
         ungrouped_tabs.push( tab )
+      }
+
+      if( browser_tab.highlighted ) {
+        highlighted_tab_ids.push( browser_tab.id )
       }
     }
 
@@ -115,6 +120,7 @@ export default function init( state, { browser_tabs, config, contextual_identiti
       // error
       active_tab_group_id: active_tab_group_id || window_tab_groups[ 1 ].id,
       active_tab_id,
+      highlighted_tab_ids,
       tab_groups: window_tab_groups
     })
   }

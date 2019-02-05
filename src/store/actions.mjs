@@ -13,6 +13,7 @@ import {
   GROUP_MUTE,
   GROUP_UNMUTE,
   THEME_UPDATE,
+  TABS_HIGHLIGHT,
   TABS_MOVE,
   TAB_ACTIVATE,
   TAB_ADD,
@@ -190,6 +191,14 @@ export function updateTabImageAction( tab_id, window_id, preview_image_uri ) {
     tab_id,
     window_id,
     preview_image_uri
+  }
+}
+
+export function highlightTabsAction( window_id, tab_ids ) {
+  return {
+    type: TABS_HIGHLIGHT,
+    window_id,
+    tab_ids,
   }
 }
 
