@@ -10,7 +10,9 @@ export function toggleTabSelection( tab_id ) {
     for( const tab of tab_group.tabs ) {
       if( tab.id === tab_id ) {
         if( this.selected_tab_ids[ selected_tab_index ] === tab_id ) {
-          this.selected_tab_ids.splice( selected_tab_index, 1 )
+          if( this.selected_tab_ids.length > 1 ) {
+            this.selected_tab_ids.splice( selected_tab_index, 1 )
+          }
         } else {
           this.selected_tab_ids.splice( selected_tab_index, 0, tab_id )
         }
@@ -30,7 +32,6 @@ export function toggleTabBatchSelection( tab_id ) {
   // @todo parallel scan of selected_tab_ids & tab_groups to match
   let selected_tab_index = 0
   for( const tab_group of this.tab_groups ) {
-    let delete_count = 0
     let delete_start_index = selected_tab_index
     let selected_group_tab_ids
     let tab_group_selection_start_index = null
@@ -44,12 +45,11 @@ export function toggleTabBatchSelection( tab_id ) {
         if( tab_group_selection_start_index == null ) {
           tab_group_selection_start_index = tab_group_index
         }
-        // could do this with 1 counter, but might be harder to read
-        delete_count++
         selected_tab_index++
       }
       tab_group_index++
     }
+    const delete_count = selected_tab_index
     if( selected_group_tab_ids != null ) {
       this.selected_tab_ids.splice( delete_start_index, delete_count, ...selected_group_tab_ids )
     }

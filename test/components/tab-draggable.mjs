@@ -121,6 +121,6 @@ function getTransferDataFromLink( t ) {
   t.end()
 }
 
-// tap.test( draggingLocalTab )
+tap.test( draggingLocalTab )
 tap.test( getTransferDataFromBookmark )
 tap.test( getTransferDataFromBookmarkFolder )

@@ -161,7 +161,7 @@
         <span :class="[ `action-strip__button-text` ]" v-once>{{ __MSG_tab_group_new__ }}</span>
       </div>
     </div>
-    <div v-if="tab_group_context_menu.open" class="context-menu__ctx" @click="closeTabGroupMore" @click.right="closeTabGroupMore"></div>
+    <div v-if="tab_group_context_menu.open" class="context-menu__ctx" @click="closeTabGroupMore"></div>
     <!-- @todo animate -->
     <div v-if="tab_group_context_menu.open" class="context-menu__content" :style="{ top: tab_group_context_menu.y + 'px', right: tab_group_context_menu.x + 'px' }">
       <!-- @todo localize -->
@@ -210,7 +210,6 @@ import {
   debounce,
   getCountMessage,
   getFriendlyUrlText,
-  getNewSelectedTabIds,
   getTabGroupCopyText,
   onStateChange,
 } from './helpers.mjs'
@@ -314,7 +313,6 @@ export default {
       // @todo optimize translation
 
       // @todo this could be done more efficiently
-      const new_selected_tab_ids = getNewSelectedTabIds( this.selected_tab_ids, state_window )
       const search_missed_tab_ids = []
 
       // Need to deep clone the objects because Vue extends prototypes when state added to the vm
@@ -356,7 +354,7 @@ export default {
       })
       // Use the extended splice to trigger change detection
       Object.getPrototypeOf( this.search_missed_tab_ids ).splice.apply( this.search_missed_tab_ids, [ 0, this.search_missed_tab_ids.length, ...search_missed_tab_ids ] )
-      Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...new_selected_tab_ids ] )
+      Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...state_window.highlighted_tab_ids ] )
       // Object.getPrototypeOf( this.pinned_tabs ).splice.apply( this.pinned_tabs, [ 0, this.pinned_tabs.length, ...tab_groups[ 0 ].tabs ] )
       Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length, ...tab_groups.slice( 1 ) ] )
 
@@ -480,9 +478,6 @@ export default {
       // @todo should be moved to background
       window.store.dispatch( updateGroupAction( tab_group.id, this.window_id, { title } ) )
     },
-    getNewSelectedTabIds() {
-      return getNewSelectedTabIds( this.selected_tab_ids, this.tab_groups )
-    },
     getTabSearchState( tab ) {
       if( ! this.is_searching ) {
         return false
@@ -500,12 +495,14 @@ export default {
     toggleTabSelection( tab ) {
       console.info('toggleTabSelection', tab.id)
       toggleTabSelection.call( this, tab.id )
-      console.info('selected_tab_ids', this.selected_tab_ids)
+      const highlighted_tab_ids = this.selected_tab_ids.slice( 0, this.selected_tab_ids.length )
+      window.background.setHighlightedTabIds( window.store, this.window_id, highlighted_tab_ids )
     },
     toggleTabBatchSelection( tab ) {
       console.info('toggleTabBatchSelection', tab)
       toggleTabBatchSelection.call( this, tab.id )
-      console.info('selected_tab_ids', this.selected_tab_ids)
+      const highlighted_tab_ids = this.selected_tab_ids.slice( 0, this.selected_tab_ids.length )
+      window.background.setHighlightedTabIds( window.store, this.window_id, highlighted_tab_ids )
     },
   }
 }

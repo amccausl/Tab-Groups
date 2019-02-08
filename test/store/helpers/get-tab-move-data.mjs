@@ -270,9 +270,65 @@ function testNativeDragToStartOfSecondGroup( t ) {
   t.end()
 }
 
+function testNativeDragMultiple( t ) {
+  const state0 = {
+    windows: [
+      createWindow(
+        1,
+        [
+          createPinnedTabGroup( [] ),
+          createTabGroup( 3, [
+            createTestTab({ id: 6 }),
+            createTestTab({ id: 7 }),
+          ]),
+          createTabGroup( 4, [
+            createTestTab({ id: 8, highlighted: true }),
+            createTestTab({ id: 9, highlighted: true }),
+          ]),
+        ],
+        { highlighted_tab_ids: [ 8, 9 ] }
+      ),
+      createWindow( 2, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( 5, [
+          createTestTab({ id: 10 }),
+          createTestTab({ id: 11 }),
+        ])
+      ])
+    ]
+  }
+
+  state0.windows[ 0 ].active_tab_group_id = 4
+  state0.windows[ 0 ].active_tab_id = 9
+
+  let source_data = {
+    type: "moz-tab",
+    urls: [
+      "about:blank",
+      "about:blank",
+    ]
+  }
+  let target_data = {
+    window_id: 1,
+    index: 2,
+  }
+
+  let tab_move_data = getTabMoveData( state0, source_data, target_data )
+
+  t.same( tab_move_data.target_data, {
+    window_id: 1,
+    index: 2,
+    tab_group_id: 4,
+    tab_group_index: 0,
+  })
+
+  t.end()
+}
+
 // tap.test( testGetTabMoveData )
 // tap.test( testGetTabMoveDataMiddle )
 // tap.test( testGetTabMoveDataNewGroup )
 // tap.test( testGetTabMoveDataReopenPinned )
 tap.test( testMoveFromUrl )
 tap.test( testNativeDragToStartOfSecondGroup )
+tap.test( testNativeDragMultiple )

@@ -23,6 +23,7 @@ import {
   resetBrowserState,
   runTabSearch,
   setConfig,
+  setHighlightedTabIds,
   setTabActive,
   setWindowTabGroupsState,
 } from "./integrations/index.mjs"
@@ -75,6 +76,7 @@ window.getStore = function() {
 
 // Proxy public methods from integrations to reduce duplication in app js
 // @todo standardize naming
+window.setHighlightedTabIds = setHighlightedTabIds
 window.moveTabsToGroup = moveTabsToGroup
 window.moveTabGroup = moveTabGroup
 window.closeTab = closeTab

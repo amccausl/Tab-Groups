@@ -231,6 +231,9 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       }
     }
     // @todo should omit ignored properties and check if result is empty instead
+    if( change_info.hasOwnProperty( "attention" ) ) {
+      return
+    }
     if( change_info.hasOwnProperty( "discarded" ) ) {
       return
     }

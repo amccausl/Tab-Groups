@@ -475,6 +475,32 @@ export function unmuteTabGroup( store, window_id, tab_group_id ) {
   })
 }
 
+export function setHighlightedTabIds( store, window_id, tab_ids ) {
+  const state0 = store.getState()
+  const target_window = state0.windows.find( window => window.id === window_id )
+  if( ! target_window ) {
+    // @todo error
+    return Promise.reject()
+  }
+  const tab_indices = []
+  let tab_index = 0
+  for( const tab_group of target_window.tab_groups ) {
+    for( const tab of tab_group.tabs ) {
+      if( tab_ids.includes( tab.id ) ) {
+        // When calling the highlight API, will update active tab if another tab is first :(
+        if( tab_group.active_tab_id === tab.id ) {
+          tab_indices.unshift( tab_index )
+        } else {
+          tab_indices.push( tab_index )
+        }
+      }
+      tab_index++
+    }
+  }
+  console.info('browser.tabs.highlight', { windowId: window_id, tabs: tab_indices })
+  browser.tabs.highlight( { windowId: window_id, tabs: tab_indices } )
+}
+
 /**
  * Move tabs to a different group
  * @param store

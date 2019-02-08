@@ -8,13 +8,17 @@ export const default_config = {
   show_tab_icon_background: true,
 }
 
-export function createWindow( window_id, tab_groups ) {
-  return {
-    id: window_id,
-    active_tab_group_id: tab_groups[ 1 ].id,
-    active_tab_id: tab_groups[ 1 ].active_tab_id,
-    tab_groups: tab_groups
-  }
+export function createWindow( window_id, tab_groups, properties = {} ) {
+  return Object.assign(
+    {
+      id: window_id,
+      active_tab_group_id: tab_groups[ 1 ].id,
+      active_tab_id: tab_groups[ 1 ].active_tab_id,
+      highlighted_tab_ids: [ tab_groups[ 1 ].active_tab_id ],
+      tab_groups: tab_groups,
+    },
+    properties
+  )
 }
 
 export function createTabGroup( tab_group_id, tabs, active_tab_id ) {
@@ -307,16 +311,34 @@ export function getTabMoveData( state, source_data, target_data ) {
       }
     } else if( source_data.type === 'moz-tab' ) {
       // @todo scan target_data group, then window first
-      source_data.tabs = [ null ]
+      const urls = ( source_data.url ? [ source_data.url ] : source_data.urls )
+      source_data.tab_ids = Array( urls.length ).fill( null )
+      source_data.tabs = Array( urls.length ).fill( null )
       for( let window of windows ) {
+        if( window.highlighted_tab_ids.length !== urls.length ) {
+          continue
+        }
         for( let tab_group of window.tab_groups ) {
           for( let tab of tab_group.tabs ) {
-            if( tab.id === window.active_tab_id && tab.url === source_data.url ) {
+            if( ! window.highlighted_tab_ids.includes( tab.id ) ) {
+              continue
+            }
+            let url_index = urls.indexOf( tab.url )
+            // Check if url is duplicate,
+            while( url_index > -1 && source_data.tabs[ url_index ] != null ) {
+              url_index = urls.indexOf( tab.url, url_index + 1 )
+            }
+            if( url_index > -1 ) {
               source_data.window_id = window.id
-              source_data.tab_ids = [ tab.id ]
-              source_data.tabs[ 0 ] = tab
+              source_data.tab_ids[ url_index ] = tab.id
+              source_data.tabs[ url_index ] = tab
             }
           }
+        }
+        if( source_data.tabs.includes( null ) ) {
+          source_data.fill( null )
+        } else {
+          break
         }
       }
       // @todo if scan doesn't find anything, dragging from another instance of firefox, can process as URL
