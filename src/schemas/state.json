@@ -163,6 +163,9 @@
                     },
                     "active_tab_id": {
                     },
+                    "last_active": {
+                      "type": "integer"
+                    },
                     "tabs": {
                       "type": "array",
                       "items": { "$ref": "#/definitions/tab" }
@@ -188,6 +191,9 @@
                       "minLength": 1
                     },
                     "active_tab_id": {
+                    },
+                    "last_active": {
+                      "type": "integer"
                     },
                     "muted": {
                       "type": "boolean"

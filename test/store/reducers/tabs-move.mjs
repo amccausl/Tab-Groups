@@ -48,16 +48,20 @@ function testSingleWindowMoveOne( t ) {
 }
 
 function testMoveActiveTab( t ) {
+  const last_active = ( new Date() ).getTime() - 10
   const initial_state = {
     config: {},
     windows: [
       createWindow( 1, [
         createPinnedTabGroup( [] ),
-        createTabGroup( 2, [
-          createTestTab({ id: 4 }),
-          createTestTab({ id: 5 }),
-          createTestTab({ id: 6 })
-        ]),
+        {
+          ...createTabGroup( 2, [
+            createTestTab({ id: 4 }),
+            createTestTab({ id: 5 }),
+            createTestTab({ id: 6 })
+          ]),
+          last_active
+        },
         createTabGroup( 3, [
           createTestTab({ id: 7 }),
           createTestTab({ id: 8 })
@@ -86,10 +90,13 @@ function testMoveActiveTab( t ) {
   const state1 = moveTabs( initial_state, tab_move_data )
   t.ok( validateState( state1 ), "state validates", validateState.errors )
   t.equal( state1.windows[ 0 ].active_tab_group_id, inactive_tab_group.id, "activate new group on move of active tab" )
+  t.type( state1.windows[ 0 ].tab_groups[ 2 ].last_active, "number" )
+  t.ok( state1.windows[ 0 ].tab_groups[ 2 ].last_active > last_active, `${ state1.windows[ 0 ].tab_groups[ 2 ].last_active } > ${ last_active }` )
   t.end()
 }
 
 function testMoveTabsToNewGroup( t ) {
+  const last_active = ( new Date() ).getTime() - 10
   const state0 = {
     config: {},
     windows: [
@@ -99,12 +106,15 @@ function testMoveTabsToNewGroup( t ) {
         active_tab_id: 7,
         tab_groups: [
           createPinnedTabGroup( [] ),
-          createTabGroup( 1, [
-            createTestTab({ id: 4 }),
-            createTestTab({ id: 5 }),
-            createTestTab({ id: 6 }),
-            createTestTab({ id: 7 }),
-          ], 7)
+          {
+            ...createTabGroup( 1, [
+              createTestTab({ id: 4 }),
+              createTestTab({ id: 5 }),
+              createTestTab({ id: 6 }),
+              createTestTab({ id: 7 }),
+            ], 7),
+            last_active
+          }
         ]
       }
     ]
@@ -124,8 +134,11 @@ function testMoveTabsToNewGroup( t ) {
   const state1 = moveTabs( state0, tab_move_data )
 
   t.ok( validateState( state1 ), "state validates", validateState.errors )
+  const target_tab_group = state1.windows[ 0 ].tab_groups[ 2 ]
   t.equal( state1.windows[ 0 ].tab_groups.length, 3 )
-  t.same( state1.windows[ 0 ].tab_groups[ 2 ].tabs.map( tab => tab.id ), source_data.tab_ids )
+  t.same( target_tab_group.tabs.map( tab => tab.id ), source_data.tab_ids )
+  t.type( target_tab_group.last_active, "number" )
+  t.ok( target_tab_group.last_active > last_active, `${ target_tab_group.last_active } > ${ last_active }` )
   t.equal( state1.windows[ 0 ].active_tab_id, 7 )
   t.equal( state1.windows[ 0 ].active_tab_group_id, tab_move_data.target_data.tab_group_id )
   t.end()

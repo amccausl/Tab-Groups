@@ -120,7 +120,6 @@ export function attachTab( state, { tab_id, window_id, index } ) {
 }
 
 export function activateTab( state, { tab_id, window_id } ) {
-  // @todo activate the group the tab is in
   // @todo optimize to return existing state if tab already active
   return Object.assign( {}, state, {
     windows: state.windows.map( window => {
@@ -135,7 +134,8 @@ export function activateTab( state, { tab_id, window_id } ) {
             }
             active_tab_id = tab_id
             tab_group = Object.assign( {}, tab_group, {
-              active_tab_id
+              active_tab_id,
+              last_active: ( new Date() ).getTime(),
             })
           }
           return tab_group
@@ -174,7 +174,6 @@ export function updateTab( state, { browser_tab, change_info } ) {
 
     return moveTabs( state, move_data )
   }
-  // @todo change use the nature of change_info to ignore changes
   return Object.assign( {}, state, {
     windows: state.windows.map( window => {
       if( window.id !== browser_tab.windowId ) {
@@ -306,6 +305,7 @@ export function moveTabs( state, { source_data, target_data } ) {
 
   // @todo If source is same as target, noop
   // @todo if active tab is moved, switch to next one
+  // @todo if active tab is moved, update last active
   return Object.assign( {}, state, {
     windows: windows.map( window => {
       if( window.id !== source_data.window_id && window.id !== target_data.window_id ) {
@@ -315,7 +315,7 @@ export function moveTabs( state, { source_data, target_data } ) {
       let active_tab_group_id = window.active_tab_group_id
       let window_active_tab_id = window.active_tab_id || null
       let tab_groups = window.tab_groups.map( tab_group => {
-        let { tabs, active_tab_id } = tab_group
+        let { tabs, active_tab_id, last_active } = tab_group
 
         if( tabs.some( tab => source_data.tabs.includes( tab ) ) ) {
           const filtered_tabs = []
@@ -364,12 +364,14 @@ export function moveTabs( state, { source_data, target_data } ) {
           }
           if( window_active_tab_id && tabs.some( tab => tab.id === window_active_tab_id ) ) {
             active_tab_id = window_active_tab_id
+            last_active = ( new Date() ).getTime()
           }
         }
 
         if( tabs !== tab_group.tabs ) {
           tab_group = Object.assign( {}, tab_group, {
             active_tab_id,
+            last_active,
             tabs,
             tabs_count: tabs.length
           })
@@ -379,12 +381,14 @@ export function moveTabs( state, { source_data, target_data } ) {
       })
 
       if( window.id === target_data.window_id && target_data.tab_group ) {
-        tab_groups.push( target_data.tab_group )
+        const tab_group = { ...target_data.tab_group }
 
-        if( target_data.tab_group.tabs.some( tab => tab.id === window_active_tab_id ) ) {
-          target_data.tab_group.active_tab_id = window_active_tab_id
-          active_tab_group_id = target_data.tab_group.id
+        if( tab_group.tabs.some( tab => tab.id === window_active_tab_id ) ) {
+          tab_group.active_tab_id = window_active_tab_id
+          tab_group.last_active = ( new Date() ).getTime()
+          active_tab_group_id = tab_group.id
         }
+        tab_groups.push( tab_group )
       }
 
       return Object.assign( {}, window, { tab_groups, active_tab_group_id, active_tab_id: window_active_tab_id } )
@@ -393,8 +397,6 @@ export function moveTabs( state, { source_data, target_data } ) {
 }
 
 export function removeTab( state, { tab_id, window_id } ) {
-  // @todo update active_tab_id if required
-
   const windows = state.windows.map( window => {
     if( window.id === window_id ) {
       let active_tab_id = window.active_tab_id
