@@ -335,11 +335,19 @@ export function getTabMoveData( state, source_data, target_data ) {
             }
           }
         }
-        if( source_data.tabs.includes( null ) ) {
-          source_data.fill( null )
-        } else {
+        if( ! source_data.tabs.includes( null ) ) {
+          // Pinned tabs shouldn't be moved to a group
+          for( const tab of window.tab_groups[ 0 ].tabs ) {
+            const index = source_data.tab_ids.indexOf( tab.id )
+            if( index > -1 ) {
+              source_data.tab_ids.splice( index, 1 )
+              source_data.tabs.splice( index, 1 )
+            }
+          }
           break
         }
+        // Reset the state, try again
+        source_data.fill( null )
       }
       // @todo if scan doesn't find anything, dragging from another instance of firefox, can process as URL
     } else {
