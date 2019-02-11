@@ -31,6 +31,7 @@
     "babel-core": "6.26.3",
     "bower": "1.8.8",
     "cross-env": "5.2.0",
+    "eslint": "5.13.0",
     "node-sass": "4.11.0",
     "rollup": "1.1.2",
     "rollup-plugin-alias": "1.5.1",
