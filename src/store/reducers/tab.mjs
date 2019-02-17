@@ -14,6 +14,12 @@ import {
 export function addTab( state, { browser_tab } ) {
   const target_window = state.windows.find( window => window.id === browser_tab.windowId )
 
+  for( const tab_group of target_window.tab_groups ) {
+    if( tab_group.tabs.some( tab => tab.id === browser_tab.id ) ) {
+      return state
+    }
+  }
+
   const tab = getTabState( browser_tab )
   const target_info = getCreateTabTarget( state, browser_tab )
 

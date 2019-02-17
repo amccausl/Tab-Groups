@@ -545,7 +545,8 @@ export function moveTabsToGroup( store, source_data, target_data ) {
       if( browser_tabs.length > 0 ) {
         source_data = {
           window_id: target_data.window_id,
-          tab_ids: browser_tabs.map( browser_tab => browser_tab.id )
+          tab_ids: browser_tabs.map( browser_tab => browser_tab.id ),
+          tabs: browser_tabs.map( getTabState ),
         }
       }
 
@@ -553,6 +554,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
       const move_data = getTabMoveData( state, source_data, target_data )
       if( ! move_data ) {
         console.info('error')
+        // @todo wait and try again
         return
       }
 

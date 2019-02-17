@@ -5,7 +5,7 @@ export const TAB_GROUP_ID_KEY = 'group_id'
 const tab_group_id_map = new Map()
 
 /**
- * Fetch the preview image for a tab from session storage
+ * Fetch the group id for a tab from session storage
  */
 export function getTabGroupId( tab_id ) {
   console.info(`browser.sessions.getTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY } )`)

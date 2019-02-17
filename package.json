@@ -26,12 +26,12 @@
     "vue": "2.5.17"
   },
   "devDependencies": {
-    "ajv": "6.8.1",
+    "ajv": "6.9.1",
     "ajv-cli": "3.0.0",
     "babel-core": "6.26.3",
     "bower": "1.8.8",
     "cross-env": "5.2.0",
-    "eslint": "5.13.0",
+    "eslint": "5.14.0",
     "node-sass": "4.11.0",
     "rollup": "1.1.2",
     "rollup-plugin-alias": "1.5.1",
@@ -42,7 +42,7 @@
     "rollup-plugin-node-resolve": "4.0.0",
     "rollup-plugin-replace": "2.1.0",
     "rollup-plugin-vue": "4.7.1",
-    "tap": "12.5.2",
+    "tap": "12.5.3",
     "vue-template-compiler": "2.5.17",
     "web-ext": "2.9.3"
   }

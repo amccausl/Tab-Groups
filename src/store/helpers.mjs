@@ -47,7 +47,8 @@ export function createPinnedTabGroup( tabs, active_tab_id ) {
 
 export function cloneWindow( window ) {
   return Object.assign( {}, window, {
-    tab_groups: window.tab_groups.map( cloneTabGroup )
+    tab_groups: window.tab_groups.map( cloneTabGroup ),
+    highlighted_tab_ids: window.highlighted_tab_ids.slice( 0 ),
   })
 }
 

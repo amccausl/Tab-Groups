@@ -372,15 +372,13 @@ export default {
   methods: {
     bem,
     getCountMessage,
-    createTabGroup() {
+    async createTabGroup() {
       // Create new group with default properties in the store
-      window.background.createGroup( window.store, this.window_id )
-        .then( tab_group => {
-          console.info('created group', tab_group)
-          Vue.nextTick( () => {
-            this.renameTabGroup( tab_group.id )
-          })
-        })
+      const tab_group = await window.background.createGroup( window.store, this.window_id )
+      console.info('created group', tab_group)
+      Vue.nextTick( () => {
+        this.renameTabGroup( tab_group.id )
+      })
     },
     openTabGroupMore( event, tab_group ) {
       console.info('openTabGroupMore', event, tab_group )
