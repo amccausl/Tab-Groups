@@ -28,7 +28,7 @@ export function startWindowSearch( state, { window_id, search_text } ) {
           matched_tab_ids.push( tab.id )
         } else if( tab.url && search_regex.test( tab.url ) ) {
           matched_tab_ids.push( tab.id )
-        } else {
+        } else if( ! tab.url || ! tab.url.startsWith( "about:" ) ) {
           queued_tab_ids.push( tab.id )
         }
       }
