@@ -188,6 +188,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
   ])
 
   let is_processing = false
+  let is_paused = false
   function handleEvent( event_name ) {
     return async function( ...args ) {
       console.info( "handleEvent", event_name, args )
@@ -195,25 +196,27 @@ export function bindBrowserEvents( browser, browser_state, store ) {
         console.warn( "no handler for event", event_name )
         return
       }
-      if( is_processing ) {
-        console.info( "handleEvent queued" )
-        queued_events.push( [ event_name, args ] )
-        return
-      }
-      is_processing = true
+      queued_events.push( [ event_name, args ] )
+      runQueuedEvents()
+    }
+  }
+
+  async function runQueuedEvents() {
+    if( is_processing || is_paused ) {
+      return
+    }
+    is_processing = true
+    while( queued_events.length > 0 ) {
+      const [ queued_event_name, queued_args ] = queued_events.shift()
+      console.info( "handleEvent running", queued_event_name, queued_args )
       try {
-        await event_handlers.get( event_name )( store, ...args )
-        while( queued_events.length > 0 ) {
-          const [ queued_event_name, queued_args ] = queued_events.shift()
-          console.info( "handleEvent running", queued_event_name, queued_args )
-          await event_handlers.get( queued_event_name )( store, ...queued_args )
-        }
+        await event_handlers.get( queued_event_name )( store, ...queued_args )
       } catch( ex ) {
         // @todo
         console.error( "handleEvent threw exception", ex )
       }
-      is_processing = false
     }
+    is_processing = false
   }
 
   if( browser_state.features.tabhide.enabled ) {
@@ -296,4 +299,14 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       }
     }
   })
+
+  return {
+    pause() {
+      is_paused = true
+    },
+    async resume() {
+      is_paused = false
+      return runQueuedEvents()
+    },
+  }
 }

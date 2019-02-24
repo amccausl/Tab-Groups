@@ -83,7 +83,7 @@ export default {
   created() {
     let state0_window;
     onStateChange( state => {
-      this.theme = ( state.config.theme === 'dark' ? 'dark' : 'light' )
+      this.theme = ( state.config.theme === 'light' ? 'light' : 'dark' )
       this.show_tabs_count = state.config.show_tabs_count
       this.show_tabs = state.config.show_tabs
 

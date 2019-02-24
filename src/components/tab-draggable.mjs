@@ -203,7 +203,7 @@ export function onTabDragStart( event, tab ) {
   setTabTransferData( event.dataTransfer, this.window_id, tabs )
 
   // Image is not available if this is a node process
-  if( process == null ) {
+  if( typeof( process ) != "undefined" ) {
     let drag_image = new Image()
     event.dataTransfer.setDragImage( drag_image, 10, 10 )
   }

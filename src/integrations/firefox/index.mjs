@@ -50,70 +50,65 @@ export function getMessage( message_name, substitutions ) {
 /**
  * Load the state of the browser to structure for reducers/init
  */
-export function loadBrowserState() {
+export async function loadBrowserState() {
   const window_ids = []
-  let browser_tabs, config, contextual_identities, theme
 
-  return Promise.all([
-    browser.storage ? browser.storage.local.get( LOCAL_CONFIG_KEY ) : null,
+  const [ config, browser_tabs, theme, contextual_identities ] = await Promise.all([
+    browser.storage ? browser.storage.local.get( LOCAL_CONFIG_KEY ).then( storage => storage[ LOCAL_CONFIG_KEY ] || {} ) : {},
     browser.tabs.query( EMPTY ),
     // theme.getCurrent is available in firefox 58+
-    browser.theme && browser.theme.getCurrent ? browser.theme.getCurrent() : null,
-    browser.contextualIdentities.query( EMPTY ).then( null, console.error )
-  ]).then(
-    ( [ storage, _browser_tabs, _theme, _contextual_identities ] ) => {
-      browser_tabs = _browser_tabs
-      config = storage[ LOCAL_CONFIG_KEY ] || {}
-      for( const [ key, value ] of Object.entries( default_config ) ) {
-        if( ! config.hasOwnProperty( key ) ) {
-          config[ key ] = value
-        }
-      }
+    browser.theme && browser.theme.getCurrent ? browser.theme.getCurrent().then( theme => theme || {} ) : {},
+    browser.contextualIdentities.query( EMPTY ).then( contextual_identities => contextual_identities || [], console.error )
+  ])
 
-      contextual_identities = _contextual_identities || []
-      theme = _theme || {}
-
-      const browser_tab_group_ids = []
-      const browser_tab_preview_images = []
-
-      let window_tab_groups = []
-      browser_tabs.forEach( browser_tab => {
-        browser_tab_group_ids.push( getTabGroupId( browser_tab.id ) )
-        browser_tab_preview_images.push( getTabPreviewState( browser_tab.id ) )
-        if( window_ids.indexOf( browser_tab.windowId ) === -1 ) {
-          window_ids.push( browser_tab.windowId )
-          window_tab_groups.push( browser.sessions.getWindowValue( browser_tab.windowId, WINDOW_TAB_GROUPS_KEY ) )
-        }
-      })
-
-      return Promise.all( [ Promise.all( browser_tab_group_ids ), Promise.all( browser_tab_preview_images ), Promise.all( window_tab_groups ), isTabHideEnabled( browser_tabs ) ] )
+  for( const [ key, value ] of Object.entries( default_config ) ) {
+    if( ! config.hasOwnProperty( key ) ) {
+      config[ key ] = value
     }
-  ).then(
-    ( [ tab_group_ids, tab_preview_images, window_tab_groups, tabhide_enabled ] ) => {
-      const window_tab_groups_map = new Map()
-      for( let i = 0; i < window_ids.length; i++ ) {
-        window_tab_groups_map.set( window_ids[ i ], window_tab_groups[ i ] )
-      }
-      for( let i = 0; i < browser_tabs.length; i++ ) {
-        browser_tabs[ i ].session = {
-          tab_group_id: tab_group_ids[ i ],
-          preview_image: tab_preview_images[ i ],
-        }
-      }
+  }
 
-      const features = {
-        contextual_identities: {
-          enabled: isContextualIdentitiesEnabled( browser_tabs )
-        },
-        tabhide: {
-          enabled: tabhide_enabled
-        }
-      }
+  const browser_tab_group_ids = []
+  const browser_tab_preview_images = []
 
-      // This is the same structure from reducers.init
-      return { browser_tabs, config, contextual_identities, features, theme, window_tab_groups_map }
+  const browser_window_tab_groups = []
+  browser_tabs.forEach( browser_tab => {
+    browser_tab_group_ids.push( getTabGroupId( browser_tab.id ) )
+    browser_tab_preview_images.push( getTabPreviewState( browser_tab.id ) )
+    if( window_ids.indexOf( browser_tab.windowId ) === -1 ) {
+      window_ids.push( browser_tab.windowId )
+      browser_window_tab_groups.push( browser.sessions.getWindowValue( browser_tab.windowId, WINDOW_TAB_GROUPS_KEY ) )
     }
-  )
+  })
+
+  const [ tab_group_ids, tab_preview_images, window_tab_groups, tabhide_enabled ] = await Promise.all( [
+    Promise.all( browser_tab_group_ids ),
+    Promise.all( browser_tab_preview_images ),
+    Promise.all( browser_window_tab_groups ),
+    isTabHideEnabled( browser_tabs )
+  ] )
+
+  const window_tab_groups_map = new Map()
+  for( let i = 0; i < window_ids.length; i++ ) {
+    window_tab_groups_map.set( window_ids[ i ], window_tab_groups[ i ] )
+  }
+  for( let i = 0; i < browser_tabs.length; i++ ) {
+    browser_tabs[ i ].session = {
+      tab_group_id: tab_group_ids[ i ],
+      preview_image: tab_preview_images[ i ],
+    }
+  }
+
+  const features = {
+    contextual_identities: {
+      enabled: isContextualIdentitiesEnabled( browser_tabs )
+    },
+    tabhide: {
+      enabled: tabhide_enabled
+    }
+  }
+
+  // This is the same structure from reducers.init
+  return { browser_tabs, config, contextual_identities, features, theme, window_tab_groups_map }
 }
 
 export function isContextualIdentitiesEnabled( browser_tabs ) {
