@@ -1,3 +1,12 @@
+### v0.0.8
+
+#### Features
+- integration for native browser highlighted tabs
+- default to dark theme
+
+#### Bugs
+- skip search for `about:` urls
+
 ### v0.0.7
 
 #### Features
