@@ -6,6 +6,7 @@ export const default_config = {
   show_tabs: true,
   show_tab_context: true,
   show_tab_icon_background: true,
+  use_sync_config: false,
 }
 
 export function createWindow( window_id, tab_groups, properties = {} ) {

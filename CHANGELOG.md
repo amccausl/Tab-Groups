@@ -1,3 +1,8 @@
+### v0.0.9
+
+#### Features
+- use sync for config settings
+
 ### v0.0.8
 
 #### Features

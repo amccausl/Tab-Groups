@@ -29,6 +29,7 @@ import {
 } from "./helpers.mjs"
 
 export const LOCAL_CONFIG_KEY = 'config'
+export const SYNC_CONFIG_KEY = 'config'
 export const WINDOW_TAB_GROUPS_KEY = 'tab_groups'
 export const TAB_PREVIEW_IMAGE_KEY = 'preview_image'
 
@@ -53,19 +54,14 @@ export function getMessage( message_name, substitutions ) {
 export async function loadBrowserState() {
   const window_ids = []
 
-  const [ config, browser_tabs, theme, contextual_identities ] = await Promise.all([
-    browser.storage ? browser.storage.local.get( LOCAL_CONFIG_KEY ).then( storage => storage[ LOCAL_CONFIG_KEY ] || {} ) : {},
+  const browser_config = getBrowserConfig()
+
+  const [ browser_tabs, theme, contextual_identities ] = await Promise.all([
     browser.tabs.query( EMPTY ),
     // theme.getCurrent is available in firefox 58+
     browser.theme && browser.theme.getCurrent ? browser.theme.getCurrent().then( theme => theme || {} ) : {},
     browser.contextualIdentities.query( EMPTY ).then( contextual_identities => contextual_identities || [], console.error )
   ])
-
-  for( const [ key, value ] of Object.entries( default_config ) ) {
-    if( ! config.hasOwnProperty( key ) ) {
-      config[ key ] = value
-    }
-  }
 
   const browser_tab_group_ids = []
   const browser_tab_preview_images = []
@@ -98,17 +94,22 @@ export async function loadBrowserState() {
     }
   }
 
-  const features = {
-    contextual_identities: {
-      enabled: isContextualIdentitiesEnabled( browser_tabs )
-    },
-    tabhide: {
-      enabled: tabhide_enabled
-    }
-  }
-
   // This is the same structure from reducers.init
-  return { browser_tabs, config, contextual_identities, features, theme, window_tab_groups_map }
+  return {
+    browser_tabs,
+    config: await browser_config,
+    contextual_identities,
+    features: {
+      contextual_identities: {
+        enabled: isContextualIdentitiesEnabled( browser_tabs )
+      },
+      tabhide: {
+        enabled: tabhide_enabled
+      }
+    },
+    theme,
+    window_tab_groups_map,
+  }
 }
 
 export function isContextualIdentitiesEnabled( browser_tabs ) {
@@ -195,12 +196,34 @@ function setTabPreviewState( tab_id, preview_image ) {
   return browser.sessions.setTabValue( tab_id, TAB_PREVIEW_IMAGE_KEY, preview_image )
 }
 
+async function getBrowserConfig() {
+  const config = Object.assign( {}, default_config )
+
+  if( typeof( browser.storage ) != "undefined" ) {
+    const local_config = await getLocalConfig()
+    Object.assign( config, local_config )
+
+    // @todo check local config to see if sync is enabled
+    if( typeof( browser.storage.sync ) != "undefined" ) {
+      const sync_config = await getSyncConfig()
+      Object.assign( config, sync_config )
+    }
+  }
+
+  return config
+}
+
 /**
  * Load the config values
  */
-function getConfig() {
+function getLocalConfig() {
   return browser.storage.local.get( LOCAL_CONFIG_KEY )
     .then( local_storage => local_storage[ LOCAL_CONFIG_KEY ] || {} )
+}
+
+function getSyncConfig() {
+  return browser.storage.sync.get( SYNC_CONFIG_KEY )
+    .then( sync_storage => sync_storage[ SYNC_CONFIG_KEY ] || {} )
 }
 
 /**
@@ -208,16 +231,23 @@ function getConfig() {
  * @todo should allow multiple key/value pairs
  * @todo is there a better async way of doing this?
  */
-export function setConfig( key, value ) {
-  return getConfig()
-    .then(
-      ( config ) => {
-        config[ key ] = value
-        const local_storage = {}
-        local_storage[ LOCAL_CONFIG_KEY ] = config
-        return browser.storage.local.set( local_storage )
-      }
-    )
+export async function setConfig( key, value ) {
+  const config = await getLocalConfig()
+  if( key === "use_sync_config" && value ) {
+    // Pull value from remote and enable sync
+    const sync_config = await getSyncConfig()
+    Object.assign( config, sync_config )
+  }
+  config[ key ] = value
+  const local_storage = {}
+  local_storage[ LOCAL_CONFIG_KEY ] = config
+  await browser.storage.local.set( local_storage )
+  if( config.use_sync_config ) {
+    const { use_sync_config, ...sync_config } = config
+    const sync_storage = {}
+    sync_storage[ SYNC_CONFIG_KEY ] = sync_config
+    await browser.storage.sync.set( sync_storage )
+  }
 }
 
 function resetWindowState( window ) {

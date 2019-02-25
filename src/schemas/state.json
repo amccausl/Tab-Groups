@@ -86,6 +86,10 @@
         "show_tab_context": {
           "type": "boolean",
           "default": true
+        },
+        "use_sync_config": {
+          "type": "boolean",
+          "default": true
         }
       }
     },
