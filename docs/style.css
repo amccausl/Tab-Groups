@@ -1,0 +1,128 @@
+/* Reset */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/* Variables */
+:root {
+  --text-color: #fcefdf;
+}
+
+/* Header Bar */
+
+.header {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 20px);
+  padding: 10px 10px 10px 0;
+}
+
+.header-title {
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+}
+
+.header-title__logo {
+  height: 38px;
+  width: 38px;
+  background-color: #fff;
+  padding: 20px 25px;
+  border-radius: 0 5px 5px 0;
+}
+
+.header-title__text {
+  padding-left: 10px;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+}
+
+.header-nav__list {
+  display: flex;
+}
+
+.header-nav__item {
+  list-style: none;
+  padding-right: 30px;
+}
+
+.header-nav__item-link {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+/* Sections */
+
+.section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* Above the fold */
+
+.section--hero {
+  height: 100vh;
+  background: linear-gradient(135deg, #F14200 0%, #FF8B00 40%, #B50080 100%);
+}
+
+.section--version {
+  background: linear-gradient(90deg, #1aa8b0 0%, #1aa8b0 20%, #082b60 100%);
+  color: #e4e4e4;
+}
+
+.section--hero__header {
+  color: var(--text-color);
+}
+
+.section--hero__subheader {
+  color: var(--text-color);
+  font-weight: bold;
+  text-transform: uppercase;
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Tabulate",
+  "short_name": "Tabulate",
+  "start_url": ".",
+  "display": "browser",
+  "background_color": "#F14200",
+  "description": "Homepage for the Tabulate Firefox add-on",
+  "icons": [
+    {
+      "src": "assets/tabulate-logo.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    }
+  ]
+}
