@@ -844,10 +844,14 @@ $pinned-tabs-list__themes: (
 
 $sidebar-tab_groups-list__themes: (
   light: (
+    scrollbar--background-color: $white-100,
+    scrollbar--color: $light-header-hover-background,
     separator--color: #e0e0e1,
     --drag-target--ink-color: map-get( $--theme-light, --drag-target--ink-color ),
   ),
   dark: (
+    scrollbar--background-color: black,
+    scrollbar--color: #5b5b5d,
     separator--color: #545455,
     --drag-target--ink-color: map-get( $--theme-dark, --drag-target--ink-color ),
   )
@@ -864,6 +868,8 @@ $sidebar-tab_groups-list__themes: (
     align-items: stretch;
     overflow-y: auto;
     border-top: solid 1px map-get( $colors, separator--color );
+    scrollbar-color: map-get( $colors, scrollbar--color ) map-get( $colors, scrollbar--background-color );
+    scrollbar-size: thin;
 
     &__item-container {
       @extend %slow-transition;
