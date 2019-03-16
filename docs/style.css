@@ -46,13 +46,14 @@ table {
 
 /* Variables */
 :root {
+  font-family: 'Work Sans', sans-serif;
   --text-color: #fcefdf;
 }
 
 /* Header Bar */
 
 .header {
-  position: absolute;
+  position: fixed;
   display: flex;
   justify-content: space-between;
   width: calc(100% - 20px);
@@ -87,8 +88,9 @@ table {
 }
 
 .header-nav__item {
+  font-size: 18px;
   list-style: none;
-  padding-right: 30px;
+  padding-right: 24px;
 }
 
 .header-nav__item-link {
@@ -108,11 +110,12 @@ table {
 /* Above the fold */
 
 .section--hero {
-  height: 100vh;
+  height: 95vh;
   background: linear-gradient(135deg, #F14200 0%, #FF8B00 40%, #B50080 100%);
 }
 
 .section--version {
+  height: 95vh;
   background: linear-gradient(90deg, #1aa8b0 0%, #1aa8b0 20%, #082b60 100%);
   color: #e4e4e4;
 }
