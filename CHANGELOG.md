@@ -2,6 +2,11 @@
 
 #### Features
 - use sync for config settings
+- incremental search results
+- use native hilighted tabs for multi-drag
+
+#### Bugs
+- scrollbar display on windows
 
 ### v0.0.8
 
