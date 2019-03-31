@@ -446,3 +446,7 @@ export function omit( obj, ...properties ) {
 
   return new_obj
 }
+
+export function difference( arr, others ) {
+  return arr.filter( item => ! others.includes( item ) )
+}

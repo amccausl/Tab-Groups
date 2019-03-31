@@ -7,6 +7,7 @@ import {
   muteGroupAction,
   unmuteGroupAction,
   startSearchAction,
+  updateSearchAction,
   finishSearchAction,
   resetSearchAction,
 } from '../../store/actions.mjs'
@@ -707,8 +708,9 @@ export function runTabSearch( store, window_id, search_text ) {
 
   const { search } = window
 
-  const matched_tab_ids = []
   const queued_tab_ids = [ ...( search.queued_tab_ids || [] ) ]
+  let matched_tab_ids = []
+  let searched_tab_ids = []
 
   const nextFind = () => {
     if( queued_tab_ids.length > 0 ) {
@@ -720,6 +722,16 @@ export function runTabSearch( store, window_id, search_text ) {
       const tab_id = queued_tab_ids.shift()
       // @todo skip tabs "about:addons", "about:debugging"
       console.info(`browser.find.find( "${ search.text }", { tabId: ${ tab_id } } )`)
+
+      // Update status of search
+      if( searched_tab_ids.length >= 20 ) {
+        store.dispatch( updateSearchAction( window_id, search_text, searched_tab_ids, matched_tab_ids ) )
+        matched_tab_ids = []
+        searched_tab_ids = []
+      }
+
+      searched_tab_ids.push( tab_id )
+
       return browser.find.find( search.text, { tabId: tab_id } )
         .then(
           ( { count } ) => {

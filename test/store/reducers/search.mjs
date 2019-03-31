@@ -8,6 +8,7 @@ import {
 import {
   startWindowSearch,
   finishWindowSearch,
+  updateWindowSearch,
   resetWindowSearch,
 } from "../../../src/store/reducers/search.mjs"
 import {
@@ -47,4 +48,37 @@ function testSingleWindowSearch( t ) {
   t.end()
 }
 
+function testSingleWindowSearchUpdate( t ) {
+  const window_id = 1
+  const state0 = {
+    config: {},
+    windows: [
+      createWindow( window_id, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( 2, [
+          createTestTab({ id: 4, url: "http://example.com" }),
+          createTestTab({ id: 5, url: "http://example.com" }),
+          createTestTab({ id: 6, url: "http://example.com" }),
+        ]),
+        createTabGroup( 3, [
+          createTestTab({ id: 7, url: "http://example.com" }),
+          createTestTab({ id: 8, url: "http://example.com" }),
+        ])
+      ])
+    ]
+  }
+
+  let search_text = "test"
+  const state1 = startWindowSearch( state0, { window_id, search_text } )
+  t.same( state1.windows[ 0 ].search, { text: search_text, resolved: false, matched_tab_ids: [], queued_tab_ids: [ 4, 5, 6, 7, 8 ] } )
+
+  let searched_tab_ids = [ 4, 5, 6 ]
+  let matched_tab_ids = [ 5 ]
+  const state2 = updateWindowSearch( state1, { window_id, search_text, searched_tab_ids, matched_tab_ids } )
+  t.same( state2.windows[ 0 ].search, { text: search_text, resolved: false, matched_tab_ids: [ 5 ], queued_tab_ids: [ 7, 8 ] } )
+
+  t.end()
+}
+
 tap.test( testSingleWindowSearch )
+tap.test( testSingleWindowSearchUpdate )

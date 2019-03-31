@@ -25,6 +25,7 @@ import {
   WINDOW_ADD,
   WINDOW_REMOVE,
   WINDOW_SEARCH_START,
+  WINDOW_SEARCH_UPDATE,
   WINDOW_SEARCH_FINISH,
   WINDOW_SEARCH_RESET,
 } from "./action-types.mjs"
@@ -67,6 +68,7 @@ import {
 } from "./reducers/window.mjs"
 import {
   startWindowSearch,
+  updateWindowSearch,
   finishWindowSearch,
   resetWindowSearch,
 } from "./reducers/search.mjs"
@@ -82,6 +84,8 @@ export default function App( state, action ) {
       return removeWindow( state, action )
     case WINDOW_SEARCH_START:
       return startWindowSearch( state, action )
+    case WINDOW_SEARCH_UPDATE:
+      return updateWindowSearch( state, action )
     case WINDOW_SEARCH_FINISH:
       return finishWindowSearch( state, action )
     case WINDOW_SEARCH_RESET:

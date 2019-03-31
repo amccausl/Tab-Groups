@@ -1,5 +1,6 @@
-import { omit } from "../helpers.mjs"
+import { difference, omit } from "../helpers.mjs"
 
+/** Start a new search */
 export function startWindowSearch( state, { window_id, search_text } ) {
   return {
     ...state,
@@ -47,6 +48,36 @@ export function startWindowSearch( state, { window_id, search_text } ) {
   }
 }
 
+/** Update the status of the current search */
+export function updateWindowSearch( state0, { window_id, search_text, searched_tab_ids, matched_tab_ids } ) {
+  let target_window = state0.windows.find( window => window.id === window_id )
+  if( ! target_window || ( target_window.search != null && target_window.search.text !== search_text ) ) {
+    return state0
+  }
+
+  target_window = {
+    ...target_window,
+    search: {
+      ...target_window.search,
+      matched_tab_ids: target_window.search.matched_tab_ids.concat( matched_tab_ids ),
+      queued_tab_ids: difference( target_window.search.queued_tab_ids, searched_tab_ids )
+    }
+  }
+
+  const state1 = {
+    ...state0,
+    windows: state0.windows.map( window => {
+      if( window.id !== window_id ) {
+        return window
+      }
+      return target_window
+    })
+  }
+
+  return state1
+}
+
+/** Finish the current search */
 export function finishWindowSearch( state0, { window_id, search_text, matched_tab_ids } ) {
   let is_updated = false
 
@@ -75,6 +106,7 @@ export function finishWindowSearch( state0, { window_id, search_text, matched_ta
   return state0
 }
 
+/** Remove the window's search */
 export function resetWindowSearch( state0, { window_id } ) {
   let is_updated = false
   const state1 = {
