@@ -97,7 +97,33 @@
       "type": "object"
     },
     "features": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "contextual_identities": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          }
+        },
+        "tab_succession": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          }
+        },
+        "tab_hide": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
     },
     "windows": {
       "type": "array",

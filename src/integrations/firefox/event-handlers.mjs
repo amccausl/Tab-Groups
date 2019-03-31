@@ -308,5 +308,11 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       is_paused = false
       return runQueuedEvents()
     },
+    getQueuedEvents() {
+      return queued_events
+    },
+    removeQueuedEvent( index, count = 1 ) {
+      queued_events.splice( index, count )
+    },
   }
 }

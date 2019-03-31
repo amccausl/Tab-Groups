@@ -103,9 +103,12 @@ export async function loadBrowserState() {
       contextual_identities: {
         enabled: isContextualIdentitiesEnabled( browser_tabs )
       },
+      tab_succession: {
+        enabled: browser.tabs.moveInSuccession != null
+      },
       tabhide: {
         enabled: tabhide_enabled
-      }
+      },
     },
     theme,
     window_tab_groups_map,
