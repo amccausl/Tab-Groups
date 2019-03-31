@@ -1,14 +1,15 @@
 {
   "name": "tabulate",
-  "version": "0.0.4",
+  "version": "0.0.9",
   "description": "A web-extensions port for Tab Groups",
   "scripts": {
     "build": "./build.sh",
     "build-windows": "build.bat",
     "dev": "./node_modules/.bin/cross-env NODE_ENV=development ./build.sh",
-    "test": "node --experimental-modules test/index.mjs | tap -",
+    "test": "./node_modules/.bin/tap test | ./node_modules/.bin/tap -",
     "debug": "./node_modules/.bin/web-ext --source-dir dist run --verbose",
     "debug-de": "./node_modules/.bin/web-ext --source-dir dist run --verbose --firefox firefox-de",
+    "postinstall": "./node_modules/.bin/bower install",
     "pack": "./node_modules/.bin/web-ext build --source-dir dist"
   },
   "author": "Alex McCausland <alex.mccausland+tabulate@gmail.com>",
@@ -21,26 +22,28 @@
     "url": "https://github.com/amccausl/tabulate/issues"
   },
   "dependencies": {
-    "vue": "2.5.16"
+    "debug": "4.1.1",
+    "vue": "2.5.17"
   },
   "devDependencies": {
-    "ajv": "6.5.0",
+    "ajv": "6.10.0",
     "ajv-cli": "3.0.0",
     "babel-core": "6.26.3",
-    "bower": "1.8.4",
-    "cross-env": "5.1.5",
-    "node-sass": "4.9.0",
-    "rollup": "0.59.1",
-    "rollup-plugin-alias": "1.4.0",
+    "bower": "1.8.8",
+    "cross-env": "5.2.0",
+    "eslint": "5.16.0",
+    "node-sass": "4.11.0",
+    "rollup": "1.6.0",
+    "rollup-plugin-alias": "1.5.1",
     "rollup-plugin-async": "1.2.0",
-    "rollup-plugin-buble": "0.19.2",
-    "rollup-plugin-commonjs": "8.4.1",
-    "rollup-plugin-node-globals": "1.2.1",
-    "rollup-plugin-node-resolve": "3.3.0",
-    "rollup-plugin-replace": "2.0.0",
-    "rollup-plugin-vue": "3.0.0",
-    "tap": "12.0.1",
-    "vue-template-compiler": "2.5.16",
-    "web-ext": "2.6.0"
+    "rollup-plugin-buble": "0.19.6",
+    "rollup-plugin-commonjs": "9.2.2",
+    "rollup-plugin-node-globals": "1.4.0",
+    "rollup-plugin-node-resolve": "4.0.1",
+    "rollup-plugin-replace": "2.1.0",
+    "rollup-plugin-vue": "4.7.2",
+    "tap": "12.6.1",
+    "vue-template-compiler": "2.5.17",
+    "web-ext": "3.0.0"
   }
 }

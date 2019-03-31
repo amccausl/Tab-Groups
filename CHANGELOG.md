@@ -1,3 +1,48 @@
+### v0.0.9
+
+#### Features
+- use sync for config settings
+- incremental search results
+- use native hilighted tabs for multi-drag
+
+#### Bugs
+- scrollbar display on windows
+
+### v0.0.8
+
+#### Features
+- integration for native browser highlighted tabs
+- default to dark theme
+
+#### Bugs
+- skip search for `about:` urls
+
+### v0.0.7
+
+#### Features
+- action tab group open improvements
+- hover for full group name
+- audible icon for tab group in action
+
+### v0.0.6
+
+#### Features
+- improve search interactions
+- add handling for favicons blocked by tracking protection
+- styling improvements to browser action
+- sidebar closed on launch
+
+#### Bugs
+- fix selection bug for drag & drop
+
+### v0.0.5
+
+#### Features
+- add browser action with group list
+- add icon
+- shift-click for multiple select drag
+- minor UI improvements
+
 ### v0.0.4
 
 #### Features

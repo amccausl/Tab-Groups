@@ -1,19 +1,20 @@
+import tap from 'tap'
+
 import {
   createTestTab,
-  getInitialState,
-} from './helpers.mjs'
+} from "./helpers.mjs"
 
 import {
   createWindow,
   createTabGroup,
   createPinnedTabGroup,
-} from '../../src/store/helpers.mjs'
+} from "../../src/store/helpers.mjs"
 import {
   removeTab,
-} from '../../src/store/reducers/tab.mjs'
+} from "../../src/store/reducers/tab.mjs"
 import {
   validateState,
-} from '../../src/store/validators.mjs'
+} from "../../src/store/validators.mjs"
 
 function testRemoveFirstTab( t ) {
   const window_id = 1
@@ -110,9 +111,6 @@ function testRemoveLastTab( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testRemoveFirstTab )
-  tap.test( testRemoveMiddleTab )
-  tap.test( testRemoveLastTab )
-  tap.end()
-}
+tap.test( testRemoveFirstTab )
+tap.test( testRemoveMiddleTab )
+tap.test( testRemoveLastTab )

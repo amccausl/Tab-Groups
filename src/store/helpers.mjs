@@ -1,19 +1,22 @@
 
 export const default_config = {
-  theme: 'light',
+  theme: 'dark',
   show_header: true,
   show_tabs_count: true,
   show_tabs: true,
   show_tab_context: true,
   show_tab_icon_background: true,
+  use_sync_config: false,
 }
 
-export function createWindow( window_id, tab_groups ) {
+export function createWindow( window_id, tab_groups, properties = {} ) {
   return {
     id: window_id,
     active_tab_group_id: tab_groups[ 1 ].id,
     active_tab_id: tab_groups[ 1 ].active_tab_id,
-    tab_groups: tab_groups
+    highlighted_tab_ids: [ tab_groups[ 1 ].active_tab_id ],
+    tab_groups: tab_groups,
+    ...properties
   }
 }
 
@@ -42,31 +45,33 @@ export function createPinnedTabGroup( tabs, active_tab_id ) {
 }
 
 export function cloneWindow( window ) {
-  return Object.assign( {}, window, {
-    tab_groups: window.tab_groups.map( cloneTabGroup )
-  })
+  return {
+    ...window,
+    tab_groups: window.tab_groups.map( cloneTabGroup ),
+    highlighted_tab_ids: window.highlighted_tab_ids.slice( 0 ),
+  }
 }
 
 export function cloneTabGroup( tab_group ) {
-  return Object.assign( {}, tab_group, {
+  return {
+    ...tab_group,
     tabs: tab_group.tabs.map( cloneTab )
-  })
+  }
 }
 
 export function cloneTab( tab ) {
-  tab = Object.assign( {}, tab )
+  tab = { ...tab }
   if( tab.mutedInfo ) {
-    tab.mutedInfo = Object.assign( {}, tab.mutedInfo )
+    tab.mutedInfo = { ...tab.mutedInfo }
   }
   if( tab.preview_image ) {
-    tab.preview_image = Object.assign( {}, tab.preview_image )
+    tab.preview_image = { ...tab.preview_image }
   }
   return tab
 }
 
 /**
  * Find a tab in the state
- * @param state
  */
 export function findTab( state, window_id, tab_id ) {
   for( let window of state.windows ) {
@@ -102,6 +107,13 @@ export function getCreateTabTarget( state, browser_tab ) {
     return {
       index: browser_tab.index,
       tab_group_id: 0
+    }
+  }
+
+  if( browser_tab.session != null && browser_tab.session.tab_group_id != null ) {
+    return {
+      index: browser_tab.index,
+      tab_group_id: browser_tab.session.tab_group_id
     }
   }
 
@@ -268,8 +280,8 @@ export function getTargetTabGroupData( target_window, target_data, ignored_tabs 
  */
 export function getTabMoveData( state, source_data, target_data ) {
   let { windows } = state
-  source_data = Object.assign( {}, source_data )
-  target_data = Object.assign( {}, target_data )
+  source_data = { ...source_data }
+  target_data = { ...target_data }
 
   if( source_data.tabs == null && source_data.type !== "moz-place" && source_data.type !== "moz-url" ) {
     if( source_data.tab_ids ) {
@@ -301,17 +313,43 @@ export function getTabMoveData( state, source_data, target_data ) {
       }
     } else if( source_data.type === 'moz-tab' ) {
       // @todo scan target_data group, then window first
-      source_data.tabs = [ null ]
+      const urls = ( source_data.url ? [ source_data.url ] : source_data.urls )
+      source_data.tab_ids = Array( urls.length ).fill( null )
+      source_data.tabs = Array( urls.length ).fill( null )
       for( let window of windows ) {
+        if( window.highlighted_tab_ids.length !== urls.length ) {
+          continue
+        }
         for( let tab_group of window.tab_groups ) {
           for( let tab of tab_group.tabs ) {
-            if( tab.id === window.active_tab_id && tab.url === source_data.url ) {
+            if( ! window.highlighted_tab_ids.includes( tab.id ) ) {
+              continue
+            }
+            let url_index = urls.indexOf( tab.url )
+            // Check if url is duplicate,
+            while( url_index > -1 && source_data.tabs[ url_index ] != null ) {
+              url_index = urls.indexOf( tab.url, url_index + 1 )
+            }
+            if( url_index > -1 ) {
               source_data.window_id = window.id
-              source_data.tab_ids = [ tab.id ]
-              source_data.tabs[ 0 ] = tab
+              source_data.tab_ids[ url_index ] = tab.id
+              source_data.tabs[ url_index ] = tab
             }
           }
         }
+        if( ! source_data.tabs.includes( null ) ) {
+          // Pinned tabs shouldn't be moved to a group
+          for( const tab of window.tab_groups[ 0 ].tabs ) {
+            const index = source_data.tab_ids.indexOf( tab.id )
+            if( index > -1 ) {
+              source_data.tab_ids.splice( index, 1 )
+              source_data.tabs.splice( index, 1 )
+            }
+          }
+          break
+        }
+        // Reset the state, try again
+        source_data.fill( null )
       }
       // @todo if scan doesn't find anything, dragging from another instance of firefox, can process as URL
     } else {
@@ -358,14 +396,16 @@ export function getTabMoveData( state, source_data, target_data ) {
     }
 
     // Load the global index for the target
-    target_data = Object.assign( {}, target_data,
-      getTargetIndex( target_window, target_data, source_data.tabs || [] )
-    )
+    target_data = {
+      ...target_data,
+      ...getTargetIndex( target_window, target_data, source_data.tabs || [] )
+    }
     // @todo check result
   } else if( target_data.tab_group_id == null ) {
-    target_data = Object.assign( {}, target_data,
-      getTargetTabGroupData( target_window, target_data )
-    )
+    target_data = {
+      ...target_data,
+      ...getTargetTabGroupData( target_window, target_data )
+    }
   }
 
   return {
@@ -405,4 +445,8 @@ export function omit( obj, ...properties ) {
   }
 
   return new_obj
+}
+
+export function difference( arr, others ) {
+  return arr.filter( item => ! others.includes( item ) )
 }

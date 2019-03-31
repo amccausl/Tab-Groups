@@ -1,3 +1,5 @@
+import tap from "tap"
+
 import {
   createBrowserTab,
   createTestTab,
@@ -141,11 +143,78 @@ function testOpenNewTabWithOpenerId( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testSingleWindowAdd )
-  tap.test( testMultiWindowAdd )
-  tap.test( testAddToNewWindow )
-  tap.test( testReopenClosedPinnedTab )
-  tap.test( testOpenNewTabWithOpenerId )
-  tap.end()
+function testOpenNewTabInOtherGroup( t ) {
+  const state0 = {
+    config: {},
+    windows: [
+      createWindow( 1, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( 2, [
+          createTestTab({ id: 5 }),
+          createTestTab({ id: 6 }),
+        ], 5),
+        createTabGroup( 3, [
+        ])
+      ])
+    ]
+  }
+  state0.windows[ 0 ].active_tab_group_id = 2
+  state0.windows[ 0 ].active_tab_id = 5
+
+  let browser_tab = createBrowserTab({
+    id: 9,
+    index: 5,
+    windowId: 1,
+    openerTabId: 5,
+    active: true,
+    session: {
+      tab_group_id: 3
+    },
+  })
+
+  const state1 = addTab( state0, { browser_tab } )
+  const window1 = state1.windows[ 0 ]
+  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.equal( window1.tab_groups[ 1 ].tabs_count, 2 )
+  t.equal( window1.tab_groups[ 2 ].active_tab_id, 9 )
+  t.equal( window1.active_tab_id, 9 )
+  t.equal( window1.active_tab_group_id, 3 )
+  t.end()
 }
+
+function testOpenActiveTabUndefinedGroup( t ) {
+  const state0 = {
+    config: {},
+    windows: [
+      createWindow( 1, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( 2, [
+          createTestTab({ id: 3 }),
+        ], 3 ),
+      ])
+    ]
+  }
+  state0.windows[ 0 ].active_tab_group_id = 2
+  state0.windows[ 0 ].active_tab_id = 3
+
+  let browser_tab = createBrowserTab({
+    id: 4,
+    index: 1,
+    windowId: 1,
+    active: true,
+  })
+
+  const state1 = addTab( state0, { browser_tab, tab_group_id: undefined } )
+  const window1 = state1.windows[ 0 ]
+  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.equal( window1.active_tab_id, browser_tab.id )
+  t.end()
+}
+
+tap.test( testSingleWindowAdd )
+tap.test( testMultiWindowAdd )
+tap.test( testAddToNewWindow )
+tap.test( testReopenClosedPinnedTab )
+tap.test( testOpenNewTabWithOpenerId )
+tap.test( testOpenNewTabInOtherGroup )
+tap.test( testOpenActiveTabUndefinedGroup )

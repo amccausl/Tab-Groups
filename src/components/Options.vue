@@ -74,6 +74,12 @@
                 <span class="checkbox__icon"></span>
                 <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_tab_icon_background__ }}</span>
               </label>
+
+              <label class="checkbox">
+                <input class="checkbox__input" type="checkbox" v-model="use_sync_config">
+                <span class="checkbox__icon"></span>
+                <span class="checkbox__label" v-once>{{ __MSG_options_use_sync_config__ }}</span>
+              </label>
             </fieldset>
           </form>
         </section>
@@ -81,7 +87,7 @@
           <form @submit.prevent>
             <!-- @todo localize -->
             <button @click="clearAllData()" class="browser-style">Clear All Data</button>
-            <button @click="syncState()" class="browser-style">Sync State</button>
+            <button @click="syncState()" class="browser-style">Reload State</button>
           </form>
         </section>
         <section v-if="selected_section === 'debug'">
@@ -164,6 +170,9 @@ export default {
     __MSG_options_sidebar_show_tab_icon_background__() {
       return window.background.getMessage( "options_sidebar_show_tab_icon_background" )
     },
+    __MSG_options_use_sync_config__() {
+      return window.background.getMessage( "options_use_sync_config" )
+    },
     show_header: {
       get() {
         return this.preferences.show_header
@@ -210,6 +219,14 @@ export default {
       },
       set( value ) {
         window.background.setConfig( 'show_tab_icon_background', value )
+      }
+    },
+    use_sync_config: {
+      get() {
+        return this.preferences.use_sync_config
+      },
+      set( value ) {
+        window.background.setConfig( 'use_sync_config', value )
       }
     }
   },
@@ -337,5 +354,4 @@ export default {
     background-color: $blue-70;
   }
 }
-
 </style>

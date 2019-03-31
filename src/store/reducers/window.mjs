@@ -12,7 +12,8 @@ export function addWindow( state, { browser_window } ) {
     return state
   }
 
-  return Object.assign( {}, state, {
+  return {
+    ...state,
     windows: [
       ...state.windows,
       createWindow( browser_window.id, [
@@ -20,7 +21,7 @@ export function addWindow( state, { browser_window } ) {
         createTabGroup( getNewTabGroupId( state ), [] )
       ])
     ]
-  })
+  }
 }
 
 export function removeWindow( state, { window_id } ) {
@@ -28,7 +29,8 @@ export function removeWindow( state, { window_id } ) {
   if( ! state.windows.some( window => window.id === window_id ) ) {
     return state
   }
-  return Object.assign( {}, state, {
+  return {
+    ...state,
     windows: state.windows.filter( window => window.id !== window_id )
-  })
+  }
 }

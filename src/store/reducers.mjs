@@ -5,12 +5,14 @@ import {
   CONTEXTUAL_IDENTITY_UPDATE,
   CONTEXTUAL_IDENTITY_REMOVE,
   FEATURES_UPDATE,
+  GROUP_ACTIVATE,
   GROUP_ADD,
   GROUP_REMOVE,
   GROUP_UPDATE,
   GROUP_MOVE,
   GROUP_MUTE,
   GROUP_UNMUTE,
+  TABS_HIGHLIGHT,
   TABS_MOVE,
   TAB_ACTIVATE,
   TAB_ADD,
@@ -23,6 +25,7 @@ import {
   WINDOW_ADD,
   WINDOW_REMOVE,
   WINDOW_SEARCH_START,
+  WINDOW_SEARCH_UPDATE,
   WINDOW_SEARCH_FINISH,
   WINDOW_SEARCH_RESET,
 } from "./action-types.mjs"
@@ -43,6 +46,7 @@ import {
   addTab,
   activateTab,
   attachTab,
+  highlightTabs,
   updateTab,
   updateTabImage,
   moveTab,
@@ -50,6 +54,7 @@ import {
   removeTab,
 } from "./reducers/tab.mjs"
 import {
+  activateGroup,
   addGroup,
   removeGroup,
   updateGroup,
@@ -63,6 +68,7 @@ import {
 } from "./reducers/window.mjs"
 import {
   startWindowSearch,
+  updateWindowSearch,
   finishWindowSearch,
   resetWindowSearch,
 } from "./reducers/search.mjs"
@@ -78,10 +84,14 @@ export default function App( state, action ) {
       return removeWindow( state, action )
     case WINDOW_SEARCH_START:
       return startWindowSearch( state, action )
+    case WINDOW_SEARCH_UPDATE:
+      return updateWindowSearch( state, action )
     case WINDOW_SEARCH_FINISH:
       return finishWindowSearch( state, action )
     case WINDOW_SEARCH_RESET:
       return resetWindowSearch( state, action )
+    case GROUP_ACTIVATE:
+      return activateGroup( state, action )
     case GROUP_ADD:
       return addGroup( state, action )
     case GROUP_REMOVE:
@@ -94,6 +104,8 @@ export default function App( state, action ) {
       return muteGroup( state, action )
     case GROUP_UNMUTE:
       return unmuteGroup( state, action )
+    case TABS_HIGHLIGHT:
+      return highlightTabs( state, action )
     case TABS_MOVE:
       return moveTabs( state, action )
     case TAB_ACTIVATE:
@@ -125,7 +137,7 @@ export default function App( state, action ) {
     case THEME_UPDATE:
       return updateTheme( state, action )
     default:
-      console.warn('unknown action type', action.type)
+      console.warn("unknown action type", action.type)
       return state
   }
 }

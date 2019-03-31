@@ -1,15 +1,16 @@
+import tap from "tap"
 
 import {
   getTransferData,
   onTabDragStart,
   onTabDragEnter,
-} from '../../src/components/draggable.mjs'
+} from "../../src/components/tab-draggable.mjs"
 import {
   createTabGroup,
-} from '../../src/store/helpers.mjs'
+} from "../../src/store/helpers.mjs"
 import {
   createTestTab,
-} from '../store/helpers.mjs'
+} from "../store/helpers.mjs"
 
 function createTestComponent( window_id ) {
   const component = {
@@ -32,7 +33,7 @@ function createTestEvent( event_type ) {
   const event_data = {}
 
   const dataTransfer = {
-    effectAllowed: 'none',
+    effectAllowed: "none",
     setData( type, data ) {
       if( ! event_data.hasOwnProperty( type ) ) {
         dataTransfer.mozItemCount++
@@ -67,14 +68,14 @@ function draggingLocalTab( t ) {
   const source_tab_id = 2
   const source_tab = createTestTab({ id: source_tab_id })
 
-  let event = createTestEvent( 'dragstart' )
+  let event = createTestEvent( "dragstart" )
   onTabDragStart.call( component, event, source_tab )
 
   t.equal( component.is_dragging, true )
   t.same( component.selected_tab_ids, [ source_tab_id ] )
   t.same( component.drag_state, {
     source: {
-      type: 'tab',
+      type: "tab",
       window_id,
       tab_ids: [ source_tab_id ]
     },
@@ -120,9 +121,6 @@ function getTransferDataFromLink( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  // tap.test( draggingLocalTab )
-  tap.test( getTransferDataFromBookmark )
-  tap.test( getTransferDataFromBookmarkFolder )
-  tap.end()
-}
+tap.test( draggingLocalTab )
+tap.test( getTransferDataFromBookmark )
+tap.test( getTransferDataFromBookmarkFolder )

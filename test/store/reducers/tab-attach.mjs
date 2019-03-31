@@ -1,17 +1,19 @@
+import tap from "tap"
+
 import {
   attachTab
-} from '../../../src/store/reducers/tab.mjs'
+} from "../../../src/store/reducers/tab.mjs"
 import {
   validateState
-} from '../../../src/store/validators.mjs'
+} from "../../../src/store/validators.mjs"
 import {
   createTabGroup,
   createPinnedTabGroup,
   createWindow,
-} from '../../../src/store/helpers.mjs'
+} from "../../../src/store/helpers.mjs"
 import {
   createTestTab,
-} from '../helpers.mjs'
+} from "../helpers.mjs"
 
 function shouldValidateNativeTabDragToNativeTabBar( t ) {
   const window_id = 1
@@ -40,7 +42,4 @@ function shouldValidateNativeTabDragToNativeTabBar( t ) {
   t.end()
 }
 
-export default function testTabAttach( tap ) {
-  tap.test( shouldValidateNativeTabDragToNativeTabBar )
-  tap.end()
-}
+tap.test( shouldValidateNativeTabDragToNativeTabBar )

@@ -94,6 +94,11 @@
     "description": ""
   },
 
+  "options_use_sync_config": {
+    "message": "Save options to sync",
+    "description": ""
+  },
+
   "tab_group_name_placeholder": {
     "message": "Group $INDEX$",
     "description": "This is used as a placeholder name for new groups",

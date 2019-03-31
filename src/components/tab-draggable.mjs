@@ -126,10 +126,32 @@ export function getTransferData( data_transfer ) {
   // }
   if( data_transfer.types.includes( "text/x-moz-text-internal" ) ) {
     event_data = { type: "moz-tab", url: data_transfer.getData( "text/x-moz-text-internal" ) }
+
+    const count = data_transfer.mozItemCount
+    if( count > 1 ) {
+      event_data.urls = []
+      for( let i = 0; i < count; i++ ) {
+        delete event_data.url
+        const types = data_transfer.mozTypesAt( i )
+        for( let t = 0; t < types.length; t++ ) {
+          if( types[ t ] === "text/x-moz-text-internal" ) {
+            try {
+              const data = data_transfer.mozGetDataAt( types[ t ], i )
+              event_data.urls.push( data )
+            } catch( ex ) {
+              dump( ex )
+            }
+          }
+        }
+      }
+    }
+    // console.info('text/x-moz-text-internal', event_data)
   }
   if( data_transfer.types.includes( "application/json" ) ) {
+    // console.info('application/json', data_transfer.getData( "application/json" ) )
     try {
       event_data = JSON.parse( data_transfer.getData( "application/json" ) )
+      // @todo should validate structure of json is expected
     } catch( ex ) {
       console.warn('problem parsing "application/json" type', data_transfer.getData( 'application/json' ))
     }
@@ -170,7 +192,6 @@ export function onTabDragStart( event, tab ) {
   this.is_dragging = true
 
   // Use the selected tabs if the tab is selected
-  let drag_image = new Image()
   let tabs
   if( this.isSelected( tab ) ) {
     tabs = getNewSelectedTabs( this.selected_tab_ids, this.tab_groups )
@@ -180,7 +201,12 @@ export function onTabDragStart( event, tab ) {
   }
   const tab_ids = tabs.map( tab => tab.id )
   setTabTransferData( event.dataTransfer, this.window_id, tabs )
-  event.dataTransfer.setDragImage( drag_image, 10, 10 )
+
+  // Image is not available if this is a node process
+  if( typeof Image != "undefined" ) {
+    let drag_image = new Image()
+    event.dataTransfer.setDragImage( drag_image, 10, 10 )
+  }
 
   this.drag_state.source = {
     type: "tab",
@@ -189,7 +215,7 @@ export function onTabDragStart( event, tab ) {
   }
 }
 
-export function onTabDragEnd( event ) {
+export function onTabDragEnd() {
   resetDragState.call( this )
 }
 
@@ -209,7 +235,7 @@ export function onTabDragEnter( event, tab_group, tab ) {
   }
 }
 
-export function onTabDragLeave( event, tab_group, tab ) {
+export function onTabDragLeave( event ) {
   // Leave is fired after the new enter, so detect if this is still the active group
   if( drag_target === event.target ) {
     this.drag_state.target = {}
@@ -227,6 +253,7 @@ export function onTabDrop( event, tab_group, tab ) {
     }
 
     window.background.moveTabsToGroup( window.store, event_data, target_data )
+    // @todo consider removing this
     this.selected_tab_ids.splice( 0, this.selected_tab_ids.length )
   }
   resetDragState.call( this )
@@ -241,7 +268,7 @@ export function onTabGroupDragStart( event, tab_group ) {
   setTabGroupTransferData( event.dataTransfer, this.window_id, tab_group )
 }
 
-export function onTabGroupDragEnd( event, tab_group ) {
+export function onTabGroupDragEnd() {
   resetDragState.call( this )
 }
 
@@ -275,7 +302,7 @@ export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
   }
 }
 
-export function onTabGroupDragLeave( event, tab_group, tab_group_index ) {
+export function onTabGroupDragLeave( event ) {
   // Leave is fired after the new enter, so detect if this is still the active group
   if( drag_target === event.target ) {
     clearTimeout( drag_target_timer )

@@ -13,6 +13,7 @@ import {
   GROUP_MUTE,
   GROUP_UNMUTE,
   THEME_UPDATE,
+  TABS_HIGHLIGHT,
   TABS_MOVE,
   TAB_ACTIVATE,
   TAB_ADD,
@@ -24,9 +25,10 @@ import {
   WINDOW_ADD,
   WINDOW_REMOVE,
   WINDOW_SEARCH_START,
+  WINDOW_SEARCH_UPDATE,
   WINDOW_SEARCH_FINISH,
   WINDOW_SEARCH_RESET,
-} from './action-types.mjs'
+} from "./action-types.mjs"
 
 export function initAction({ browser_tabs, config, contextual_identities, theme, window_tab_groups_map }) {
   return {
@@ -193,6 +195,14 @@ export function updateTabImageAction( tab_id, window_id, preview_image_uri ) {
   }
 }
 
+export function highlightTabsAction( window_id, tab_ids ) {
+  return {
+    type: TABS_HIGHLIGHT,
+    window_id,
+    tab_ids,
+  }
+}
+
 export function moveTabsAction( source_data, target_data ) {
   return {
     type: TABS_MOVE,
@@ -233,6 +243,16 @@ export function startSearchAction( window_id, search_text ) {
     type: WINDOW_SEARCH_START,
     window_id,
     search_text
+  }
+}
+
+export function updateSearchAction( window_id, search_text, searched_tab_ids, matched_tab_ids ) {
+  return {
+    type: WINDOW_SEARCH_UPDATE,
+    window_id,
+    search_text,
+    searched_tab_ids,
+    matched_tab_ids
   }
 }
 

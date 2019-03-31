@@ -1,3 +1,5 @@
+import tap from 'tap'
+
 import {
   createBrowserTab,
   createTestTab,
@@ -190,12 +192,9 @@ function testPinActiveTab( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  // @todo move pinned tabs
-  tap.test( testSingleWindowFreshInit )
-  tap.test( testPinnedTabs )
-  tap.test( testOpenerPinnedTab )
-  tap.test( testReopenPinnedTab )
-  tap.test( testPinActiveTab )
-  tap.end()
-}
+// @todo move pinned tabs
+tap.test( testSingleWindowFreshInit )
+tap.test( testPinnedTabs )
+tap.test( testOpenerPinnedTab )
+tap.test( testReopenPinnedTab )
+tap.test( testPinActiveTab )

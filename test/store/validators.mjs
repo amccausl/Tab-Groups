@@ -1,15 +1,17 @@
+import tap from 'tap'
+
 import {
   createTabGroup,
   createPinnedTabGroup,
   createWindow,
-} from '../../src/store/helpers.mjs'
+} from "../../src/store/helpers.mjs"
 import {
   validateState,
-} from '../../src/store/validators.mjs'
+} from "../../src/store/validators.mjs"
 import {
   createTestTab,
   getInitialState,
-} from './helpers.mjs'
+} from "./helpers.mjs"
 
 function testStateValidation( t ) {
   const state = getInitialState()
@@ -48,7 +50,7 @@ function shouldFailWhenActiveTabNotInActiveGroup( t ) {
   t.equal( validateState( state0 ), false )
   t.same( validateState.errors, [
     {
-      keyword: 'link',
+      keyword: "link",
       dataPath: `window[0].active_tab_group_id`,
       message: `Active tab "7" isn't in the active tab group`
     }
@@ -57,8 +59,5 @@ function shouldFailWhenActiveTabNotInActiveGroup( t ) {
   t.end()
 }
 
-export default function( tap ) {
-  tap.test( testStateValidation )
-  tap.test( shouldFailWhenActiveTabNotInActiveGroup )
-  tap.end()
-}
+tap.test( testStateValidation )
+tap.test( shouldFailWhenActiveTabNotInActiveGroup )

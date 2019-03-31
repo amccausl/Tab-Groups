@@ -6,6 +6,7 @@ module.exports = {
   },
   "extends": "eslint:recommended",
   "parserOptions": {
+    "ecmaVersion": 2018,
     "sourceType": "module"
   },
   "globals": {
@@ -113,7 +114,7 @@ module.exports = {
     "newline-per-chained-call": "off",
     "no-alert": "error",
     "no-array-constructor": "error",
-    "no-await-in-loop": "error",
+    "no-await-in-loop": "off",
     "no-bitwise": "error",
     "no-buffer-constructor": "error",
     "no-caller": "error",
@@ -192,6 +193,7 @@ module.exports = {
     "no-unmodified-loop-condition": "error",
     "no-unneeded-ternary": "error",
     "no-unused-expressions": "off",
+    "no-unused-vars": "off",
     "no-use-before-define": "off",
     "no-useless-call": "error",
     "no-useless-computed-key": "error",
@@ -225,7 +227,7 @@ module.exports = {
     "operator-linebreak": "error",
     "padded-blocks": "off",
     "padding-line-between-statements": "error",
-    "prefer-arrow-callback": "error",
+    "prefer-arrow-callback": "off",
     "prefer-const": "off",
     "prefer-destructuring": "off",
     "prefer-numeric-literals": "error",

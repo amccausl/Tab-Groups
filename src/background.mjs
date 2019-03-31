@@ -1,9 +1,9 @@
-import { createStore } from './store/dispatcher.mjs'
+import { createStore } from "./store/dispatcher.mjs"
 
-import { initAction } from './store/actions.mjs'
+import { initAction } from "./store/actions.mjs"
 import init from "./store/reducers/init.mjs"
-import App from './store/reducers.mjs'
-import { getTabGroupsPersistState } from './store/helpers.mjs'
+import App from "./store/reducers.mjs"
+import { getTabGroupsPersistState } from "./store/helpers.mjs"
 import {
   bindBrowserEvents,
   closeTab,
@@ -19,12 +19,14 @@ import {
   moveTabGroup,
   openOptionsPage,
   openSidebarPage,
+  openTabGroup,
   resetBrowserState,
   runTabSearch,
   setConfig,
+  setHighlightedTabIds,
   setTabActive,
   setWindowTabGroupsState,
-} from './integrations/index.mjs'
+} from "./integrations/index.mjs"
 
 function onError( error ) {
   console.error( error )
@@ -35,7 +37,7 @@ const store_promise = loadBrowserState()
     const { window_tab_groups_map } = browser_state
     const store = createStore( App, init( null, browser_state ) )
 
-    bindBrowserEvents( browser, browser_state, store )
+    window.event_handler = bindBrowserEvents( browser, browser_state, store )
 
     store.subscribe( () => {
       const state = store.getState()
@@ -74,6 +76,7 @@ window.getStore = function() {
 
 // Proxy public methods from integrations to reduce duplication in app js
 // @todo standardize naming
+window.setHighlightedTabIds = setHighlightedTabIds
 window.moveTabsToGroup = moveTabsToGroup
 window.moveTabGroup = moveTabGroup
 window.closeTab = closeTab
@@ -86,6 +89,7 @@ window.unmuteTabGroup = unmuteTabGroup
 window.getMessage = getMessage
 window.openOptionsPage = openOptionsPage
 window.openSidebarPage = openSidebarPage
+window.openTabGroup = openTabGroup
 window.resetBrowserState = resetBrowserState
 window.runTabSearch = runTabSearch
 window.setConfig = setConfig

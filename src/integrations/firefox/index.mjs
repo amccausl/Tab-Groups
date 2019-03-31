@@ -1,11 +1,13 @@
 import {
   moveTabsAction,
+  activateGroupAction,
   createGroupAction,
   removeGroupAction,
   moveGroupAction,
   muteGroupAction,
   unmuteGroupAction,
   startSearchAction,
+  updateSearchAction,
   finishSearchAction,
   resetSearchAction,
 } from '../../store/actions.mjs'
@@ -21,10 +23,15 @@ import {
 import {
   ignorePendingMove,
 } from "./event-handlers.mjs"
+import {
+  TAB_GROUP_ID_KEY,
+  getTabGroupId,
+  setTabGroupId,
+} from "./helpers.mjs"
 
 export const LOCAL_CONFIG_KEY = 'config'
+export const SYNC_CONFIG_KEY = 'config'
 export const WINDOW_TAB_GROUPS_KEY = 'tab_groups'
-export const TAB_GROUP_ID_KEY = 'group_id'
 export const TAB_PREVIEW_IMAGE_KEY = 'preview_image'
 
 const EMPTY = {}
@@ -45,70 +52,68 @@ export function getMessage( message_name, substitutions ) {
 /**
  * Load the state of the browser to structure for reducers/init
  */
-export function loadBrowserState() {
+export async function loadBrowserState() {
   const window_ids = []
-  let browser_tabs, config, contextual_identities, theme
 
-  return Promise.all([
-    browser.storage ? browser.storage.local.get( LOCAL_CONFIG_KEY ) : null,
+  const browser_config = getBrowserConfig()
+
+  const [ browser_tabs, theme, contextual_identities ] = await Promise.all([
     browser.tabs.query( EMPTY ),
     // theme.getCurrent is available in firefox 58+
-    browser.theme && browser.theme.getCurrent ? browser.theme.getCurrent() : null,
-    browser.contextualIdentities.query( EMPTY ).then( null, console.error )
-  ]).then(
-    ( [ storage, _browser_tabs, _theme, _contextual_identities ] ) => {
-      browser_tabs = _browser_tabs
-      config = storage[ LOCAL_CONFIG_KEY ] || {}
-      for( const [ key, value ] of Object.entries( default_config ) ) {
-        if( ! config.hasOwnProperty( key ) ) {
-          config[ key ] = value
-        }
-      }
+    browser.theme && browser.theme.getCurrent ? browser.theme.getCurrent().then( theme => theme || {} ) : {},
+    browser.contextualIdentities.query( EMPTY ).then( contextual_identities => contextual_identities || [], console.error )
+  ])
 
-      contextual_identities = _contextual_identities || []
-      theme = _theme || {}
+  const browser_tab_group_ids = []
+  const browser_tab_preview_images = []
 
-      const browser_tab_group_ids = []
-      const browser_tab_preview_images = []
-
-      let window_tab_groups = []
-      browser_tabs.forEach( browser_tab => {
-        browser_tab_group_ids.push( getTabGroupId( browser_tab.id ) )
-        browser_tab_preview_images.push( getTabPreviewState( browser_tab.id ) )
-        if( window_ids.indexOf( browser_tab.windowId ) === -1 ) {
-          window_ids.push( browser_tab.windowId )
-          window_tab_groups.push( browser.sessions.getWindowValue( browser_tab.windowId, WINDOW_TAB_GROUPS_KEY ) )
-        }
-      })
-
-      return Promise.all( [ Promise.all( browser_tab_group_ids ), Promise.all( browser_tab_preview_images ), Promise.all( window_tab_groups ), isTabHideEnabled( browser_tabs ) ] )
+  const browser_window_tab_groups = []
+  browser_tabs.forEach( browser_tab => {
+    browser_tab_group_ids.push( getTabGroupId( browser_tab.id ) )
+    browser_tab_preview_images.push( getTabPreviewState( browser_tab.id ) )
+    if( window_ids.indexOf( browser_tab.windowId ) === -1 ) {
+      window_ids.push( browser_tab.windowId )
+      browser_window_tab_groups.push( browser.sessions.getWindowValue( browser_tab.windowId, WINDOW_TAB_GROUPS_KEY ) )
     }
-  ).then(
-    ( [ tab_group_ids, tab_preview_images, window_tab_groups, tabhide_enabled ] ) => {
-      const window_tab_groups_map = new Map()
-      for( let i = 0; i < window_ids.length; i++ ) {
-        window_tab_groups_map.set( window_ids[ i ], window_tab_groups[ i ] )
-      }
-      for( let i = 0; i < browser_tabs.length; i++ ) {
-        browser_tabs[ i ].session = {
-          tab_group_id: tab_group_ids[ i ],
-          preview_image: tab_preview_images[ i ],
-        }
-      }
+  })
 
-      const features = {
-        contextual_identities: {
-          enabled: isContextualIdentitiesEnabled( browser_tabs )
-        },
-        tabhide: {
-          enabled: tabhide_enabled
-        }
-      }
+  const [ tab_group_ids, tab_preview_images, window_tab_groups, tabhide_enabled ] = await Promise.all( [
+    Promise.all( browser_tab_group_ids ),
+    Promise.all( browser_tab_preview_images ),
+    Promise.all( browser_window_tab_groups ),
+    isTabHideEnabled( browser_tabs )
+  ] )
 
-      // This is the same structure from reducers.init
-      return { browser_tabs, config, contextual_identities, features, theme, window_tab_groups_map }
+  const window_tab_groups_map = new Map()
+  for( let i = 0; i < window_ids.length; i++ ) {
+    window_tab_groups_map.set( window_ids[ i ], window_tab_groups[ i ] )
+  }
+  for( let i = 0; i < browser_tabs.length; i++ ) {
+    browser_tabs[ i ].session = {
+      tab_group_id: tab_group_ids[ i ],
+      preview_image: tab_preview_images[ i ],
     }
-  )
+  }
+
+  // This is the same structure from reducers.init
+  return {
+    browser_tabs,
+    config: await browser_config,
+    contextual_identities,
+    features: {
+      contextual_identities: {
+        enabled: isContextualIdentitiesEnabled( browser_tabs )
+      },
+      tab_succession: {
+        enabled: browser.tabs.moveInSuccession != null
+      },
+      tabhide: {
+        enabled: tabhide_enabled
+      },
+    },
+    theme,
+    window_tab_groups_map,
+  }
 }
 
 export function isContextualIdentitiesEnabled( browser_tabs ) {
@@ -176,8 +181,6 @@ export function getTabState( browser_tab ) {
 
 /**
  * Save value to the window session
- * @param window_id
- * @param tab_groups_state
  */
 export function setWindowTabGroupsState( window_id, tab_groups_state ) {
   return browser.sessions.setWindowValue( window_id, WINDOW_TAB_GROUPS_KEY, tab_groups_state )
@@ -185,26 +188,6 @@ export function setWindowTabGroupsState( window_id, tab_groups_state ) {
 
 /**
  * Fetch the preview image for a tab from session storage
- * @param tab_id
- */
-function getTabGroupId( tab_id ) {
-  console.info(`browser.sessions.getTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY } )`)
-  return browser.sessions.getTabValue( tab_id, TAB_GROUP_ID_KEY )
-}
-
-/**
- * Save the tab preview image and details to the
- * @param tab_id
- * @param group_id
- */
-function setTabGroupId( tab_id, group_id ) {
-  console.info(`browser.sessions.setTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY }, ${ group_id } )`)
-  return browser.sessions.setTabValue( tab_id, TAB_GROUP_ID_KEY, group_id )
-}
-
-/**
- * Fetch the preview image for a tab from session storage
- * @param tab_id
  */
 function getTabPreviewState( tab_id ) {
   return browser.sessions.getTabValue( tab_id, TAB_PREVIEW_IMAGE_KEY )
@@ -212,38 +195,63 @@ function getTabPreviewState( tab_id ) {
 
 /**
  * Save the tab preview image and details to the
- * @param tab_id
- * @param preview_image
  */
 function setTabPreviewState( tab_id, preview_image ) {
   return browser.sessions.setTabValue( tab_id, TAB_PREVIEW_IMAGE_KEY, preview_image )
 }
 
+async function getBrowserConfig() {
+  const config = { ...default_config }
+
+  if( typeof( browser.storage ) != "undefined" ) {
+    const local_config = await getLocalConfig()
+    Object.assign( config, local_config )
+
+    // @todo check local config to see if sync is enabled
+    if( typeof( browser.storage.sync ) != "undefined" ) {
+      const sync_config = await getSyncConfig()
+      Object.assign( config, sync_config )
+    }
+  }
+
+  return config
+}
+
 /**
  * Load the config values
  */
-function getConfig() {
+function getLocalConfig() {
   return browser.storage.local.get( LOCAL_CONFIG_KEY )
     .then( local_storage => local_storage[ LOCAL_CONFIG_KEY ] || {} )
 }
 
+function getSyncConfig() {
+  return browser.storage.sync.get( SYNC_CONFIG_KEY )
+    .then( sync_storage => sync_storage[ SYNC_CONFIG_KEY ] || {} )
+}
+
 /**
  * Set the value for a key in the config
- * @param key
- * @param value
  * @todo should allow multiple key/value pairs
  * @todo is there a better async way of doing this?
  */
-export function setConfig( key, value ) {
-  return getConfig()
-    .then(
-      ( config ) => {
-        config[ key ] = value
-        const local_storage = {}
-        local_storage[ LOCAL_CONFIG_KEY ] = config
-        return browser.storage.local.set( local_storage )
-      }
-    )
+export async function setConfig( key, value ) {
+  const config = await getLocalConfig()
+  if( key === "use_sync_config" && value ) {
+    // Pull value from remote and enable sync
+    const sync_config = await getSyncConfig()
+    Object.assign( config, sync_config )
+  }
+  config[ key ] = value
+  const local_storage = {}
+  local_storage[ LOCAL_CONFIG_KEY ] = config
+  await browser.storage.local.set( local_storage )
+  if( config.use_sync_config ) {
+    const { use_sync_config, ...sync_config } = config
+    const sync_storage = {}
+    sync_storage[ SYNC_CONFIG_KEY ] = sync_config
+    await browser.storage.sync.set( sync_storage )
+  }
 }
 
 function resetWindowState( window ) {
@@ -265,7 +273,6 @@ function moveBrowserTabs( tab_ids, move_properties ) {
 
 /**
  * Remove all values stored in the browser
- * @param store
  * @todo should this return a promise?
  */
 export function resetBrowserState( store ) {
@@ -326,11 +333,64 @@ export function openTabGroupsPage() {
     })
 }
 
+/**
+ * Open a given tab group
+ */
+export function openTabGroup( store, window_id, target_tab_group_id ) {
+  const state0 = store.getState()
+  const window0 = getWindow( state0, window_id )
+  const target_tab_group = window0.tab_groups.find( tab_group => tab_group.id === target_tab_group_id )
+  if( ! target_tab_group ) {
+    // @todo error
+    console.error( "Attempt to open tab group that doesn't exist", target_tab_group_id )
+    return
+  }
+
+  const is_pinned_tab_active = window0.tab_groups[ 0 ].tabs.find( tab => tab.id === window.active_tab_id )
+  if( is_pinned_tab_active ) {
+    // Change active group without changing active tab
+    store.dispatch( activateGroupAction( target_tab_group_id, window_id ) )
+    return
+  }
+
+  if( window0.search && window0.search.matched_tab_ids ) {
+    // Switching group while search active opens first match in group
+    const tab = target_tab_group.tabs.find( tab => window0.search.matched_tab_ids.includes( tab.id ) )
+    if( tab ) {
+      setTabActive( window.store, window_id, tab.id )
+      return
+    }
+  }
+
+  if( target_tab_group.tabs.length === 0 ) {
+    // If switching to empty group, create new tab
+    let index = 0
+    for( const tab_group of window0.tab_groups ) {
+      if( tab_group.id === target_tab_group.id ) {
+        break
+      }
+      index += tab_group.tabs_count
+    }
+
+    return browser.tabs.create({
+      active: true,
+      windowId: window_id,
+      index,
+    })
+      .then( browser_tab => {
+        setTabGroupId( browser_tab.id, target_tab_group_id )
+      })
+  }
+
+  if( target_tab_group.active_tab_id ) {
+    setTabActive( window.store, window_id, target_tab_group.active_tab_id )
+  }
+}
+
 // TABS
 
 /**
  * Activate the given tab in the window
- * @param tab_id
  * @todo should this include the window_id?
  */
 export function setTabActive( store, window_id, tab_id ) {
@@ -339,7 +399,6 @@ export function setTabActive( store, window_id, tab_id ) {
 
 /**
  * Close the given tab
- * @param tab_id
  */
 export function closeTab( store, tab_id ) {
   console.info('browser.tabs.remove', [ tab_id ])
@@ -445,6 +504,32 @@ export function unmuteTabGroup( store, window_id, tab_group_id ) {
   })
 }
 
+export function setHighlightedTabIds( store, window_id, tab_ids ) {
+  const state0 = store.getState()
+  const target_window = state0.windows.find( window => window.id === window_id )
+  if( ! target_window ) {
+    // @todo error
+    return Promise.reject()
+  }
+  const tab_indices = []
+  let tab_index = 0
+  for( const tab_group of target_window.tab_groups ) {
+    for( const tab of tab_group.tabs ) {
+      if( tab_ids.includes( tab.id ) ) {
+        // When calling the highlight API, will update active tab if another tab is first :(
+        if( tab_group.active_tab_id === tab.id ) {
+          tab_indices.unshift( tab_index )
+        } else {
+          tab_indices.push( tab_index )
+        }
+      }
+      tab_index++
+    }
+  }
+  console.info('browser.tabs.highlight', { windowId: window_id, tabs: tab_indices })
+  browser.tabs.highlight( { windowId: window_id, tabs: tab_indices } )
+}
+
 /**
  * Move tabs to a different group
  * @param store
@@ -489,7 +574,8 @@ export function moveTabsToGroup( store, source_data, target_data ) {
       if( browser_tabs.length > 0 ) {
         source_data = {
           window_id: target_data.window_id,
-          tab_ids: browser_tabs.map( browser_tab => browser_tab.id )
+          tab_ids: browser_tabs.map( browser_tab => browser_tab.id ),
+          tabs: browser_tabs.map( getTabState ),
         }
       }
 
@@ -497,6 +583,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
       const move_data = getTabMoveData( state, source_data, target_data )
       if( ! move_data ) {
         console.info('error')
+        // @todo wait and try again
         return
       }
 
@@ -601,10 +688,6 @@ export function moveTabGroup( store, source_data, target_data ) {
 
 /**
  * Run a text search for tabs in a window and dispatch start and finish to the store
- * @param store
- * @param window_id
- * @param search_text
- *
  * @todo consider storing window => search info map locally
  */
 export function runTabSearch( store, window_id, search_text ) {
@@ -625,8 +708,9 @@ export function runTabSearch( store, window_id, search_text ) {
 
   const { search } = window
 
-  const matched_tab_ids = []
   const queued_tab_ids = [ ...( search.queued_tab_ids || [] ) ]
+  let matched_tab_ids = []
+  let searched_tab_ids = []
 
   const nextFind = () => {
     if( queued_tab_ids.length > 0 ) {
@@ -638,6 +722,16 @@ export function runTabSearch( store, window_id, search_text ) {
       const tab_id = queued_tab_ids.shift()
       // @todo skip tabs "about:addons", "about:debugging"
       console.info(`browser.find.find( "${ search.text }", { tabId: ${ tab_id } } )`)
+
+      // Update status of search
+      if( searched_tab_ids.length >= 20 ) {
+        store.dispatch( updateSearchAction( window_id, search_text, searched_tab_ids, matched_tab_ids ) )
+        matched_tab_ids = []
+        searched_tab_ids = []
+      }
+
+      searched_tab_ids.push( tab_id )
+
       return browser.find.find( search.text, { tabId: tab_id } )
         .then(
           ( { count } ) => {

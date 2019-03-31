@@ -1,9 +1,11 @@
+import tap from "tap"
+
 import {
   getInitialState,
-} from '../helpers.mjs'
+} from "../helpers.mjs"
 
-import { addGroup } from '../../../src/store/reducers/group.mjs'
-import { validateState } from '../../../src/store/validators.mjs'
+import { addGroup } from "../../../src/store/reducers/group.mjs"
+import { validateState } from "../../../src/store/validators.mjs"
 
 function testNormalCreate( t ) {
   let state = getInitialState()
@@ -15,7 +17,4 @@ function testNormalCreate( t ) {
   t.end()
 }
 
-export default function testGroupCreate( tap ) {
-  tap.test( testNormalCreate )
-  tap.end()
-}
+tap.test( testNormalCreate )

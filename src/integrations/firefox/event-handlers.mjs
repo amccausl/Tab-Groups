@@ -12,6 +12,7 @@ import {
   removeTabAction,
   updateTabAction,
   // updateTabImageAction,
+  highlightTabsAction,
   moveTabAction,
   attachTabAction,
 } from "../../store/actions.mjs"
@@ -19,6 +20,9 @@ import {
   default_config,
   getCreateTabTarget,
 } from "../../store/helpers.mjs"
+import {
+  getTabGroupId,
+} from "./helpers.mjs"
 
 // @todo pull to shared file
 const LOCAL_CONFIG_KEY = "config"
@@ -30,12 +34,190 @@ export function ignorePendingMove( tab_ids ) {
 
 /**
  * Bind change events for the browser to dispatch operations on the store
- * @param store The redux store
  */
 export function bindBrowserEvents( browser, browser_state, store ) {
   // @todo need way to turn off console
   const hide_tab_ids = new Set()
   const show_tab_ids = new Set()
+
+  const queued_events = []
+  let last_change = null
+  const event_handlers = new Map([
+    [ "sessions.onChanged", function onSessionChanged() {
+      console.info('sessions.onChanged')
+    }],
+    [ "storage.onChanged", function onStorageChanged( store, changes, area ) {
+      if( area === 'local' && changes[ LOCAL_CONFIG_KEY ] ) {
+        const config = changes[ LOCAL_CONFIG_KEY ].newValue || {}
+        for( let key of Object.keys( default_config ) ) {
+          if( ! config.hasOwnProperty( key ) ) {
+            config[ key ] = default_config[ key ]
+          }
+        }
+        store.dispatch( updateConfigAction( config ) )
+      }
+    }],
+    [ "windows.onCreated", function onWindowCreated( store, browser_window ) {
+      if( browser_window.type === 'normal' ) {
+        store.dispatch( addWindowAction( browser_window ) )
+      }
+    }],
+    [ "windows.onRemoved", function onWindowRemoved( store, window_id ) {
+      store.dispatch( removeWindowAction( window_id ) )
+    }],
+    [ "tabs.onCreated", async function onTabCreated( store, browser_tab ) {
+      const state = store.getState()
+      const tab_group_id = await getTabGroupId( browser_tab.id )
+      if( tab_group_id != null ) {
+        browser_tab.session = {
+          tab_group_id: tab_group_id,
+        }
+      } else {
+        const { index } = getCreateTabTarget( state, browser_tab )
+        if( browser_tab.index !== index ) {
+          console.info('browser.tabs.move', [ browser_tab.id ], { index })
+          browser.tabs.move( [ browser_tab.id ], { index } )
+        }
+      }
+
+      if( browser_tab.hidden ) {
+        hide_tab_ids.add( browser_tab.id )
+      } else {
+        show_tab_ids.add( browser_tab.id )
+      }
+
+      if( browser_tab.cookieStoreId != null && browser_tab.cookieStoreId !== "firefox-default" && ! state.features.contextual_identities.enabled ) {
+        store.dispatch( updateFeaturesAction( { contextual_identities: { enabled: true } } ) )
+      }
+
+      // @todo update succession if browser_tab.successorTabId is in different tab group
+      return store.dispatch( addTabAction( browser_tab ) )
+    }],
+    [ "tabs.onUpdated", function onTabUpdated( store, tab_id, change_info, browser_tab ) {
+      const state = store.getState()
+      // If change_info.audible && tab_group.muted, mute tab
+      if( change_info.hasOwnProperty( 'audible' ) ) {
+        for( let window of state.windows ) {
+          if( window.id !== browser_tab.windowId ) {
+            continue
+          }
+          for( let tab_group of window.tab_groups ) {
+            if( ! tab_group.tabs.some( tab => tab.id === tab_id ) ) {
+              continue
+            }
+            if( change_info.audible && tab_group.muted ) {
+              browser.tabs.update( tab_id, { muted: true } )
+            }
+            break
+          }
+          break
+        }
+      }
+      // @todo should omit ignored properties and check if result is empty instead
+      if( change_info.hasOwnProperty( "attention" ) ) {
+        return
+      }
+      if( change_info.hasOwnProperty( "discarded" ) ) {
+        return
+      }
+      if( change_info.hasOwnProperty( 'isArticle' ) ) {
+        return
+      }
+      if( change_info.hasOwnProperty( 'sharingState' ) ) {
+        return
+      }
+      const change_info_json = JSON.stringify( change_info )
+      if( last_change && last_change.tab_id === tab_id && last_change.change_info_json === change_info_json ) {
+        console.info(`onTabUpdated skipping duplicate change`)
+        return
+      }
+      last_change = { tab_id, change_info_json }
+      if( change_info.hasOwnProperty( 'hidden' ) ) {
+        console.info(`onTabUpdated( tab_id=${ tab_id }, change_info=${ change_info_json } )`, browser_tab)
+        if( change_info.hidden ) {
+          hide_tab_ids.add( tab_id )
+          show_tab_ids.delete( tab_id )
+        } else {
+          hide_tab_ids.delete( tab_id )
+          show_tab_ids.add( tab_id )
+        }
+        if( ! state.features.tabhide.enabled ) {
+          store.dispatch( updateFeaturesAction( { tabhide: { enabled: true } } ) )
+        }
+        return
+      }
+      console.info(`onTabUpdated( tab_id=${ tab_id }, change_info=${ change_info_json } )`, browser_tab)
+      store.dispatch( updateTabAction( browser_tab, change_info ) )
+    }],
+    [ "tabs.onRemoved", function onTabRemoved( store, tab_id, { windowId, isWindowClosing } ) {
+      hide_tab_ids.delete( tab_id )
+      show_tab_ids.delete( tab_id )
+      // @todo if this was the last tab in the group, activate the next group
+      store.dispatch( removeTabAction( tab_id, windowId ) )
+    }],
+    [ "tabs.onMoved", function onTabMoved( store, tab_id, { windowId, fromIndex, toIndex } ) {
+      const ignore_index = ignore_moves.indexOf( tab_id )
+      if( ignore_index > -1 ) {
+        ignore_moves.splice( ignore_index, 1 )
+        console.info('ignoring')
+      } else {
+        store.dispatch( moveTabAction( tab_id, windowId, toIndex ) )
+        // @todo update succession if required
+      }
+    }],
+    [ "tabs.onAttached", function onTabAttached( store, tab_id, { newWindowId, newPosition } ) {
+      store.dispatch( attachTabAction( tab_id, newWindowId, newPosition ) )
+      // @todo update succession if required
+    }],
+    [ "tabs.onActivated", function onTabActivated( store, { tabId, windowId } ) {
+      // @todo if previous tab.url == about:config, check features
+
+      store.dispatch( activateTabAction( tabId, windowId ) )
+
+      // Start background task to get preview image
+      // NOTE: Not needed at the moment, disabled for now
+      // browser.tabs.captureVisibleTab( windowId, TAB_PREVIEW_IMAGE_DETAILS )
+      //   .then( preview_image_uri => {
+      //     store.dispatch( updateTabImageAction( tabId, windowId, preview_image_uri ) )
+      //     const tab = findTab( store.getState(), windowId, tabId )
+      //     if( tab && tab.preview_image ) {
+      //       setTabPreviewState( tab.id, tab.preview_image )
+      //     }
+      //   })
+    }],
+  ])
+
+  let is_processing = false
+  let is_paused = false
+  function handleEvent( event_name ) {
+    return async function( ...args ) {
+      console.info( "handleEvent", event_name, args )
+      if( ! event_handlers.has( event_name ) ) {
+        console.warn( "no handler for event", event_name )
+        return
+      }
+      queued_events.push( [ event_name, args ] )
+      runQueuedEvents()
+    }
+  }
+
+  async function runQueuedEvents() {
+    if( is_processing || is_paused ) {
+      return
+    }
+    is_processing = true
+    while( queued_events.length > 0 ) {
+      const [ queued_event_name, queued_args ] = queued_events.shift()
+      console.info( "handleEvent running", queued_event_name, queued_args )
+      try {
+        await event_handlers.get( queued_event_name )( store, ...queued_args )
+      } catch( ex ) {
+        // @todo
+        console.error( "handleEvent threw exception", ex )
+      }
+    }
+    is_processing = false
+  }
 
   if( browser_state.features.tabhide.enabled ) {
     for( const browser_tab of browser_state.browser_tabs ) {
@@ -52,230 +234,33 @@ export function bindBrowserEvents( browser, browser_state, store ) {
   //   console.info('runtime.onMessage', message, sender, sendResponse)
   // })
 
-  browser.sessions.onChanged.addListener( () => {
-    console.info('sessions.onChanged')
-  })
-
-  function onStorageChanged( store, changes, area ) {
-    if( area === 'local' && changes[ LOCAL_CONFIG_KEY ] ) {
-      const config = changes[ LOCAL_CONFIG_KEY ].newValue || {}
-      for( let key of Object.keys( default_config ) ) {
-        if( ! config.hasOwnProperty( key ) ) {
-          config[ key ] = default_config[ key ]
-        }
-      }
-      store.dispatch( updateConfigAction( config ) )
-    }
+  if( browser.contextualIdentities ) {
+    event_handlers.set( "contextualIdentities.onCreated", function onContextualIdentityCreated( store, contextual_identity ) {
+      store.dispatch( createContextualIdentityAction( contextual_identity ) )
+    })
+    event_handlers.set( "contextualIdentities.onUpdated", function onContextualIdentityUpdated( store, contextual_identity ) {
+      store.dispatch( updateContextualIdentityAction( contextual_identity ) )
+    })
+    event_handlers.set( "contextualIdentities.onRemoved", function onContextualIdentityRemoved( store, contextual_identity ) {
+      store.dispatch( removeContextualIdentityAction( contextual_identity ) )
+    })
   }
 
-  browser.storage.onChanged.addListener( ( changes, area ) => {
-    console.info('storage.onChanged', area, changes)
-    onStorageChanged( store, changes, area )
-  })
-
-  // Attach listeners for changes to windows
-
-  function onWindowCreated( store, browser_window ) {
-    store.dispatch( addWindowAction( browser_window ) )
-  }
-
-  browser.windows.onCreated.addListener( ( browser_window ) => {
-    console.info('windows.onCreated', browser_window)
-    if( browser_window.type === 'normal' ) {
-      onWindowCreated( store, browser_window )
-    }
-  })
-
-  function onWindowRemoved( store, window_id ) {
-    store.dispatch( removeWindowAction( window_id ) )
-  }
-
-  browser.windows.onRemoved.addListener( ( window_id ) => {
-    console.info('windows.onRemoved', window_id)
-    onWindowRemoved( store, window_id )
-  })
-
-  // Attach listeners for changes to tabs
-
-  function onTabActivated( store, tab_id, window_id ) {
-    // @todo if previous tab.url == about:config, check features
-
-    store.dispatch( activateTabAction( tab_id, window_id ) )
-
-    // Start background task to get preview image
-    // NOTE: Not needed at the moment, disabled for now
-    // browser.tabs.captureVisibleTab( windowId, TAB_PREVIEW_IMAGE_DETAILS )
-    //   .then( preview_image_uri => {
-    //     store.dispatch( updateTabImageAction( tabId, windowId, preview_image_uri ) )
-    //     const tab = findTab( store.getState(), windowId, tabId )
-    //     if( tab && tab.preview_image ) {
-    //       setTabPreviewState( tab.id, tab.preview_image )
-    //     }
-    //   })
-  }
-
-  browser.tabs.onActivated.addListener( ( { tabId, windowId } ) => {
-    console.info('tabs.onActivated', tabId, windowId)
-    onTabActivated( store, tabId, windowId )
-  })
-
-  function onTabCreated( store, browser_tab ) {
-    const state = store.getState()
-    const { index } = getCreateTabTarget( state, browser_tab )
-    if( browser_tab.index !== index ) {
-      console.info('browser.tabs.move', [ browser_tab.id ], { index })
-      browser.tabs.move( [ browser_tab.id ], { index } )
-    }
-
-    if( browser_tab.hidden ) {
-      hide_tab_ids.add( browser_tab.id )
-    } else {
-      show_tab_ids.add( browser_tab.id )
-    }
-
-    if( browser_tab.cookieStoreId != null && browser_tab.cookieStoreId !== "firefox-default" && ! state.features.contextual_identities.enabled ) {
-      return store.dispatch( updateFeaturesAction( { contextual_identities: { enabled: true } } ) )
-    }
-
-    return store.dispatch( addTabAction( browser_tab ) )
-  }
-
-  browser.tabs.onCreated.addListener( ( browser_tab ) => {
-    console.info('tabs.onCreated', browser_tab)
-    onTabCreated( store, browser_tab )
-  })
-
-  function onTabRemoved( store, tab_id, window_id ) {
-    hide_tab_ids.delete( tab_id )
-    show_tab_ids.delete( tab_id )
-    // @todo if this was the last tab in the group, activate the next group
-    store.dispatch( removeTabAction( tab_id, window_id ) )
-  }
-
-  browser.tabs.onRemoved.addListener( ( tab_id, { windowId, isWindowClosing } ) => {
-    console.info('tabs.onRemoved', tab_id, windowId)
-    onTabRemoved( store, tab_id, windowId )
-  })
-
-  function onTabMoved( store, tab_id, window_id, index ) {
-    console.info(`onTabMoved( tab_id=${ tab_id }, window_id=${ window_id }, index=${ index } )`)
-    const ignore_index = ignore_moves.indexOf( tab_id )
-    if( ignore_index > -1 ) {
-      ignore_moves.splice( ignore_index, 1 )
-      console.info('ignoring')
-    } else {
-      store.dispatch( moveTabAction( tab_id, window_id, index ) )
-    }
-  }
-
-  browser.tabs.onMoved.addListener( ( tab_id, { windowId, fromIndex, toIndex } ) => {
-    onTabMoved( store, tab_id, windowId, toIndex )
-  })
-
-  browser.tabs.onAttached.addListener( ( tab_id, { newWindowId, newPosition } ) => {
-    console.info('tabs.onAttached', tab_id, newWindowId, newPosition)
-    store.dispatch( attachTabAction( tab_id, newWindowId, newPosition ) )
-  })
-
-  browser.tabs.onDetached.addListener( ( tab_id, { oldWindowId, oldPosition } ) => {
-    console.info('tabs.onDetached', tab_id, oldWindowId, oldPosition)
-  })
-
-  browser.tabs.onReplaced.addListener( ( added_tab_id, removed_tab_id ) => {
-    console.info('tabs.onReplaced', added_tab_id, removed_tab_id)
-    // @todo
-  })
-
-  function onTabUpdated( store, tab_id, change_info, browser_tab ) {
-    const state = store.getState()
-    // If change_info.audible && tab_group.muted, mute tab
-    if( change_info.hasOwnProperty( 'audible' ) ) {
-      for( let window of state.windows ) {
-        if( window.id !== browser_tab.windowId ) {
-          continue
-        }
-        for( let tab_group of window.tab_groups ) {
-          if( ! tab_group.tabs.some( tab => tab.id === tab_id ) ) {
-            continue
-          }
-          if( change_info.audible && tab_group.muted ) {
-            browser.tabs.update( tab_id, { muted: true } )
-          }
-          break
-        }
-        break
-      }
-    }
-    // @todo should omit ignored properties and check if result is empty instead
-    if( change_info.hasOwnProperty( "discarded" ) ) {
-      return
-    }
-    if( change_info.hasOwnProperty( 'isArticle' ) ) {
-      return
-    }
-    if( change_info.hasOwnProperty( 'sharingState' ) ) {
-      return
-    }
-    if( change_info.hasOwnProperty( 'hidden' ) ) {
-      console.info(`onTabUpdated( tab_id=${ tab_id }, change_info=${ JSON.stringify( change_info ) } )`, browser_tab)
-      if( change_info.hidden ) {
-        hide_tab_ids.add( tab_id )
-        show_tab_ids.delete( tab_id )
-      } else {
-        hide_tab_ids.delete( tab_id )
-        show_tab_ids.add( tab_id )
-      }
-      if( ! state.features.tabhide.enabled ) {
-        store.dispatch( updateFeaturesAction( { tabhide: { enabled: true } } ) )
-      }
-      return
-    }
-    console.info(`onTabUpdated( tab_id=${ tab_id }, change_info=${ JSON.stringify( change_info ) } )`, browser_tab)
-    store.dispatch( updateTabAction( browser_tab, change_info ) )
-  }
-
-  browser.tabs.onUpdated.addListener( ( tab_id, change_info, browser_tab ) => {
-    onTabUpdated( store, tab_id, change_info, browser_tab )
-  })
-
-  function onThemeUpdated( store, theme, window_id ) {
-    console.info('onThemeUpdated', window_id, theme)
-    store.dispatch( updateThemeAction( theme ) )
+  if( browser.tabs.onHighlighted != null ) {
+    event_handlers.set( "tabs.onHighlighted", function onTabHighlighted( store, { windowId, tabIds } ) {
+      store.dispatch( highlightTabsAction( windowId, tabIds ) )
+    })
   }
 
   if( browser.theme ) {
-    browser.theme.onUpdated.addListener( ( { theme, windowId } ) => {
-      onThemeUpdated( store, theme, windowId )
+    event_handlers.set( "theme.onUpdated", function onThemeUpdated( store, { theme, windowId } ) {
+      store.dispatch( updateThemeAction( theme ) )
     })
   }
 
-  function onContextualIdentityCreated( store, contextual_identity ) {
-    console.info('onContextualIdentityCreated', contextual_identity)
-    store.dispatch( createContextualIdentityAction( contextual_identity ) )
-  }
-
-  function onContextualIdentityUpdated( store, contextual_identity ) {
-    console.info('onContextualIdentityUpdated', contextual_identity)
-    store.dispatch( updateContextualIdentityAction( contextual_identity ) )
-  }
-
-  function onContextualIdentityRemoved( store, contextual_identity ) {
-    console.info('onContextualIdentityRemoved', contextual_identity)
-    store.dispatch( removeContextualIdentityAction( contextual_identity ) )
-  }
-
-  if( browser.contextualIdentities ) {
-    browser.contextualIdentities.onCreated.addListener( ( { contextualIdentity } ) => {
-      onContextualIdentityCreated( store, contextualIdentity )
-    })
-
-    browser.contextualIdentities.onUpdated.addListener( ( { contextualIdentity } ) => {
-      onContextualIdentityUpdated( store, contextualIdentity )
-    })
-
-    browser.contextualIdentities.onRemoved.addListener( ( { contextualIdentity } ) => {
-      onContextualIdentityRemoved( store, contextualIdentity )
-    })
+  for( const key of event_handlers.keys() ) {
+    const [ context, method ] = key.split( "." )
+    browser[ context ][ method ].addListener( handleEvent( key ) )
   }
 
   // @todo this should be moved somewhere else
@@ -314,4 +299,20 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       }
     }
   })
+
+  return {
+    pause() {
+      is_paused = true
+    },
+    async resume() {
+      is_paused = false
+      return runQueuedEvents()
+    },
+    getQueuedEvents() {
+      return queued_events
+    },
+    removeQueuedEvent( index, count = 1 ) {
+      queued_events.splice( index, count )
+    },
+  }
 }

@@ -33,6 +33,7 @@
       >
         <div :class="[ `sidebar-tab_groups-list--${ theme }__item` ]">
           <div :class="bem( `tab-groups-list-item-header--${ theme }`, { 'active': active_tab_group_id === tab_group.id, 'open': show_tabs && tab_group.open, 'drag-source': isTabGroupDragSource( tab_group ), [`drag-${ drag_state.source.type }-target`]: ! isTabGroupDragSource( tab_group ) && isTabGroupDragTarget( tab_group ) } )"
+              :title="tab_group.title"
               @dragenter="onTabGroupDragEnter( $event, tab_group, tab_group_index + 1 )"
               @dragover.prevent
               @dragleave="onTabGroupDragLeave( $event, tab_group, tab_group_index + 1 )"
@@ -79,7 +80,7 @@
             <div :class="bem( `list-flex-col__item`, { 'active': tab.active, 'drag-target-index': drag_state.target.tab_id === tab.id && ! isSelected( tab ), 'drag-selected': isSelected( tab ), 'drag-source': is_dragging && isSelected( tab ), 'search': getTabSearchState( tab ) } )"
                 v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
                 :title="tab.title"
-                @click.ctrl="toggleTabSelection( tab )" @click.exact="openTab( tab.id )" @click.middle="closeTab( tab )"
+                @click.ctrl="toggleTabSelection( tab )" @click.shift="toggleTabBatchSelection( tab )" @click.middle="closeTab( tab )" @click.exact="openTab( tab.id )"
                 @dragenter="onTabDragEnter( $event, tab_group, tab )"
                 @dragover.prevent
                 @dragleave="onTabDragLeave( $event, tab_group, tab )"
@@ -160,7 +161,7 @@
         <span :class="[ `action-strip__button-text` ]" v-once>{{ __MSG_tab_group_new__ }}</span>
       </div>
     </div>
-    <div v-if="tab_group_context_menu.open" class="context-menu__ctx" @click="closeTabGroupMore" @click.right="closeTabGroupMore"></div>
+    <div v-if="tab_group_context_menu.open" class="context-menu__ctx" @click="closeTabGroupMore"></div>
     <!-- @todo animate -->
     <div v-if="tab_group_context_menu.open" class="context-menu__content" :style="{ top: tab_group_context_menu.y + 'px', right: tab_group_context_menu.x + 'px' }">
       <!-- @todo localize -->
@@ -203,19 +204,22 @@ import {
   onTabGroupDragEnter,
   onTabGroupDragLeave,
   onTabGroupDrop,
-} from './draggable.mjs'
+} from './tab-draggable.mjs'
 import {
   bem,
   debounce,
   getCountMessage,
   getFriendlyUrlText,
-  getNewSelectedTabIds,
   getTabGroupCopyText,
   onStateChange,
 } from './helpers.mjs'
 import {
   INK_90,
 } from './photon-colors'
+import {
+  toggleTabSelection,
+  toggleTabBatchSelection,
+} from './tab-selectable.mjs'
 
 import Editable from './Editable.vue'
 import TabIcon from './TabIcon.vue'
@@ -266,7 +270,7 @@ export default {
   created() {
     let state0_window;
     onStateChange( state => {
-      this.theme = ( state.config.theme === 'dark' ? 'dark' : 'light' )
+      this.theme = ( state.config.theme === 'light' ? 'light' : 'dark' )
       this.show_header = state.config.show_header
       this.show_tabs_count = state.config.show_tabs_count
       this.show_tabs = state.config.show_tabs
@@ -309,7 +313,6 @@ export default {
       // @todo optimize translation
 
       // @todo this could be done more efficiently
-      const new_selected_tab_ids = getNewSelectedTabIds( this.selected_tab_ids, state_window )
       const search_missed_tab_ids = []
 
       // Need to deep clone the objects because Vue extends prototypes when state added to the vm
@@ -351,7 +354,7 @@ export default {
       })
       // Use the extended splice to trigger change detection
       Object.getPrototypeOf( this.search_missed_tab_ids ).splice.apply( this.search_missed_tab_ids, [ 0, this.search_missed_tab_ids.length, ...search_missed_tab_ids ] )
-      Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...new_selected_tab_ids ] )
+      Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...state_window.highlighted_tab_ids ] )
       // Object.getPrototypeOf( this.pinned_tabs ).splice.apply( this.pinned_tabs, [ 0, this.pinned_tabs.length, ...tab_groups[ 0 ].tabs ] )
       Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length, ...tab_groups.slice( 1 ) ] )
 
@@ -369,15 +372,13 @@ export default {
   methods: {
     bem,
     getCountMessage,
-    createTabGroup() {
+    async createTabGroup() {
       // Create new group with default properties in the store
-      window.background.createGroup( window.store, this.window_id )
-        .then( tab_group => {
-          console.info('created group', tab_group)
-          Vue.nextTick( () => {
-            this.renameTabGroup( tab_group.id )
-          })
-        })
+      const tab_group = await window.background.createGroup( window.store, this.window_id )
+      console.info('created group', tab_group)
+      Vue.nextTick( () => {
+        this.renameTabGroup( tab_group.id )
+      })
     },
     openTabGroupMore( event, tab_group ) {
       console.info('openTabGroupMore', event, tab_group )
@@ -475,9 +476,6 @@ export default {
       // @todo should be moved to background
       window.store.dispatch( updateGroupAction( tab_group.id, this.window_id, { title } ) )
     },
-    getNewSelectedTabIds() {
-      return getNewSelectedTabIds( this.selected_tab_ids, this.tab_groups )
-    },
     getTabSearchState( tab ) {
       if( ! this.is_searching ) {
         return false
@@ -493,15 +491,17 @@ export default {
       window.background.openOptionsPage()
     },
     toggleTabSelection( tab ) {
-      console.info('toggleTabSelection', tab)
-      const tab_index = this.selected_tab_ids.indexOf( tab.id )
-      if( tab_index > -1 ) {
-        this.selected_tab_ids.splice( tab_index, 1 )
-      } else {
-        this.selected_tab_ids.push( tab.id )
-      }
-      console.info('selected_tab_ids', this.selected_tab_ids)
-    }
+      console.info('toggleTabSelection', tab.id)
+      toggleTabSelection.call( this, tab.id )
+      const highlighted_tab_ids = this.selected_tab_ids.slice( 0, this.selected_tab_ids.length )
+      window.background.setHighlightedTabIds( window.store, this.window_id, highlighted_tab_ids )
+    },
+    toggleTabBatchSelection( tab ) {
+      console.info('toggleTabBatchSelection', tab)
+      toggleTabBatchSelection.call( this, tab.id )
+      const highlighted_tab_ids = this.selected_tab_ids.slice( 0, this.selected_tab_ids.length )
+      window.background.setHighlightedTabIds( window.store, this.window_id, highlighted_tab_ids )
+    },
   }
 }
 </script>
@@ -844,10 +844,14 @@ $pinned-tabs-list__themes: (
 
 $sidebar-tab_groups-list__themes: (
   light: (
+    scrollbar--background-color: $white-100,
+    scrollbar--color: $light-header-hover-background,
     separator--color: #e0e0e1,
     --drag-target--ink-color: map-get( $--theme-light, --drag-target--ink-color ),
   ),
   dark: (
+    scrollbar--background-color: black,
+    scrollbar--color: #5b5b5d,
     separator--color: #545455,
     --drag-target--ink-color: map-get( $--theme-dark, --drag-target--ink-color ),
   )
@@ -864,6 +868,8 @@ $sidebar-tab_groups-list__themes: (
     align-items: stretch;
     overflow-y: auto;
     border-top: solid 1px map-get( $colors, separator--color );
+    scrollbar-color: map-get( $colors, scrollbar--color ) map-get( $colors, scrollbar--background-color );
+    scrollbar-size: thin;
 
     &__item-container {
       @extend %slow-transition;
