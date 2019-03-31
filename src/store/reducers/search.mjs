@@ -1,7 +1,8 @@
 import { omit } from "../helpers.mjs"
 
 export function startWindowSearch( state, { window_id, search_text } ) {
-  return Object.assign( {}, state, {
+  return {
+    ...state,
     windows: state.windows.map( window => {
       if( window.id !== window_id ) {
         return window
@@ -33,36 +34,40 @@ export function startWindowSearch( state, { window_id, search_text } ) {
         }
       }
 
-      return Object.assign( {}, window, {
+      return {
+        ...window,
         search: {
           text: search_text,
           resolved: ( queued_tab_ids.length === 0 ),
           matched_tab_ids,
           queued_tab_ids
         }
-      })
+      }
     })
-  })
+  }
 }
 
 export function finishWindowSearch( state0, { window_id, search_text, matched_tab_ids } ) {
   let is_updated = false
 
-  const state1 = Object.assign( {}, state0, {
+  const state1 = {
+    ...state0,
     windows: state0.windows.map( window => {
       if( window.id !== window_id || window.search != null && window.search.text !== search_text ) {
         return window
       }
       is_updated = true
-      return Object.assign( {}, window, {
-        search: Object.assign( {}, window.search, {
+      return {
+        ...window,
+        search: {
+          ...window.search,
           resolved: true,
           matched_tab_ids: window.search.matched_tab_ids.concat( matched_tab_ids ),
           queued_tab_ids: []
-        })
-      })
+        }
+      }
     })
-  })
+  }
 
   if( is_updated ) {
     return state1
@@ -72,7 +77,8 @@ export function finishWindowSearch( state0, { window_id, search_text, matched_ta
 
 export function resetWindowSearch( state0, { window_id } ) {
   let is_updated = false
-  const state1 = Object.assign( {}, state0, {
+  const state1 = {
+    ...state0,
     windows: state0.windows.map( window => {
       if( window.id !== window_id || window.search == null ) {
         return window
@@ -80,7 +86,7 @@ export function resetWindowSearch( state0, { window_id } ) {
       is_updated = true
       return omit( window, "search" )
     })
-  })
+  }
 
   if( is_updated ) {
     return state1

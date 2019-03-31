@@ -10,16 +10,14 @@ export const default_config = {
 }
 
 export function createWindow( window_id, tab_groups, properties = {} ) {
-  return Object.assign(
-    {
-      id: window_id,
-      active_tab_group_id: tab_groups[ 1 ].id,
-      active_tab_id: tab_groups[ 1 ].active_tab_id,
-      highlighted_tab_ids: [ tab_groups[ 1 ].active_tab_id ],
-      tab_groups: tab_groups,
-    },
-    properties
-  )
+  return {
+    id: window_id,
+    active_tab_group_id: tab_groups[ 1 ].id,
+    active_tab_id: tab_groups[ 1 ].active_tab_id,
+    highlighted_tab_ids: [ tab_groups[ 1 ].active_tab_id ],
+    tab_groups: tab_groups,
+    ...properties
+  }
 }
 
 export function createTabGroup( tab_group_id, tabs, active_tab_id ) {
@@ -47,25 +45,27 @@ export function createPinnedTabGroup( tabs, active_tab_id ) {
 }
 
 export function cloneWindow( window ) {
-  return Object.assign( {}, window, {
+  return {
+    ...window,
     tab_groups: window.tab_groups.map( cloneTabGroup ),
     highlighted_tab_ids: window.highlighted_tab_ids.slice( 0 ),
-  })
+  }
 }
 
 export function cloneTabGroup( tab_group ) {
-  return Object.assign( {}, tab_group, {
+  return {
+    ...tab_group,
     tabs: tab_group.tabs.map( cloneTab )
-  })
+  }
 }
 
 export function cloneTab( tab ) {
-  tab = Object.assign( {}, tab )
+  tab = { ...tab }
   if( tab.mutedInfo ) {
-    tab.mutedInfo = Object.assign( {}, tab.mutedInfo )
+    tab.mutedInfo = { ...tab.mutedInfo }
   }
   if( tab.preview_image ) {
-    tab.preview_image = Object.assign( {}, tab.preview_image )
+    tab.preview_image = { ...tab.preview_image }
   }
   return tab
 }
@@ -280,8 +280,8 @@ export function getTargetTabGroupData( target_window, target_data, ignored_tabs 
  */
 export function getTabMoveData( state, source_data, target_data ) {
   let { windows } = state
-  source_data = Object.assign( {}, source_data )
-  target_data = Object.assign( {}, target_data )
+  source_data = { ...source_data }
+  target_data = { ...target_data }
 
   if( source_data.tabs == null && source_data.type !== "moz-place" && source_data.type !== "moz-url" ) {
     if( source_data.tab_ids ) {
@@ -396,14 +396,16 @@ export function getTabMoveData( state, source_data, target_data ) {
     }
 
     // Load the global index for the target
-    target_data = Object.assign( {}, target_data,
-      getTargetIndex( target_window, target_data, source_data.tabs || [] )
-    )
+    target_data = {
+      ...target_data,
+      ...getTargetIndex( target_window, target_data, source_data.tabs || [] )
+    }
     // @todo check result
   } else if( target_data.tab_group_id == null ) {
-    target_data = Object.assign( {}, target_data,
-      getTargetTabGroupData( target_window, target_data )
-    )
+    target_data = {
+      ...target_data,
+      ...getTargetTabGroupData( target_window, target_data )
+    }
   }
 
   return {

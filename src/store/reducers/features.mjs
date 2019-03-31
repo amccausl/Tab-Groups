@@ -1,6 +1,7 @@
 
 export function updateFeatures( state, { features } ) {
-  return Object.assign( {}, state, {
-    features: Object.assign( {}, state.features, features )
-  })
+  return {
+    ...state,
+    features: { ...state.features, ...features }
+  }
 }

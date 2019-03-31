@@ -31,11 +31,17 @@ export const base_new_browser_tab = {
 export const base_new_tab = getTabState( base_new_browser_tab )
 
 export function createBrowserTab( tab ) {
-  return Object.assign( {}, base_new_browser_tab, tab )
+  return {
+    ...base_new_browser_tab,
+    ...tab,
+  }
 }
 
 export function createTestTab( tab ) {
-  return Object.assign( {}, base_new_tab, tab )
+  return {
+    ...base_new_tab,
+    ...tab,
+  }
 }
 
 export function getInitialState() {

@@ -17,6 +17,7 @@ let plugins = [
     // target: { firefox: 57 },
     transforms: {
       arrow: false,
+      asyncAwait: false,
       conciseMethodProperty: false,
       destructuring: false,
       forOf: false,

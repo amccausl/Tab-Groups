@@ -200,7 +200,7 @@ function setTabPreviewState( tab_id, preview_image ) {
 }
 
 async function getBrowserConfig() {
-  const config = Object.assign( {}, default_config )
+  const config = { ...default_config }
 
   if( typeof( browser.storage ) != "undefined" ) {
     const local_config = await getLocalConfig()
