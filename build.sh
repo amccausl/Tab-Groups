@@ -5,7 +5,9 @@ cp -r src/assets/* dist/
 cp src/integrations/firefox/manifest.json dist/
 ./node_modules/.bin/ajv compile -s src/schemas/state.json -o src/schemas/validate_state.js
 ./node_modules/.bin/rollup -c rollup.background.config.js
-./node_modules/.bin/rollup -c rollup.main.config.js
+./node_modules/.bin/rollup -c rollup.action.config.js
+./node_modules/.bin/rollup -c rollup.options.config.js
+./node_modules/.bin/rollup -c rollup.sidebar.config.js
 cp bower_components/fira/woff/FiraSans-Light.woff \
    bower_components/fira/woff/FiraSans-LightItalic.woff \
    bower_components/fira/woff/FiraSans-Regular.woff \
