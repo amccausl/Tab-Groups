@@ -1,9 +1,13 @@
 <script>
-  import { writable } from 'svelte/store'
+  import {
+    getMessage,
+    openTabGroupsPage,
+  } from "../integrations/index.mjs"
 
-  import { getMessage, openTabGroupsPage } from "../integrations/index.mjs"
+  import {
+    onStateChange,
+  } from "./helpers.mjs"
 
-  let selected_section = 'preferences'
   const __MSG_container_tabs_info_url__ = getMessage( "container_tabs_info_url" )
   const __MSG_learn_more__ = getMessage( "learn_more" )
   const __MSG_options_section_preferences__ = getMessage( "options_section_preferences" )
@@ -21,14 +25,17 @@
   const __MSG_options_sidebar_show_tab_icon_background__ = getMessage( "options_sidebar_show_tab_icon_background" )
   const __MSG_options_use_sync_config__ = getMessage( "options_use_sync_config" )
 
-  let theme = "dark"
-  let show_tabs = writable( false, ( value ) => console.info('show_tabs', value) )
-  let show_header = false
-  let show_tabs_count = false
-  let show_pinned_tabs = false
-  let show_tab_context = false
-  let show_tab_icon_background = false
-  let use_sync_config = false
+  let selected_section = 'preferences'
+  let preferences = {}
+  let features_contexual_identities_enabled
+  let features_tabhide_enabled
+
+  onStateChange( state => {
+    console.info('loadState', state)
+    preferences = { ...preferences, ...state.config }
+    features_contexual_identities_enabled = state.features.contextual_identities.enabled
+    features_tabhide_enabled = state.features.tabhide.enabled
+  })
 
   function selectSection( section ) {
     selected_section = section
@@ -168,11 +175,11 @@
       <form>
         { __MSG_options_theme__ }:
         <div class="browser-style">
-          <input type="radio" id="theme_light" bind:group={ theme } value="light" on:change={ e => selectTheme( 'light' ) }>
+          <input type="radio" id="theme_light" bind:group={ preferences.theme } value="light" on:change={ e => selectTheme( 'light' ) }>
           <label for="theme_light">{ __MSG_options_theme_light__ }</label>
         </div>
         <div class="browser-style">
-          <input type="radio" id="theme_dark" bind:group={ theme } value="dark" on:change={ e => selectTheme( 'dark' ) }>
+          <input type="radio" id="theme_dark" bind:group={ preferences.theme } value="dark" on:change={ e => selectTheme( 'dark' ) }>
           <label for="theme_dark">{ __MSG_options_theme_dark__ }</label>
         </div>
 
@@ -180,19 +187,19 @@
           <legend>{ __MSG_options_sidebar_legend__ }</legend>
 
           <label class="checkbox">
-            <input class="checkbox__input" type="checkbox" bind:checked={ show_header } on:change={ e => setConfig( 'show_header', show_header ) }>
+            <input class="checkbox__input" type="checkbox" bind:checked={ preferences.show_header } on:change={ e => setConfig( 'show_header', preferences.show_header ) }>
             <span class="checkbox__icon"></span>
             <span class="checkbox__label">{ __MSG_options_sidebar_show_header__ }</span>
           </label>
 
           <label class="checkbox">
-            <input class="checkbox__input" type="checkbox" bind:checked={ show_tabs_count } on:change={ e => setConfig( 'show_tabs_count', show_tabs_count ) }>
+            <input class="checkbox__input" type="checkbox" bind:checked={ preferences.show_tabs_count } on:change={ e => setConfig( 'show_tabs_count', preferences.show_tabs_count ) }>
             <span class="checkbox__icon"></span>
             <span class="checkbox__label">{ __MSG_options_sidebar_show_tabs_count__ }</span>
           </label>
 
           <label class="checkbox">
-            <input class="checkbox__input" type="checkbox" bind:checked={ show_tabs } on:change={ e => setConfig( 'show_tabs', show_tabs ) }>
+            <input class="checkbox__input" type="checkbox" bind:checked={ preferences.show_tabs } on:change={ e => setConfig( 'show_tabs', preferences.show_tabs ) }>
             <span class="checkbox__icon"></span>
             <span class="checkbox__label">{ __MSG_options_sidebar_show_tabs__ }</span>
           </label>
@@ -203,20 +210,24 @@
             <span class="checkbox__label">{ __MSG_options_sidebar_show_pinned_tabs__ }</span>
           </label> -->
 
-          <label v-if="show_tabs && features_contexual_identities_enabled" class="checkbox checkbox--nested">
-            <input class="checkbox__input" type="checkbox" bind:checked={ show_tab_context } on:change={ e => setConfig( 'show_tab_context', show_tab_context ) }>
+          {#if preferences.show_tabs && features_contexual_identities_enabled }
+          <label class="checkbox checkbox--nested">
+            <input class="checkbox__input" type="checkbox" bind:checked={ preferences.show_tab_context } on:change={ e => setConfig( 'show_tab_context', preferences.show_tab_context ) }>
             <span class="checkbox__icon"></span>
             <span class="checkbox__label">{ __MSG_options_sidebar_show_tab_context__ } <a href={ __MSG_container_tabs_info_url__ }>{ __MSG_learn_more__ }</a></span>
           </label>
+          {/if}
 
-          <label v-if="show_tabs && preferences.theme === 'dark'" class="checkbox checkbox--nested">
-            <input class="checkbox__input" type="checkbox" bind:checked={ show_tab_icon_background } on:change={ e => setConfig( 'show_tab_icon_background', show_tab_icon_background ) }>
+          {#if preferences.show_tabs && preferences.theme === 'dark' }
+          <label class="checkbox checkbox--nested">
+            <input class="checkbox__input" type="checkbox" bind:checked={ preferences.show_tab_icon_background } on:change={ e => setConfig( 'show_tab_icon_background', preferences.show_tab_icon_background ) }>
             <span class="checkbox__icon"></span>
             <span class="checkbox__label">{ __MSG_options_sidebar_show_tab_icon_background__ }</span>
           </label>
+          {/if}
 
           <label class="checkbox">
-            <input class="checkbox__input" type="checkbox" bind:checked={ use_sync_config } on:change={ e => setConfig( 'use_sync_config', use_sync_config ) }>
+            <input class="checkbox__input" type="checkbox" bind:checked={ preferences.use_sync_config } on:change={ e => setConfig( 'use_sync_config', preferences.use_sync_config ) }>
             <span class="checkbox__icon"></span>
             <span class="checkbox__label">{ __MSG_options_use_sync_config__ }</span>
           </label>

@@ -11,18 +11,6 @@
     getWindow,
   } from "../store/helpers.mjs"
   import {
-    onTabDragStart,
-    onTabDragEnd,
-    onTabDragEnter,
-    onTabDragLeave,
-    onTabDrop,
-    onTabGroupDragStart,
-    onTabGroupDragEnd,
-    onTabGroupDragEnter,
-    onTabGroupDragLeave,
-    onTabGroupDrop,
-  } from "./tab-draggable.mjs"
-  import {
     bem,
     debounce,
     getCountMessage,
@@ -33,6 +21,18 @@
   import {
     INK_90,
   } from "./photon-colors"
+  import {
+    onTabDragStart as onTabDragStartHelper,
+    onTabDragEnd as onTabDragEndHelper,
+    onTabDragEnter as onTabDragEnterHelper,
+    onTabDragLeave as onTabDragLeaveHelper,
+    onTabDrop as onTabDropHelper,
+    onTabGroupDragStart as onTabGroupDragStartHelper,
+    onTabGroupDragEnd as onTabGroupDragEndHelper,
+    onTabGroupDragEnter as onTabGroupDragEnterHelper,
+    onTabGroupDragLeave as onTabGroupDragLeaveHelper,
+    onTabGroupDrop as onTabGroupDropHelper,
+  } from "./tab-draggable.mjs"
   import {
     toggleTabSelection as toggleTabSelectionHelper,
     toggleTabBatchSelection as toggleTabBatchSelectionHelper,
@@ -383,6 +383,99 @@
         e.preventDefault()
       }
     }
+  }
+
+  function getDraggableState() {
+    return {
+      window_id,
+      is_dragging,
+      isSelected,
+      selected_tab_ids,
+      drag_state,
+    }
+  }
+
+  function onTabDragStart( event, tab ) {
+    const ctrl = getDraggableState()
+    onTabDragStartHelper.call( ctrl, event, tab )
+    if( ctrl.is_dragging !== is_dragging ) {
+      is_dragging = ctrl.is_dragging
+    }
+    selected_tab_ids = ctrl.selected_tab_ids
+    drag_state = ctrl.drag_state
+  }
+
+  function onTabDragEnter( event, tab_group, tab ) {
+    const ctrl = getDraggableState()
+    onTabDragEnterHelper.call( ctrl, event, tab_group, tab )
+    drag_state = ctrl.drag_state
+  }
+
+  function onTabGroupDrop( event, tab_group, tab_group_index ) {
+    const ctrl = getDraggableState()
+    onTabGroupDropHelper.call( ctrl, event, tab_group, tab_group_index )
+    if( ctrl.is_dragging !== is_dragging ) {
+      is_dragging = ctrl.is_dragging
+    }
+    selected_tab_ids = ctrl.selected_tab_ids
+    drag_state = ctrl.drag_state
+  }
+
+  function onTabGroupDragStart( event, tab_group ) {
+    const ctrl = getDraggableState()
+    onTabGroupDragStartHelper.call( ctrl, event, tab_group )
+    if( ctrl.is_dragging !== is_dragging ) {
+      is_dragging = ctrl.is_dragging
+    }
+    drag_state = ctrl.drag_state
+  }
+
+  function onTabGroupDragLeave( event ) {
+    const ctrl = getDraggableState()
+    onTabGroupDragLeaveHelper.call( ctrl, event )
+    drag_state = ctrl.drag_state
+  }
+
+  function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
+    const ctrl = getDraggableState()
+    onTabGroupDragEnterHelper.call( ctrl, event, tab_group, tab_group_index )
+    drag_state = ctrl.drag_state
+  }
+
+  function onTabGroupDragEnd() {
+    const ctrl = getDraggableState()
+    onTabGroupDragEndHelper.call( ctrl )
+    if( ctrl.is_dragging !== is_dragging ) {
+      is_dragging = ctrl.is_dragging
+    }
+    selected_tab_ids = ctrl.selected_tab_ids
+    drag_state = ctrl.drag_state
+  }
+
+  function onTabDragEnd() {
+    const ctrl = getDraggableState()
+    onTabDragEndHelper.call( ctrl )
+    if( ctrl.is_dragging !== is_dragging ) {
+      is_dragging = ctrl.is_dragging
+    }
+    selected_tab_ids = ctrl.selected_tab_ids
+    drag_state = ctrl.drag_state
+  }
+
+  function onTabDrop( event, tab_group, tab ) {
+    const ctrl = getDraggableState()
+    onTabDropHelper.call( ctrl, event, tab_group, tab )
+    if( ctrl.is_dragging !== is_dragging ) {
+      is_dragging = ctrl.is_dragging
+    }
+    selected_tab_ids = ctrl.selected_tab_ids
+    drag_state = ctrl.drag_state
+  }
+
+  function onTabDragLeave( event ) {
+    const ctrl = getDraggableState()
+    onTabDragLeaveHelper.call( ctrl, event )
+    drag_state = ctrl.drag_state
   }
 </script>
 
@@ -1266,14 +1359,14 @@
     <div class={ `sidebar-tab_groups-list--${ theme }__item` }>
       <div class={ bem( `tab-groups-list-item-header--${ theme }`, { 'active': active_tab_group_id === tab_group.id, 'open': show_tabs && tab_group_states[ tab_group_index ].open, 'drag-source': isTabGroupDragSource( tab_group ), [`drag-${ drag_state.source.type }-target`]: ! isTabGroupDragSource( tab_group ) && isTabGroupDragTarget( tab_group ) } ).join( " " ) }
           title={ tab_group.title }
-          @dragenter="onTabGroupDragEnter( $event, tab_group, tab_group_index + 1 )"
-          @dragover.prevent
-          @dragleave="onTabGroupDragLeave( $event, tab_group, tab_group_index + 1 )"
-          @drop="onTabGroupDrop( $event, tab_group, tab_group_index + 1 )"
+          on:dragenter={ e => onTabGroupDragEnter( e, tab_group, tab_group_index + 1 ) }
+          on:dragover|preventDefault
+          on:dragleave={ e => onTabGroupDragLeave( e, tab_group, tab_group_index + 1 ) }
+          on:drop={ e => onTabGroupDrop( e, tab_group, tab_group_index + 1 ) }
           on:click={ e => onTabGroupClick( tab_group ) }
           draggable="true"
-          @dragstart="onTabGroupDragStart( $event, tab_group )"
-          @dragend="onTabGroupDragEnd( $event, tab_group )"
+          on:dragstart={ e => onTabGroupDragStart( e, tab_group ) }
+          on:dragend={ e => onTabGroupDragEnd( e, tab_group ) }
       >
         <div class={ `tab-groups-list-item-header--${ theme }__container` }>
           <div class={ `tab-groups-list-item-header--${ theme }__drag-target-ink` }></div>
@@ -1284,7 +1377,7 @@
             </svg>
             {/if}
             <div class={ bem( `tab-groups-list-item-header--${ theme }__title`, { 'editing': rename_tab_group_id === tab_group.id } ).join( " " ) }>
-              <Editable class={ `tab-groups-list-item-header--${ theme }__title-editable` } value={ tab_group.title } @input="onTabGroupTitleInput( $event, tab_group )" active={ rename_tab_group_id === tab_group.id }></Editable>
+              <Editable class={ `tab-groups-list-item-header--${ theme }__title-editable` } value={ tab_group.title } on:input={ e => onTabGroupTitleInput( e, tab_group ) } active={ rename_tab_group_id === tab_group.id }></Editable>
             </div>
 
             {#if tab_group.muted}
