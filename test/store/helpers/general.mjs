@@ -166,7 +166,8 @@ function testGetTabMoveDataNewGroup( t ) {
     title: "Group 3",
     active_tab_id: 4,
     tabs: tab_move_data.source_data.tabs,
-    tabs_count: tab_move_data.source_data.tabs.length
+    tabs_count: tab_move_data.source_data.tabs.length,
+    last_active: undefined,
   })
 
   t.end()

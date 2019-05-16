@@ -16,8 +16,12 @@ export function validateState( state ) {
     // Ensure that the active tab is in active group or pinned
     if( window.hasOwnProperty( "active_tab_id" ) && window.active_tab_id != null ) {
       let is_window_active_tab_valid = false
+      let is_window_active_tab_group_valid = false
       for( let tab_group_index = 0; tab_group_index < tab_groups_length; tab_group_index++ ) {
         const tab_group = window.tab_groups[ tab_group_index ]
+        if( tab_group.id === window.active_tab_group_id ) {
+          is_window_active_tab_group_valid = true
+        }
         for( let tab of tab_group.tabs ) {
           if( tab.id === window.active_tab_id ) {
             is_window_active_tab_valid = true
@@ -36,6 +40,14 @@ export function validateState( state ) {
             }
           }
         }
+      }
+
+      if( window.active_tab_group_id != null && ! is_window_active_tab_group_valid ) {
+        errors.push({
+          keyword: "link",
+          dataPath: `window[${ window_index }].active_tab_group_id`,
+          message: `Active tab group "${ window.active_tab_group_id }" isn't in tab groups array`
+        })
       }
 
       if( ! is_window_active_tab_valid ) {
