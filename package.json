@@ -42,7 +42,7 @@
     "rollup-plugin-node-resolve": "4.0.1",
     "rollup-plugin-replace": "2.1.0",
     "rollup-plugin-vue": "4.7.2",
-    "tap": "13.1.8",
+    "tap": "14.2.5",
     "vue-template-compiler": "2.5.17",
     "web-ext": "3.0.0"
   }
