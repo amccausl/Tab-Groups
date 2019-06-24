@@ -117,7 +117,7 @@ export default {
       features_contexual_identities_enabled: false,
       features_tabhide_enabled: false,
       preferences: {
-        theme: 'dark',
+        theme: 'system',
         show_header: true,
         show_tabs_count: false,
         show_tabs: false,

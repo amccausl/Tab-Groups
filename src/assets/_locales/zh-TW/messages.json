@@ -152,6 +152,11 @@
     }
   },
 
+  "window_new": {
+    "message": "",
+    "description": "Dropzone to create a new window"
+  },
+
   "matched_tabs_count_singular": {
     "message": "$INDEX$ 搜尋結果",
     "description": "This is used where tab count is displayed",

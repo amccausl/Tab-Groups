@@ -152,6 +152,11 @@
     }
   },
 
+  "window_new": {
+    "message": "New Window",
+    "description": "Dropzone to create a new window"
+  },
+
   "matched_tabs_count_singular": {
     "message": "$INDEX$ found",
     "description": "This is used where tab count is displayed",

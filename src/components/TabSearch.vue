@@ -160,5 +160,31 @@ $tab-search__theme: (
       fill: map-get( $colors, --color );
     }
   }
+
+  @media (prefers-color-scheme: $theme) {
+    .tab-search {
+      &__input {
+        background-color: map-get( $colors, --background-color );
+        color: map-get( $colors, --color );
+        border: 1px solid rgba( map-get( $colors, --color ), 0.3 );
+
+        &::-moz-placeholder {
+          color: map-get( $colors, --color );
+        }
+      }
+
+      &__label:hover &__input {
+        border-color: rgba( map-get( $colors, --color ), 0.5 );
+      }
+
+      &__icon {
+        fill: map-get( $colors, --color );
+      }
+
+      &__clear-icon {
+        fill: map-get( $colors, --color );
+      }
+    }
+  }
 }
 </style>

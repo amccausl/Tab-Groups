@@ -152,6 +152,11 @@
     }
   },
 
+  "window_new": {
+    "message": "",
+    "description": "Dropzone to create a new window"
+  },
+
   "matched_tabs_count_singular": {
     "message": "$INDEX$ 件",
     "description": "タブ数が表示されている場合に使用",
