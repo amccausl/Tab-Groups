@@ -30,9 +30,7 @@ let plugins = [
     'process.env.NODE_ENV': JSON.stringify( 'production' )
   }),
   nodeResolve({
-    jsnext: true,
-    main: true,
-    browser: true
+    modulesOnly: true,
   }),
   commonjs(),
 ]

@@ -6,9 +6,6 @@ import commonjs from 'rollup-plugin-commonjs'
 let plugins = [
   async(),
   nodeResolve({
-    jsnext: true,
-    main: true,
-    browser: true
   }),
   commonjs()
 ]
