@@ -59,6 +59,11 @@
     "description": ""
   },
 
+  "options_theme_system": {
+    "message": "",
+    "description": ""
+  },
+
   "options_sidebar_legend": {
     "message": "サイドバー",
     "description": ""

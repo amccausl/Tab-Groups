@@ -12,7 +12,19 @@ Promise.all([
     .then( background => {
       // Save a reference to the background script so it can be accessed syncronously
       window.background = background
-      return background.getStore()
+
+      // Sometimes this is reached before the background script has run it's initializer, check for that
+      if( background.getStore ) {
+        return background.getStore()
+      }
+
+      console.info('deferring load')
+      return new Promise( ( resolve ) => {
+        background.addEventListener( "load", () => {
+          console.info('load event', background.getStore)
+          resolve( background.getStore() )
+        })
+      })
     })
 ])
 .then( ( [ current_window, store ] ) => {

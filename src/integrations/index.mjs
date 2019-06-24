@@ -15,6 +15,7 @@ export const LOCALE_KEYS = [
   "options_theme",
   "options_theme_light",
   "options_theme_dark",
+  "options_theme_system",
   "options_sidebar_legend",
   "options_sidebar_show_header",
   "options_sidebar_show_tabs_count",

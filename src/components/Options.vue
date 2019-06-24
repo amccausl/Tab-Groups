@@ -35,6 +35,10 @@
               <input type="radio" id="theme_dark" value="dark" v-model="preferences.theme" @input="selectTheme( 'dark' )">
               <label for="theme_dark" v-once>{{ __MSG_options_theme_dark__ }}</label>
             </div>
+            <div class="browser-style">
+              <input type="radio" id="theme_system" value="system" v-model="preferences.theme" @input="selectTheme( 'system' )">
+              <label for="theme_system" v-once>{{ __MSG_options_theme_system__ }}</label>
+            </div>
 
             <fieldset>
               <legend v-once>{{ __MSG_options_sidebar_legend__ }}</legend>
@@ -69,7 +73,7 @@
                 <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_tab_context__ }} <a :href="__MSG_container_tabs_info_url__">{{ __MSG_learn_more__ }}</a></span>
               </label>
 
-              <label v-if="show_tabs && preferences.theme === 'dark'" class="checkbox checkbox--nested">
+              <label v-if="show_tabs && preferences.theme !== 'light'" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_tab_icon_background">
                 <span class="checkbox__icon"></span>
                 <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_tab_icon_background__ }}</span>
@@ -148,6 +152,9 @@ export default {
     },
     __MSG_options_theme_dark__() {
       return window.background.getMessage( "options_theme_dark" )
+    },
+    __MSG_options_theme_system__() {
+      return window.background.getMessage( "options_theme_system" )
     },
     __MSG_options_sidebar_legend__() {
       return window.background.getMessage( "options_sidebar_legend" )

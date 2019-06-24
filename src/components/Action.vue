@@ -83,7 +83,14 @@ export default {
   created() {
     let state0_window;
     onStateChange( state => {
-      this.theme = ( state.config.theme === 'light' ? 'light' : 'dark' )
+      switch( state.config.theme ) {
+        case "dark":
+        case "light":
+          this.theme = state.config.theme
+          break
+        default:
+          this.theme = null
+      }
       this.show_tabs_count = state.config.show_tabs_count
       this.show_tabs = state.config.show_tabs
 
@@ -313,6 +320,58 @@ $action__theme: (
 
     .panel-section-footer-button:hover {
       background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
+    }
+  }
+
+  @media (prefers-color-scheme: $theme) {
+    .action-panel {
+      background-color: map-get( $colors, --background-color );
+
+      .panel {
+        color: map-get( $colors, --primary-color );
+      }
+
+      .panel-section-footer-separator {
+        background-color: map-get( $colors, __ink--color );
+      }
+
+      .panel-section-footer {
+        border-top: 1px solid rgba( map-get( $colors, __ink--color ), 0.1 );
+        border-color: rgba( map-get( $colors, __ink--color ), 0.1 );
+      }
+
+      .panel-section-footer-button {
+        color: map-get( $colors, --primary-color );
+        fill: map-get( $colors, --primary-color );
+      }
+
+      .panel-list-item {
+        &:not(.disabled):hover {
+          background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
+          border-bottom: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+          border-top: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+        }
+
+        &:not(.disabled):hover:active {
+          background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+        }
+
+        &--active {
+          background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+        }
+
+        &__icon {
+          height: 16px;
+          width: 16px;
+          margin-right: 4px;
+          color: map-get( $colors, --primary-color );
+          fill: map-get( $colors, --primary-color );
+        }
+      }
+
+      .panel-section-footer-button:hover {
+        background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
+      }
     }
   }
 }
