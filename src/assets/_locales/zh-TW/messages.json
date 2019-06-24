@@ -1,0 +1,181 @@
+{
+  "extension_name": {
+    "message": "Tabulate",
+    "description": "Name of the extension."
+  },
+
+  "extension_description": {
+    "message": "Tabulate 幫你整理網頁瀏覽器,提高你工作的效率,讓你可以專心",
+    "description": "Description of the extension."
+  },
+
+  "sidebar_name": {
+    "message": "整理分頁",
+    "description": "Name of the sidebar."
+  },
+
+  "onboarding_title": {
+    "message": "歡迎",
+    "description": ""
+  },
+
+  "learn_more": {
+    "message": "資訊",
+    "description": ""
+  },
+
+  "container_tabs_info_url": {
+    "message": "https://support.mozilla.org/zh-TW/kb/容器分頁功能",
+    "description": ""
+  },
+
+  "options_section_preferences": {
+    "message": "設定",
+    "description": ""
+  },
+
+  "options_section_data": {
+    "message": "資料",
+    "description": ""
+  },
+
+  "options_section_debug": {
+    "message": "調試工具",
+    "description": ""
+  },
+
+  "options_theme": {
+    "message": "主題",
+    "description": ""
+  },
+
+  "options_theme_light": {
+    "message": "亮",
+    "description": ""
+  },
+
+  "options_theme_dark": {
+    "message": "暗",
+    "description": ""
+  },
+
+  "options_system_dark": {
+    "message": "",
+    "description": ""
+  },
+
+  "options_sidebar_legend": {
+    "message": "側邊攔",
+    "description": ""
+  },
+
+  "options_sidebar_show_header": {
+    "message": "顯示標題欄",
+    "description": ""
+  },
+
+  "options_sidebar_show_tabs_count": {
+    "message": "顯示分頁數量",
+    "description": ""
+  },
+
+  "options_sidebar_show_tabs": {
+    "message": "顯示分頁",
+    "description": ""
+  },
+
+  "options_sidebar_show_pinned_tabs": {
+    "message": "顯示固定標籤頁",
+    "description": ""
+  },
+
+  "options_sidebar_show_tab_context": {
+    "message": "顯示容器分頁功能",
+    "description": ""
+  },
+
+  "options_sidebar_show_tab_icon_background": {
+    "message": "顯示分頁符號",
+    "description": ""
+  },
+
+  "options_use_sync_config": {
+    "message": "使用Firefox帳號",
+    "description": ""
+  },
+
+  "tab_group_name_placeholder": {
+    "message": "群組 $INDEX$",
+    "description": "This is used as a placeholder name for new groups",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+
+  "tab_group_manage": {
+    "message": "管理我的群組",
+    "description": "Link to tab group page"
+  },
+
+  "tab_group_new": {
+    "message": "新群組",
+    "description": "Link to tab group page"
+  },
+
+  "tab_group_sidebar_action": {
+    "message": "開啟分頁群組側邊攔",
+    "description": "Open the tab groups sidebar"
+  },
+
+  "tabs_count_singular": {
+    "message": "$INDEX$ 分頁",
+    "description": "This is used where tab count is displayed",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+
+  "tabs_count_plural": {
+    "message": "$INDEX$ 分頁",
+    "description": "This is used where tab count is displayed",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+
+  "matched_tabs_count_singular": {
+    "message": "$INDEX$ 搜尋結果",
+    "description": "This is used where tab count is displayed",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+
+  "matched_tabs_count_plural": {
+    "message": "$INDEX$ 搜尋結果",
+    "description": "This is used where tab count is displayed",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+
+  "tab_search_placeholder": {
+    "message": "搜尋分頁",
+    "description": "Placeholder for tab search field"
+  }
+}
