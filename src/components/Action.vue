@@ -83,15 +83,7 @@ export default {
   created() {
     let state0_window;
     onStateChange( state => {
-      switch( state.config.theme ) {
-        case "dark":
-        case "light":
-        case "system":
-          this.theme = state.config.theme
-          break
-        default:
-          this.theme = null
-      }
+      this.theme = state.config.theme || "system"
       this.show_tabs_count = state.config.show_tabs_count
       this.show_tabs = state.config.show_tabs
 
