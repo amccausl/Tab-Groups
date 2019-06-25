@@ -86,6 +86,7 @@ export default {
       switch( state.config.theme ) {
         case "dark":
         case "light":
+        case "system":
           this.theme = state.config.theme
           break
         default:
@@ -272,106 +273,66 @@ $action__theme: (
   ),
 );
 
-@each $theme, $colors in $action__theme {
-  .action-panel--theme-#{$theme} {
-    background-color: map-get( $colors, --background-color );
+@mixin action( $theme ) {
+  $colors: map-get( $map: $action__theme, $key: $theme );
 
-    .panel {
-      color: map-get( $colors, --primary-color );
+  background-color: map-get( $colors, --background-color );
+
+  .panel {
+    color: map-get( $colors, --primary-color );
+  }
+
+  .panel-section-footer-separator {
+    background-color: map-get( $colors, __ink--color );
+  }
+
+  .panel-section-footer {
+    border-top: 1px solid rgba( map-get( $colors, __ink--color ), 0.1 );
+    border-color: rgba( map-get( $colors, __ink--color ), 0.1 );
+  }
+
+  .panel-section-footer-button {
+    color: map-get( $colors, --primary-color );
+    fill: map-get( $colors, --primary-color );
+  }
+
+  .panel-list-item {
+    &:not(.disabled):hover {
+      background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
+      border-bottom: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
+      border-top: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
     }
 
-    .panel-section-footer-separator {
-      background-color: map-get( $colors, __ink--color );
+    &:not(.disabled):hover:active {
+      background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
     }
 
-    .panel-section-footer {
-      border-top: 1px solid rgba( map-get( $colors, __ink--color ), 0.1 );
-      border-color: rgba( map-get( $colors, __ink--color ), 0.1 );
+    &--active {
+      background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
     }
 
-    .panel-section-footer-button {
+    &__icon {
+      height: 16px;
+      width: 16px;
+      margin-right: 4px;
       color: map-get( $colors, --primary-color );
       fill: map-get( $colors, --primary-color );
     }
+  }
 
-    .panel-list-item {
-      &:not(.disabled):hover {
-        background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
-        border-bottom: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
-        border-top: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
-      }
+  .panel-section-footer-button:hover {
+    background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
+  }
+}
 
-      &:not(.disabled):hover:active {
-        background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
-      }
-
-      &--active {
-        background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
-      }
-
-      &__icon {
-        height: 16px;
-        width: 16px;
-        margin-right: 4px;
-        color: map-get( $colors, --primary-color );
-        fill: map-get( $colors, --primary-color );
-      }
-    }
-
-    .panel-section-footer-button:hover {
-      background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
-    }
+@each $theme, $colors in $action__theme {
+  .action-panel--theme-#{$theme} {
+    @include action( $theme );
   }
 
   @media (prefers-color-scheme: $theme) {
-    .action-panel {
-      background-color: map-get( $colors, --background-color );
-
-      .panel {
-        color: map-get( $colors, --primary-color );
-      }
-
-      .panel-section-footer-separator {
-        background-color: map-get( $colors, __ink--color );
-      }
-
-      .panel-section-footer {
-        border-top: 1px solid rgba( map-get( $colors, __ink--color ), 0.1 );
-        border-color: rgba( map-get( $colors, __ink--color ), 0.1 );
-      }
-
-      .panel-section-footer-button {
-        color: map-get( $colors, --primary-color );
-        fill: map-get( $colors, --primary-color );
-      }
-
-      .panel-list-item {
-        &:not(.disabled):hover {
-          background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
-          border-bottom: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
-          border-top: 1px solid rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
-        }
-
-        &:not(.disabled):hover:active {
-          background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
-        }
-
-        &--active {
-          background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.1 );
-        }
-
-        &__icon {
-          height: 16px;
-          width: 16px;
-          margin-right: 4px;
-          color: map-get( $colors, --primary-color );
-          fill: map-get( $colors, --primary-color );
-        }
-      }
-
-      .panel-section-footer-button:hover {
-        background-color: rgba( map-get( $colors, __list-item--hover--background-color ), 0.06 );
-      }
+    .action-panel--theme-system {
+      @include action( $theme );
     }
   }
 }

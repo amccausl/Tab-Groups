@@ -5,6 +5,7 @@
   "scripts": {
     "build": "./build.sh",
     "build-windows": "build.bat",
+    "build-watch": "$(npm bin)/rollup -c rollup.config.js -w",
     "dev": "$(npm bin)/cross-env NODE_ENV=development ./build.sh",
     "test": "$(npm bin)/tap test",
     "debug": "$(npm bin)/web-ext --source-dir dist run --verbose",

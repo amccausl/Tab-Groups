@@ -32,6 +32,9 @@ Will add a new "Tabulate" sidebar and action.
 
 # Specific Versions
 
+## Firefox 67
+Added support for `prefers-color-scheme` media queries.  To support on linux, you can create a new key `ui.systemUsesDarkTheme` with value of integer `1` at [about:config](about:config) to enable
+
 ## Firefox 59
 Hiding tabs in the header is behind a feature flag.  You can update `extensions.webextensions.tabhide.enabled` property at [about:config](about:config) to enable
 

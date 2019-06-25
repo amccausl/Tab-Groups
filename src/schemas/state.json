@@ -65,8 +65,8 @@
       "type": "object",
       "properties": {
         "theme": {
-          "enum": [ "light", "dark" ],
-          "default": "light"
+          "enum": [ "light", "dark", "system" ],
+          "default": "system"
         },
         "show_pinned_tabs": {
           "type": "boolean",
