@@ -27,6 +27,7 @@ export const LOCALE_KEYS = [
   "tab_group_name_placeholder",
   "tab_group_manage",
   "tab_group_new",
+  "window_new",
   "tab_group_sidebar_action",
   "tabs_count_singular",
   "tabs_count_plural",
