@@ -142,6 +142,9 @@
               "resolved": {
                 "type": "boolean"
               },
+              "total_tabs_count": {
+                "type": "number"
+              },
               "matched_tab_ids": {
                 "type": "array",
                 "items": {

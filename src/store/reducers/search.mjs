@@ -10,8 +10,10 @@ export function startWindowSearch( state, { window_id, search_text } ) {
       }
 
       let search_tabs = []
+      let total_tabs_count = 0
       for( let tab_group of window.tab_groups ) {
         search_tabs.push( ...tab_group.tabs )
+        total_tabs_count += tab_group.tabs.length
       }
 
       // Can incrementally restrict search results
@@ -40,6 +42,7 @@ export function startWindowSearch( state, { window_id, search_text } ) {
         search: {
           text: search_text,
           resolved: ( queued_tab_ids.length === 0 ),
+          total_tabs_count,
           matched_tab_ids,
           queued_tab_ids,
         }

@@ -36,14 +36,15 @@ function testSingleWindowSearch( t ) {
   }
 
   let search_text = "test"
+  const total_tabs_count = 5
   const state1 = startWindowSearch( state0, { window_id, search_text } )
 
-  t.same( state1.windows[ 0 ].search, { text: search_text, resolved: false, matched_tab_ids: [ 4, 6, 7 ], queued_tab_ids: [ 5, 8 ] } )
+  t.same( state1.windows[ 0 ].search, { text: search_text, resolved: false, total_tabs_count, matched_tab_ids: [ 4, 6, 7 ], queued_tab_ids: [ 5, 8 ] } )
 
   let matched_tab_ids = [ 8 ]
   const state2 = finishWindowSearch( state1, { window_id, search_text, matched_tab_ids } )
 
-  t.same( state2.windows[ 0 ].search, { text: search_text, resolved: true, matched_tab_ids: [ 4, 6, 7, 8 ], queued_tab_ids: [] } )
+  t.same( state2.windows[ 0 ].search, { text: search_text, resolved: true, total_tabs_count, matched_tab_ids: [ 4, 6, 7, 8 ], queued_tab_ids: [] } )
 
   t.end()
 }
@@ -69,13 +70,14 @@ function testSingleWindowSearchUpdate( t ) {
   }
 
   let search_text = "test"
+  const total_tabs_count = 5
   const state1 = startWindowSearch( state0, { window_id, search_text } )
-  t.same( state1.windows[ 0 ].search, { text: search_text, resolved: false, matched_tab_ids: [], queued_tab_ids: [ 4, 5, 6, 7, 8 ] } )
+  t.same( state1.windows[ 0 ].search, { text: search_text, resolved: false, total_tabs_count, matched_tab_ids: [], queued_tab_ids: [ 4, 5, 6, 7, 8 ] } )
 
   let searched_tab_ids = [ 4, 5, 6 ]
   let matched_tab_ids = [ 5 ]
   const state2 = updateWindowSearch( state1, { window_id, search_text, searched_tab_ids, matched_tab_ids } )
-  t.same( state2.windows[ 0 ].search, { text: search_text, resolved: false, matched_tab_ids: [ 5 ], queued_tab_ids: [ 7, 8 ] } )
+  t.same( state2.windows[ 0 ].search, { text: search_text, resolved: false, total_tabs_count, matched_tab_ids: [ 5 ], queued_tab_ids: [ 7, 8 ] } )
 
   t.end()
 }
