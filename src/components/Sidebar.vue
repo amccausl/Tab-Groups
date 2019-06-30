@@ -76,8 +76,8 @@
             </div>
           </div>
           <!-- <transition-group v-if="tab_group.open && show_tabs && ! isTabGroupDragSource( tab_group )" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]" tag="div" :name="`sidebar-tab-group-tabs-list--${ theme }__item--transition`"> -->
-          <div v-if="tab_group.open && show_tabs && tab_group.tabs.length" :class="[ bem( 'list-flex-col', { theme, 'is-dragging': is_dragging, 'is-searching': is_searching, 'is-max-height': true } ) ]">
-            <div :class="bem( `list-flex-col__item`, { 'active': tab.active, 'drag-target-index': drag_state.target.tab_id === tab.id && ! isSelected( tab ), 'drag-selected': isSelected( tab ), 'drag-source': is_dragging && isSelected( tab ), 'search': getTabSearchState( tab ) } )"
+          <div v-if="tab_group.open && show_tabs && tab_group.tabs.length" :class="[ bem( 'list-flex-col', { theme, 'is-dragging': drag_state.is_dragging, 'is-searching': is_searching, 'is-max-height': true } ) ]">
+            <div :class="bem( `list-flex-col__item`, { 'active': tab.active, 'drag-target-index': drag_state.target.tab_id === tab.id && ! isSelected( tab ), 'drag-selected': isSelected( tab ), 'drag-source': drag_state.is_dragging && isSelected( tab ), 'search': getTabSearchState( tab ) } )"
                 v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
                 :title="tab.title"
                 @click.ctrl="toggleTabSelection( tab )" @click.shift="toggleTabBatchSelection( tab )" @click.middle.exact="closeTab( tab )" @click.exact="openTab( tab.id )"
@@ -243,10 +243,10 @@ export default {
       window_id: window.current_window_id,
       active_tab_group_id: null,
       context_styles: {},
-      is_dragging: false,
       is_searching: false,
       is_tab_group_open: {},
       rename_tab_group_id: null,
+      // @todo move this to it's own object
       search_resolved: true,
       search_matched_tab_ids: [],
       search_missed_tab_ids: [],
@@ -261,6 +261,7 @@ export default {
       pinned_tabs: [],
       tab_groups: [],
       drag_state: {
+        is_dragging: false,
         source: {},
         target: {},
       },

@@ -183,14 +183,11 @@ function getTabGroupDragProperties( event, tab_group ) {
 }
 
 function resetDragState() {
-  this.is_dragging = false
-  Object.assign( this.drag_state, { source: {}, target: {} } )
+  Object.assign( this.drag_state, { is_dragging: false, source: {}, target: {} } )
   this.selected_tab_ids.splice( 0, this.selected_tab_ids.length )
 }
 
 export function onTabDragStart( event, tab ) {
-  this.is_dragging = true
-
   // Use the selected tabs if the tab is selected
   let tabs
   if( this.isSelected( tab ) ) {
@@ -208,6 +205,7 @@ export function onTabDragStart( event, tab ) {
     event.dataTransfer.setDragImage( drag_image, 10, 10 )
   }
 
+  this.drag_state.is_dragging = true
   this.drag_state.source = {
     type: "tab",
     window_id: this.window_id,
@@ -260,7 +258,7 @@ export function onTabDrop( event, tab_group, tab ) {
 }
 
 export function onTabGroupDragStart( event, tab_group ) {
-  this.is_dragging = true
+  this.drag_state.is_dragging = true
   this.drag_state.source = {
     type: 'tab_group',
     tab_group_id: tab_group.id

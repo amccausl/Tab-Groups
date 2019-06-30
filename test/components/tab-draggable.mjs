@@ -15,9 +15,9 @@ import {
 function createTestComponent( window_id ) {
   const component = {
     window_id,
-    is_dragging: false,
     selected_tab_ids: [],
     drag_state: {
+      is_dragging: false,
       source: {},
       target: {},
     },
@@ -71,9 +71,9 @@ function draggingLocalTab( t ) {
   let event = createTestEvent( "dragstart" )
   onTabDragStart.call( component, event, source_tab )
 
-  t.equal( component.is_dragging, true )
   t.same( component.selected_tab_ids, [ source_tab_id ] )
   t.same( component.drag_state, {
+    is_dragging: true,
     source: {
       type: "tab",
       window_id,
