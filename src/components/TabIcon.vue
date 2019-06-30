@@ -54,6 +54,7 @@ export default {
   computed: {
     context_fill() {
       switch( this.theme ) {
+        // @todo handle system theme
         case "dark":
           return "rgb(255, 255, 255)"
         default:
@@ -65,6 +66,7 @@ export default {
         case "chrome://mozapps/skin/extensions/extensionGeneric-16.svg":
           return "/favicons/extensionGeneric.svg"
         case "chrome://branding/content/icon32.png":
+          // @todo handle system theme
           if( this.theme === "dark" ) {
             return `/favicons/firefox-logo-glyph.svg`
           }
@@ -88,6 +90,7 @@ export default {
 
       if( this.tab.url.startsWith( "about:" ) ) {
         if( this.tab.url === 'about:debugging' || this.tab.url === 'about:config' || this.tab.url === 'about:newtab' ) {
+          // @todo handle system theme
           if( this.theme === "dark" ) {
             return `/favicons/firefox-logo-glyph.svg`
           }

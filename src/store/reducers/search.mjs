@@ -16,7 +16,7 @@ export function startWindowSearch( state, { window_id, search_text } ) {
 
       // Can incrementally restrict search results
       if( window.search != null && search_text.startsWith( window.search.text ) ) {
-        let search_tab_ids_set = new Set( window.search.matched_tab_ids.concat( window.search.queued_tab_ids || []) )
+        let search_tab_ids_set = new Set( window.search.matched_tab_ids.concat( window.search.queued_tab_ids || [] ) )
         if( search_tab_ids_set.size > 0 ) {
           search_tabs = search_tabs.filter( tab => search_tab_ids_set.has( tab.id ) )
         }
@@ -41,7 +41,7 @@ export function startWindowSearch( state, { window_id, search_text } ) {
           text: search_text,
           resolved: ( queued_tab_ids.length === 0 ),
           matched_tab_ids,
-          queued_tab_ids
+          queued_tab_ids,
         }
       }
     })

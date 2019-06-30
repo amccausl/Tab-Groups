@@ -4,7 +4,7 @@
       <svg class="tab-search__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
         <path d="M15.707 14.293l-4.822-4.822a6.019 6.019 0 1 0-1.414 1.414l4.822 4.822a1 1 0 0 0 1.414-1.414zM6 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"></path>
       </svg>
-      <input class="tab-search__input" type="search" v-model="search_text" @input="onUpdateSearchText" :placeholder="__MSG_tab_search_placeholder__"/>
+      <input class="tab-search__input" type="search" v-model="search_text" @input="onUpdateSearchText" @focus="onSearchFocus" @blur="onSearchBlur" :placeholder="__MSG_tab_search_placeholder__"/>
       <svg class="tab-search__clear-icon" @click="clearSearchText()" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
         <path fill-rule="evenodd" d="M6.586 8l-2.293 2.293a1 1 0 0 0 1.414 1.414L8 9.414l2.293 2.293a1 1 0 0 0 1.414-1.414L9.414 8l2.293-2.293a1 1 0 1 0-1.414-1.414L8 6.586 5.707 4.293a1 1 0 0 0-1.414 1.414L6.586 8zM8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0z"></path>
       </svg>
@@ -30,7 +30,7 @@ export default {
       search_text: "",
       search_resolved: true,
       window_id: window.current_window_id,
-      search_history: []
+      is_focused: false,
     }
   },
   computed: {
@@ -42,10 +42,9 @@ export default {
     onStateChange( state => {
       const state_window = getWindow( state, this.window_id )
       if( state_window && state_window.search != null ) {
-        const index = this.search_history.indexOf( state_window.search.text )
-        if( index > -1 ) {
-          this.search_history.splice( index, 1 )
-        } else {
+        console.info('new tab search state', state_window.search.text)
+        if( ! this.is_focused ) {
+          // Only set state if focused to prevent overwriting while typing
           this.search_text = state_window.search.text
         }
         this.search_resolved = state_window.search.resolved
@@ -59,9 +58,16 @@ export default {
     bem,
     onUpdateSearchText: debounce( function() {
       console.info('runSearch', this.search_text)
-      this.search_history.push( this.search_text )
       window.background.runTabSearch( window.store, this.window_id, this.search_text )
     }, 250 ),
+    onSearchBlur() {
+      console.info('onSearchBlur')
+      this.is_focused = false
+    },
+    onSearchFocus() {
+      console.info('onSearchFocus')
+      this.is_focused = true
+    },
     clearSearchText() {
       console.info('clearSearchText', this.search_text)
       this.search_text = ""
