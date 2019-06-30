@@ -1,5 +1,5 @@
 <template>
-  <div :class="bem( `tab-search`, { theme } )">
+  <div :class="bem( `tab-search`, { theme, 'is-active': !! search_text } )">
     <label class="tab-search__label">
       <svg class="tab-search__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
         <path d="M15.707 14.293l-4.822-4.822a6.019 6.019 0 1 0-1.414 1.414l4.822 4.822a1 1 0 0 0 1.414-1.414zM6 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"></path>
@@ -83,6 +83,8 @@ export default {
 $dark-awesome-bar-background: #474749;
 
 %tab-search__icon {
+  @extend %slow-transition;
+  transition-property: opacity;
   position: absolute;
   top: 11px;
   height: 16px;
@@ -130,10 +132,13 @@ $tab-search__theme: (
 
   &__clear-icon {
     @extend %tab-search__icon;
-    @extend %slow-transition;
-    transition-property: opacity;
     right: 8px;
     cursor: pointer;
+  }
+
+  &--is-active &__icon,
+  &--is-active &__clear-icon {
+    opacity: 1;
   }
 
   &__input:placeholder-shown + &__clear-icon {
