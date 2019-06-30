@@ -6,7 +6,7 @@
       </svg>
       <input class="tab-search__input" type="search" v-model="search_text" @input="onUpdateSearchText" @focus="onSearchFocus" @blur="onSearchBlur" :placeholder="__MSG_tab_search_placeholder__"/>
       <svg class="tab-search__progress-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" transform="rotate(270, 12, 12)" :stroke-dasharray="progress_dasharray"></circle>
+        <circle cx="12" cy="12" r="10" transform="rotate(-90, 12, 12)" :stroke-dasharray="progress_dasharray"></circle>
       </svg>
       <svg class="tab-search__clear-icon" @click="clearSearchText()" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
         <path fill-rule="evenodd" d="M6.586 8l-2.293 2.293a1 1 0 0 0 1.414 1.414L8 9.414l2.293 2.293a1 1 0 0 0 1.414-1.414L9.414 8l2.293-2.293a1 1 0 1 0-1.414-1.414L8 6.586 5.707 4.293a1 1 0 0 0-1.414 1.414L6.586 8zM8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0z"></path>
@@ -153,7 +153,7 @@ $tab-search__theme: (
 
   &__progress-icon {
     @extend %slow-transition;
-    transition-property: opacity;
+    transition-property: opacity, stroke-dasharray;
     position: absolute;
     top: 7px;
     right: 4px;

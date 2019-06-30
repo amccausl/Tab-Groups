@@ -11,6 +11,7 @@ import {
 /**
  * Run a text search for tabs in a window and dispatch start and finish to the store
  * @todo consider storing window => search info map locally
+ * @todo search active group first
  */
 export async function runTabSearch( store, window_id, search_text ) {
   console.info('runSearch', window_id, search_text)
@@ -34,6 +35,8 @@ export async function runTabSearch( store, window_id, search_text ) {
   let matched_tab_ids = []
   let searched_tab_ids = []
 
+  let p1 = performance.now()
+
   while( queued_tab_ids.length > 0 ) {
     window = getWindow( store.getState(), window_id )
     // Abort if search is no longer active
@@ -44,11 +47,14 @@ export async function runTabSearch( store, window_id, search_text ) {
     // @todo skip tabs "about:addons", "about:debugging"
     console.info(`browser.find.find( "${ search.text }", { tabId: ${ tab_id } } )`)
 
-    // Update status of search
-    if( searched_tab_ids.length >= 10 ) {
+    const p2 = performance.now()
+
+    // Update status of search every 100ms
+    if( p2 - 100 > p1 ) {
       store.dispatch( updateSearchAction( window_id, search_text, searched_tab_ids, matched_tab_ids ) )
       matched_tab_ids = []
       searched_tab_ids = []
+      p1 = p2
     }
 
     const find_result = await browser.find.find( search.text, { tabId: tab_id } )
