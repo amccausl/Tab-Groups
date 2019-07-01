@@ -1,4 +1,7 @@
 import {
+  createDebug,
+} from "../../helpers.mjs"
+import {
   updateConfigAction,
   createContextualIdentityAction,
   updateContextualIdentityAction,
@@ -24,6 +27,8 @@ import {
   getTabGroupId,
 } from "./helpers.mjs"
 
+const debug = createDebug( "tabulate:integrations:events" )
+
 // @todo pull to shared file
 const LOCAL_CONFIG_KEY = "config"
 
@@ -44,7 +49,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
   let last_change = null
   const event_handlers = new Map([
     [ "sessions.onChanged", function onSessionChanged() {
-      console.info('sessions.onChanged')
+      debug( 'sessions.onChanged' )
     }],
     [ "storage.onChanged", function onStorageChanged( store, changes, area ) {
       if( area === 'local' && changes[ LOCAL_CONFIG_KEY ] ) {
@@ -75,7 +80,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       } else {
         const { index } = getCreateTabTarget( state, browser_tab )
         if( browser_tab.index !== index ) {
-          console.info('browser.tabs.move', [ browser_tab.id ], { index })
+          debug( 'browser.tabs.move', [ browser_tab.id ], { index } )
           browser.tabs.move( [ browser_tab.id ], { index } )
         }
       }
@@ -128,12 +133,12 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       }
       const change_info_json = JSON.stringify( change_info )
       if( last_change && last_change.tab_id === tab_id && last_change.change_info_json === change_info_json ) {
-        console.info(`onTabUpdated skipping duplicate change`)
+        debug( `onTabUpdated skipping duplicate change` )
         return
       }
       last_change = { tab_id, change_info_json }
       if( change_info.hasOwnProperty( 'hidden' ) ) {
-        console.info(`onTabUpdated( tab_id=${ tab_id }, change_info=${ change_info_json } )`, browser_tab)
+        debug( `onTabUpdated( tab_id=${ tab_id }, change_info=${ change_info_json } )`, browser_tab )
         if( change_info.hidden ) {
           hide_tab_ids.add( tab_id )
           show_tab_ids.delete( tab_id )
@@ -146,7 +151,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
         }
         return
       }
-      console.info(`onTabUpdated( tab_id=${ tab_id }, change_info=${ change_info_json } )`, browser_tab)
+      debug( `onTabUpdated( tab_id=${ tab_id }, change_info=${ change_info_json } )`, browser_tab )
       store.dispatch( updateTabAction( browser_tab, change_info ) )
     }],
     [ "tabs.onRemoved", function onTabRemoved( store, tab_id, { windowId, isWindowClosing } ) {
@@ -159,7 +164,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       const ignore_index = ignore_moves.indexOf( tab_id )
       if( ignore_index > -1 ) {
         ignore_moves.splice( ignore_index, 1 )
-        console.info('ignoring')
+        debug( 'onTabMoved: ignoring event' )
       } else {
         store.dispatch( moveTabAction( tab_id, windowId, toIndex ) )
         // @todo update succession if required
@@ -191,7 +196,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
   let is_paused = false
   function handleEvent( event_name ) {
     return async function( ...args ) {
-      console.info( "handleEvent", event_name, args )
+      debug( "handleEvent", event_name, args )
       if( ! event_handlers.has( event_name ) ) {
         console.warn( "no handler for event", event_name )
         return
@@ -208,7 +213,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
     is_processing = true
     while( queued_events.length > 0 ) {
       const [ queued_event_name, queued_args ] = queued_events.shift()
-      console.info( "handleEvent running", queued_event_name, queued_args )
+      debug( "handleEvent running", queued_event_name, queued_args )
       try {
         await event_handlers.get( queued_event_name )( store, ...queued_args )
       } catch( ex ) {
@@ -267,7 +272,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
   store.subscribe( () => {
     const state = store.getState()
     if( browser.tabs.hide && browser.tabs.show ) {
-      console.info('updating tab show state')
+      debug( 'updating tab show state' )
       const show_ids = []
       const hide_ids = []
       const updates = []
@@ -288,12 +293,12 @@ export function bindBrowserEvents( browser, browser_state, store ) {
         break
       }
       if( hide_ids.length ) {
-        console.info(`browser.tabs.hide( ${ JSON.stringify( hide_ids ) } )`)
+        debug( `browser.tabs.hide( ${ JSON.stringify( hide_ids ) } )` )
         updates.push( browser.tabs.hide( hide_ids ) )
         // updates.push( ...hide_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: true } ) ) )
       }
       if( show_ids.length ) {
-        console.info(`browser.tabs.show( ${ JSON.stringify( show_ids ) } )`)
+        debug( `browser.tabs.show( ${ JSON.stringify( show_ids ) } )` )
         updates.push( browser.tabs.show( show_ids ) )
         // updates.push( ...show_ids.map( tab_id => browser.tabs.update( tab_id, { autoDiscardable: false } ) ) )
       }

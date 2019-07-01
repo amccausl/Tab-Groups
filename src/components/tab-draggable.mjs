@@ -1,8 +1,11 @@
-
+import {
+  createDebug,
+} from "../helpers.mjs"
 import {
   getNewSelectedTabs,
 } from "./helpers.mjs"
 
+const debug = createDebug( "tabulate:components:tab-draggable" )
 let drag_target = null
 let drag_target_timer
 
@@ -103,7 +106,7 @@ export function getTransferData( data_transfer ) {
         }
       } catch( ex ) {
         // @todo
-        console.info('caught ex', ex)
+        console.error( 'caught ex', ex )
       }
     } else {
       event_data = {
@@ -267,10 +270,12 @@ export function onTabGroupDragStart( event, tab_group ) {
 }
 
 export function onTabGroupDragEnd() {
+  debug( 'onTabGroupDragEnd' )
   resetDragState.call( this )
 }
 
 export function onTabGroupDragEnter( event, tab_group, tab_group_index, type ) {
+  debug( 'onTabGroupDragEnter', event, tab_group, tab_group_index, type )
   clearTimeout( drag_target_timer )
   const event_data = getTransferData( event.dataTransfer )
   const transfer_type = getTransferType( event_data )
@@ -303,6 +308,7 @@ export function onTabGroupDragEnter( event, tab_group, tab_group_index, type ) {
     }
     event.preventDefault()
   }
+  debug( 'this.drag_state', JSON.stringify( this.drag_state, null, 2 ) )
 }
 
 export function onTabGroupDragLeave( event ) {
@@ -316,6 +322,8 @@ export function onTabGroupDragLeave( event ) {
 export function onTabGroupDrop( event, tab_group, tab_group_index, type ) {
   const event_data = getTransferData( event.dataTransfer )
   const transfer_type = getTransferType( event_data )
+  debug( 'onTabGroupDrop', event_data )
+  debug( 'this.drag_state', JSON.stringify( this.drag_state, null, 2 ) )
   if( transfer_type != null ) {
     event.preventDefault()
     resetDragState.call( this )

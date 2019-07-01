@@ -1,4 +1,7 @@
 import {
+  createDebug
+} from "../../helpers.mjs"
+import {
   moveTabsAction,
   activateGroupAction,
   createGroupAction,
@@ -21,7 +24,6 @@ import {
 } from "./event-handlers.mjs"
 import {
   TAB_GROUP_ID_KEY,
-  createDebug,
   getTabGroupId,
   setTabGroupId,
 } from "./helpers.mjs"

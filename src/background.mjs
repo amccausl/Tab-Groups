@@ -1,3 +1,4 @@
+import { createDebug } from "./helpers"
 import { createStore } from "./store/dispatcher.mjs"
 
 import { initAction } from "./store/actions.mjs"
@@ -32,6 +33,8 @@ function onError( error ) {
   console.error( error )
 }
 
+const debug = createDebug( "tabulate:background" )
+
 const store_promise = loadBrowserState()
   .then( browser_state => {
     const { window_tab_groups_map } = browser_state
@@ -65,7 +68,7 @@ const store_promise = loadBrowserState()
 window.syncState = () => {
   return Promise.all( [ window.getStore(), loadBrowserState() ] )
     .then( ( [ store, browser_state ] ) => {
-      console.info('browser_state', JSON.stringify( browser_state ))
+      debug('browser_state', JSON.stringify( browser_state ))
       store.dispatch( initAction( browser_state ) )
     })
 }

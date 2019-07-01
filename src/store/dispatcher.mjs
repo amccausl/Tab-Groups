@@ -1,6 +1,9 @@
+import { createDebug } from "../helpers.mjs"
 import {
   validateState
 } from "./validators.mjs"
+
+const debug = createDebug( "tabulate:store:dispatcher" )
 
 export function createStore( reducer, initial_state ) {
   const listeners = []
@@ -34,12 +37,12 @@ export function createStore( reducer, initial_state ) {
     try {
       // @todo put profiling behind debug flag
       store.is_dispatching = true
-      console.time( `dispatch ${ action.type }` )
+      debug( `dispatch start ${ action.type }` )
       const new_state = reducer( current_state, action )
-      console.timeEnd( `dispatch ${ action.type }` )
+      debug( `dispatch finished ${ action.type }` )
       if( validateState( new_state ) ) {
-        console.info( 'action', action )
-        console.info( 'state', new_state )
+        debug( 'action', action )
+        debug( 'state', new_state )
       } else {
         console.error( 'Validator failed on new state' )
         console.info( 'current_state',current_state )
@@ -61,8 +64,6 @@ export function createStore( reducer, initial_state ) {
     }
     return action
   }
-
-  dispatch({ type: '@@redux/INIT' })
 
   return store
 }
