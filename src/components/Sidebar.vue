@@ -132,13 +132,13 @@
       </div>
     </div>
     <!-- </transition-group> -->
-    <div :class="bem( `empty-dropzone--${ theme }`, { [`drag-${ drag_state.source.type }-target`]: drag_state.target.tab_group_new } )"
+    <div :class="bem( `empty-dropzone--${ theme }`, { 'drag-tab-target': drag_state.source.type === 'tab' && drag_state.target.tab_group_new, 'drag-tab_group-target': drag_state.source.type === 'tab_group' && drag_state.target.tab_group_new } )"
         @click.right.prevent
         @dragenter="onTabGroupDragEnter( $event, null, null, 'dropzone' )"
         @dragover.prevent
         @dragleave="onTabGroupDragLeave"
         @dragend="onTabDragEnd"
-        @drop="onTabGroupDrop"
+        @drop="onTabGroupDrop( $event, null, null, 'dropzone' )"
     >
       <div :class="[ `empty-dropzone--${ theme }__drag-target-ink` ]"></div>
       <svg v-if="drag_state.target.tab_group_new && drag_state.source.type === 'tab'" :class="[ `empty-dropzone--${ theme }__drag-target-icon` ]" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
@@ -146,19 +146,19 @@
       </svg>
     </div>
     <div :class="bem( 'action-strip', { theme } )">
-      <div :class="bem( `action-strip__button`, { 'drag-target': drag_state.target.tab_group_new && drag_state.source.type !== 'tab_group' } )"
+      <div :class="bem( `action-strip__button`, { 'drag-target': ( drag_state.target.tab_group_new && ! drag_state.target.tab_group_last ) || drag_state.target.window_new } )"
           @click.left="createTabGroup()"
           @click.right.prevent
-          @dragenter="onTabGroupDragEnter"
+          @dragenter="onTabGroupDragEnter( $event, null, null, 'action_new' )"
           @dragover.prevent
           @dragleave="onTabGroupDragLeave"
-          @drop="onTabGroupDrop"
+          @drop="onTabGroupDrop( $event, null, null, 'action_new' )"
           @dragend="onTabDragEnd"
       >
         <svg :class="[ `action-strip__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
         </svg>
-        <span :class="[ `action-strip__button-text` ]" v-once>{{ __MSG_tab_group_new__ }}</span>
+        <span :class="[ `action-strip__button-text` ]">{{ drag_state.is_dragging && drag_state.source.type === "tab_group" ? __MSG_window_new__ : __MSG_tab_group_new__ }}</span>
       </div>
     </div>
     <div v-if="tab_group_context_menu.open" class="context-menu__ctx" @click="closeTabGroupMore"></div>
@@ -365,6 +365,9 @@ export default {
   computed: {
     __MSG_tab_group_new__() {
       return window.background.getMessage( "tab_group_new" )
+    },
+    __MSG_window_new__() {
+      return window.background.getMessage( "window_new" )
     },
   },
   filters: {

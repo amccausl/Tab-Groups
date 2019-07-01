@@ -21,10 +21,12 @@ import {
 } from "./event-handlers.mjs"
 import {
   TAB_GROUP_ID_KEY,
+  createDebug,
   getTabGroupId,
   setTabGroupId,
 } from "./helpers.mjs"
 
+const debug = createDebug( "tabulate:integrations" )
 export const LOCAL_CONFIG_KEY = 'config'
 export const SYNC_CONFIG_KEY = 'config'
 export const WINDOW_TAB_GROUPS_KEY = 'tab_groups'
@@ -128,7 +130,7 @@ export function isTabHideEnabled( browser_tabs ) {
       },
       ( error ) => {
         if( error.fileName === "chrome://browser/content/ext-tabs.js" && error.lineNumber === 0 ) {
-          console.info('detected tabhide disabled', error)
+          debug('detected tabhide disabled', error)
           return false
         }
         return true
@@ -265,7 +267,7 @@ function resetTabState( tab ) {
 
 function moveBrowserTabs( tab_ids, move_properties ) {
   ignorePendingMove( tab_ids )
-  console.info(`browser.tabs.move( ${ JSON.stringify( tab_ids ) }, ${ JSON.stringify( move_properties ) } )`)
+  debug(`browser.tabs.move( ${ JSON.stringify( tab_ids ) }, ${ JSON.stringify( move_properties ) } )`)
   return browser.tabs.move( tab_ids, move_properties )
 }
 
@@ -323,7 +325,7 @@ export function openTabGroupsPage() {
 
   const url = browser.extension.getURL( "tab-groups.html" )
 
-  console.info('browser.tabs.create', { url })
+  debug('browser.tabs.create', { url })
   browser.tabs.create({ url })
     .then( () => {
       // We don't want to sync this URL ever nor clutter the users history
@@ -399,24 +401,24 @@ export function setTabActive( store, window_id, tab_id ) {
  * Close the given tab
  */
 export function closeTab( store, tab_id ) {
-  console.info('browser.tabs.remove', [ tab_id ])
+  debug('browser.tabs.remove', [ tab_id ])
   return browser.tabs.remove( [ tab_id ] )
 }
 
 export function muteTab( store, window_id, tab_id ) {
   const change_info = { muted: true }
-  console.info('browser.tabs.update', tab_id, change_info)
+  debug('browser.tabs.update', tab_id, change_info)
   return browser.tabs.update( tab_id, change_info )
 }
 
 export function unmuteTab( store, window_id, tab_id ) {
   const change_info = { muted: false }
-  console.info('browser.tabs.update', tab_id, change_info)
+  debug('browser.tabs.update', tab_id, change_info)
   return browser.tabs.update( tab_id, change_info )
 }
 
 export function createGroup( store, window_id, source_data ) {
-  console.info(`background.createGroup( ${ window_id } )`, source_data)
+  debug(`background.createGroup( ${ window_id } )`, source_data)
   const state = store.getState()
   const tab_group = createTabGroup( getNewTabGroupId( state ), [] )
 
@@ -448,7 +450,8 @@ export function createGroup( store, window_id, source_data ) {
   */
 }
 
-export function closeTabGroup( store, window_id, tab_group_id ) {
+export async function closeTabGroup( store, window_id, tab_group_id ) {
+  debug('closeTabGroup', window_id, tab_group_id)
   const state = store.getState()
   for( let window of state.windows ) {
     if( window.id !== window_id ) {
@@ -457,12 +460,11 @@ export function closeTabGroup( store, window_id, tab_group_id ) {
     const tab_group = window.tab_groups.find( tab_group => tab_group.id === tab_group_id )
     if( tab_group ) {
       const tab_ids = tab_group.tabs.map( tab => tab.id )
-      return browser.tabs.remove( tab_ids )
-        .then( () => {
-          store.dispatch( removeGroupAction( tab_group_id, window.id ) )
-        })
+      await browser.tabs.remove( tab_ids )
+      return store.dispatch( removeGroupAction( tab_group_id, window.id ) )
     }
   }
+  console.warn('closeTabGroup: group not found')
   // @todo return empty promise
 }
 
@@ -474,7 +476,7 @@ export function muteTabGroup( store, window_id, tab_group_id ) {
     return
   }
   const change_info = { muted: true }
-  console.info('browser.tabs.update', change_info)
+  debug('browser.tabs.update', change_info)
   return Promise.all(
     tab_group.tabs
       .filter( tab => tab.audible && ! tab.muted )
@@ -492,7 +494,7 @@ export function unmuteTabGroup( store, window_id, tab_group_id ) {
     return
   }
   const change_info = { muted: false }
-  console.info('browser.tabs.update', change_info)
+  debug('browser.tabs.update', change_info)
   return Promise.all(
     tab_group.tabs
       .filter( tab => tab.hasOwnProperty( 'muted' ) )
@@ -524,7 +526,7 @@ export function setHighlightedTabIds( store, window_id, tab_ids ) {
       tab_index++
     }
   }
-  console.info('browser.tabs.highlight', { windowId: window_id, tabs: tab_indices })
+  debug('browser.tabs.highlight', { windowId: window_id, tabs: tab_indices })
   browser.tabs.highlight( { windowId: window_id, tabs: tab_indices } )
 }
 
@@ -537,7 +539,7 @@ export function setHighlightedTabIds( store, window_id, tab_ids ) {
  * @param target_data
  */
 export function moveTabsToGroup( store, source_data, target_data ) {
-  console.info('background.moveTabsToGroup', source_data, target_data)
+  debug('background.moveTabsToGroup', source_data, target_data)
   const updates = []
 
   if( source_data.links != null ) {
@@ -546,7 +548,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
     const state = store.getState()
     const move_data = getTabMoveData( state, source_data, target_data )
     if( ! move_data ) {
-      console.info('error')
+      console.error('error')
       return
     }
 
@@ -560,14 +562,14 @@ export function moveTabsToGroup( store, source_data, target_data ) {
         active
       }
       active = false
-      console.info(`browser.tabs.create( ${ JSON.stringify( create_properties ) } )`)
+      debug(`browser.tabs.create( ${ JSON.stringify( create_properties ) } )`)
       return browser.tabs.create( create_properties )
     }))
   }
 
   return Promise.all( updates )
     .then( browser_tabs => {
-      console.info('browser_tabs', browser_tabs)
+      debug('browser_tabs', browser_tabs)
 
       if( browser_tabs.length > 0 ) {
         source_data = {
@@ -580,7 +582,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
       const state = store.getState()
       const move_data = getTabMoveData( state, source_data, target_data )
       if( ! move_data ) {
-        console.info('error')
+        console.error('error')
         // @todo wait and try again
         return
       }
@@ -607,7 +609,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
           move_properties.windowId = target_data.window_id
         }
         ignorePendingMove( tab_ids )
-        console.info('browser.tabs.move', tab_ids, move_properties)
+        debug( 'browser.tabs.move', tab_ids, move_properties )
         updates.push( browser.tabs.move( tab_ids, move_properties ) )
       }
 
@@ -624,9 +626,10 @@ export function moveTabsToGroup( store, source_data, target_data ) {
  * @param target_data
  *   window_id
  *   tab_group_index
+ *   window_new
  */
-export function moveTabGroup( store, source_data, target_data ) {
-  console.info('moveTabGroup', source_data, target_data)
+export async function moveTabGroup( store, source_data, target_data ) {
+  debug('moveTabGroup', source_data, target_data)
 
   const state0 = store.getState()
   const source_window = state0.windows.find( window => window.id === source_data.window_id )
@@ -638,48 +641,71 @@ export function moveTabGroup( store, source_data, target_data ) {
   const source_tab_group = source_window.tab_groups[ source_tab_group_index ]
   const source_tab_ids = source_tab_group.tabs.map( tab => tab.id )
 
-  // Dispatch the update first to prevent move event handlers from getting confused
-  store.dispatch( moveGroupAction( source_data, target_data ) )
+  if( target_data.window_new ) {
+    // @todo can optimize this branch
+    if( source_tab_ids.length === 0 ) {
+      // @todo need better handling for this error
+      return Promise.reject()
+    }
 
-  if( source_tab_ids.length === 0 ) {
-    return Promise.resolve()
-  }
+    // @todo prevent temp state by seeding with tab from the source_tab_ids
+    const new_window = await browser.windows.create( {} )
+    await moveTabGroup( store, source_data, { window_id: new_window.id, tab_group_index: 1 } )
 
-  const state1 = store.getState()
+    const state1 = store.getState()
 
-  const target_window = state1.windows.find( window => window.id === target_data.window_id )
-  if( ! target_window ) {
-    // @todo error
+    const target_window = state1.windows.find( window => window.id === new_window.id )
+    if( ! target_window ) {
+      // @todo error
+      return Promise.reject()
+    }
+
+    // Remove the temporary group created by the window create process
+    await closeTabGroup( store, new_window.id, target_window.tab_groups[ 2 ].id )
+  } else {
+    // Dispatch the update first to prevent move event handlers from getting confused
+    store.dispatch( moveGroupAction( source_data, target_data ) )
+
+    if( source_tab_ids.length === 0 ) {
+      return Promise.resolve()
+    }
+
+    const state1 = store.getState()
+
+    const target_window = state1.windows.find( window => window.id === target_data.window_id )
+    if( ! target_window ) {
+      // @todo error
+      return Promise.reject()
+    }
+
+    let index_offset = 0
+    const tab_groups_length = target_window.tab_groups.length
+    for( let tab_group_index = 0; tab_group_index < tab_groups_length; tab_group_index++ ) {
+      const tab_group = target_window.tab_groups[ tab_group_index ]
+
+      // If this is the new index of the tab group, move tabs here
+      if( tab_group.id === source_tab_group.id ) {
+        const move_properties = {
+          index: index_offset
+        }
+        if( source_data.window_id !== target_data.window_id ) {
+          move_properties.windowId = target_data.window_id
+        }
+        return moveBrowserTabs( source_tab_ids, move_properties )
+      }
+      // If move is local to window, and new index is after old index, move other tabs forward to prevent browser issue
+      if( source_data.window_id === target_data.window_id && tab_group_index === source_tab_group_index ) {
+        const tab_ids = []
+        for( ; tab_group_index < tab_groups_length && target_window.tab_groups[ tab_group_index ].id !== source_tab_group.id; tab_group_index++ ) {
+          tab_ids.push( ...target_window.tab_groups[ tab_group_index ].tabs.map( tab => tab.id ) )
+        }
+        if( tab_ids.length === 0 ) {
+          return Promise.resolve()
+        }
+        return moveBrowserTabs( tab_ids, { index: index_offset } )
+      }
+      index_offset += tab_group.tabs_count
+    }
     return Promise.reject()
   }
-
-  let index_offset = 0
-  const tab_groups_length = target_window.tab_groups.length
-  for( let tab_group_index = 0; tab_group_index < tab_groups_length; tab_group_index++ ) {
-    const tab_group = target_window.tab_groups[ tab_group_index ]
-
-    // If this is the new index of the tab group, move tabs here
-    if( tab_group.id === source_tab_group.id ) {
-      const move_properties = {
-        index: index_offset
-      }
-      if( source_data.window_id !== target_data.window_id ) {
-        move_properties.windowId = target_data.window_id
-      }
-      return moveBrowserTabs( source_tab_ids, move_properties )
-    }
-    // If move is local to window, and new index is after old index, move other tabs forward to prevent browser issue
-    if( source_data.window_id === target_data.window_id && tab_group_index === source_tab_group_index ) {
-      const tab_ids = []
-      for( ; tab_group_index < tab_groups_length && target_window.tab_groups[ tab_group_index ].id !== source_tab_group.id; tab_group_index++ ) {
-        tab_ids.push( ...target_window.tab_groups[ tab_group_index ].tabs.map( tab => tab.id ) )
-      }
-      if( tab_ids.length === 0 ) {
-        return Promise.resolve()
-      }
-      return moveBrowserTabs( tab_ids, { index: index_offset } )
-    }
-    index_offset += tab_group.tabs_count
-  }
-  return Promise.reject()
 }

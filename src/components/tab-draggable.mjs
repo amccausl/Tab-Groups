@@ -270,7 +270,7 @@ export function onTabGroupDragEnd() {
   resetDragState.call( this )
 }
 
-export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
+export function onTabGroupDragEnter( event, tab_group, tab_group_index, type ) {
   clearTimeout( drag_target_timer )
   const event_data = getTransferData( event.dataTransfer )
   const transfer_type = getTransferType( event_data )
@@ -280,6 +280,11 @@ export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
     switch( transfer_type ) {
       case 'tab_group':
         Object.assign( this.drag_state, getTabGroupDragProperties( event, tab_group ) )
+        if( type === "dropzone" ) {
+          this.drag_state.target.tab_group_last = true
+        } else if( type === "action_new" ) {
+          this.drag_state.target = { window_new: true }
+        }
         this.drag_state.source.type = 'tab_group'
         this.drag_state.tab_group_index = tab_group_index
         break
@@ -308,7 +313,7 @@ export function onTabGroupDragLeave( event ) {
   }
 }
 
-export function onTabGroupDrop( event, tab_group, tab_group_index ) {
+export function onTabGroupDrop( event, tab_group, tab_group_index, type ) {
   const event_data = getTransferData( event.dataTransfer )
   const transfer_type = getTransferType( event_data )
   if( transfer_type != null ) {
@@ -316,6 +321,9 @@ export function onTabGroupDrop( event, tab_group, tab_group_index ) {
     resetDragState.call( this )
     switch( transfer_type ) {
       case "tab_group": {
+        if( type === "action_new" ) {
+          return window.background.moveTabGroup( window.store, event_data, { window_new: true } )
+        }
         const target_data = {
           window_id: this.window_id,
           tab_group_index

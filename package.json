@@ -36,7 +36,6 @@
     "eslint": "6.0.1",
     "rollup": "1.16.3",
     "rollup-plugin-alias": "1.5.2",
-    "rollup-plugin-async": "1.2.0",
     "rollup-plugin-buble": "0.19.6",
     "rollup-plugin-commonjs": "10.0.1",
     "rollup-plugin-node-globals": "1.4.0",

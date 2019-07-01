@@ -1,5 +1,4 @@
 // @todo most of this isn't required, can be cleaned up
-import async from 'rollup-plugin-async'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 
@@ -11,9 +10,7 @@ const config = {
     sourcemap: true,
   },
   plugins: [
-    async(),
-    nodeResolve({
-    }),
+    nodeResolve(),
     commonjs()
   ]
 }

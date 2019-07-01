@@ -1,8 +1,10 @@
-
+import createDebug from "../../../node_modules/debug/src/browser"
 export const TAB_GROUP_ID_KEY = 'group_id'
 
 // @todo need way to clean this up
 const tab_group_id_map = new Map()
+
+export { createDebug }
 
 /**
  * Fetch the group id for a tab from session storage

@@ -36,9 +36,7 @@ const config = {
     replace({
       'process.env.NODE_ENV': JSON.stringify( 'production' )
     }),
-    nodeResolve({
-      modulesOnly: true,
-    }),
+    nodeResolve(),
     commonjs(),
   ]
 }
