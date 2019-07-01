@@ -37,9 +37,9 @@ export function createStore( reducer, initial_state ) {
     try {
       // @todo put profiling behind debug flag
       store.is_dispatching = true
-      debug( `dispatch start ${ action.type }` )
+      debug( `dispatch ${ action.type } start` )
       const new_state = reducer( current_state, action )
-      debug( `dispatch finished ${ action.type }` )
+      debug( `dispatch ${ action.type } finish` )
       if( validateState( new_state ) ) {
         debug( 'action', action )
         debug( 'state', new_state )

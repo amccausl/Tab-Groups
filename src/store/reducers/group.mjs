@@ -113,6 +113,20 @@ export function moveGroup( state, { source_data, target_data } ) {
     // @todo error
     return state
   }
+
+  // Replace active group info if active group was moved
+  if( windows[ source_window_index ].active_tab_group_id === source_data.tab_group_id ) {
+    const source_window1 = windows[ source_window_index ]
+    let source_window_active_group1
+    if( source_window1.tab_groups[ source_tab_group_index ] != null ) {
+      source_window_active_group1 = source_window1.tab_groups[ source_tab_group_index ]
+    } else {
+      source_window_active_group1 = source_window1.tab_groups[ source_tab_group_index - 1 ]
+    }
+    source_window1.active_tab_group_id = source_window_active_group1.id
+    source_window1.active_tab_id = source_window_active_group1.active_tab_id
+  }
+
   const target_tab_groups = [ ...windows[ target_window_index ].tab_groups ]
   let target_tab_group_index = target_data.tab_group_index
   if( target_tab_group_index == null ) {

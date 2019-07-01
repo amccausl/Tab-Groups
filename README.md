@@ -18,6 +18,11 @@ It currently includes:
 npm run build && npm run debug
 ```
 
+When debugging in firefox, can enable log messages in console with:
+```
+localStorage.debug = 'tabulate*'
+```
+
 # Install Instructions
 
 This is still experimental, but if you're curious you can load in firefox.
