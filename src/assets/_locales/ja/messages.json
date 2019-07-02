@@ -153,7 +153,7 @@
   },
 
   "window_new": {
-    "message": "",
+    "message": "新しいウィンドウ",
     "description": "Dropzone to create a new window"
   },
 
