@@ -1,8 +1,11 @@
-
+import {
+  createDebug,
+} from "../helpers.mjs"
 import {
   getNewSelectedTabs,
 } from "./helpers.mjs"
 
+const debug = createDebug( "tabulate:components:tab-draggable" )
 let drag_target = null
 let drag_target_timer
 
@@ -103,7 +106,7 @@ export function getTransferData( data_transfer ) {
         }
       } catch( ex ) {
         // @todo
-        console.info('caught ex', ex)
+        console.error( 'caught ex', ex )
       }
     } else {
       event_data = {
@@ -183,14 +186,11 @@ function getTabGroupDragProperties( event, tab_group ) {
 }
 
 function resetDragState() {
-  this.is_dragging = false
-  Object.assign( this.drag_state, { source: {}, target: {} } )
+  Object.assign( this.drag_state, { is_dragging: false, source: {}, target: {} } )
   this.selected_tab_ids.splice( 0, this.selected_tab_ids.length )
 }
 
 export function onTabDragStart( event, tab ) {
-  this.is_dragging = true
-
   // Use the selected tabs if the tab is selected
   let tabs
   if( this.isSelected( tab ) ) {
@@ -208,6 +208,7 @@ export function onTabDragStart( event, tab ) {
     event.dataTransfer.setDragImage( drag_image, 10, 10 )
   }
 
+  this.drag_state.is_dragging = true
   this.drag_state.source = {
     type: "tab",
     window_id: this.window_id,
@@ -260,7 +261,7 @@ export function onTabDrop( event, tab_group, tab ) {
 }
 
 export function onTabGroupDragStart( event, tab_group ) {
-  this.is_dragging = true
+  this.drag_state.is_dragging = true
   this.drag_state.source = {
     type: 'tab_group',
     tab_group_id: tab_group.id
@@ -269,10 +270,12 @@ export function onTabGroupDragStart( event, tab_group ) {
 }
 
 export function onTabGroupDragEnd() {
+  debug( 'onTabGroupDragEnd' )
   resetDragState.call( this )
 }
 
-export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
+export function onTabGroupDragEnter( event, tab_group, tab_group_index, type ) {
+  debug( 'onTabGroupDragEnter', event, tab_group, tab_group_index, type )
   clearTimeout( drag_target_timer )
   const event_data = getTransferData( event.dataTransfer )
   const transfer_type = getTransferType( event_data )
@@ -282,6 +285,11 @@ export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
     switch( transfer_type ) {
       case 'tab_group':
         Object.assign( this.drag_state, getTabGroupDragProperties( event, tab_group ) )
+        if( type === "dropzone" ) {
+          this.drag_state.target.tab_group_last = true
+        } else if( type === "action_new" ) {
+          this.drag_state.target = { window_new: true }
+        }
         this.drag_state.source.type = 'tab_group'
         this.drag_state.tab_group_index = tab_group_index
         break
@@ -300,6 +308,7 @@ export function onTabGroupDragEnter( event, tab_group, tab_group_index ) {
     }
     event.preventDefault()
   }
+  debug( 'this.drag_state', JSON.stringify( this.drag_state, null, 2 ) )
 }
 
 export function onTabGroupDragLeave( event ) {
@@ -310,14 +319,19 @@ export function onTabGroupDragLeave( event ) {
   }
 }
 
-export function onTabGroupDrop( event, tab_group, tab_group_index ) {
+export function onTabGroupDrop( event, tab_group, tab_group_index, type ) {
   const event_data = getTransferData( event.dataTransfer )
   const transfer_type = getTransferType( event_data )
+  debug( 'onTabGroupDrop', event_data )
+  debug( 'this.drag_state', JSON.stringify( this.drag_state, null, 2 ) )
   if( transfer_type != null ) {
     event.preventDefault()
     resetDragState.call( this )
     switch( transfer_type ) {
       case "tab_group": {
+        if( type === "action_new" ) {
+          return window.background.moveTabGroup( window.store, event_data, { window_new: true } )
+        }
         const target_data = {
           window_id: this.window_id,
           tab_group_index

@@ -5,107 +5,107 @@
   },
 
   "extension_description": {
-    "message": "Tabulate keeps your browser organized, allowing you to work efficiently, and stay focused.",
+    "message": "Tabulate 幫你整理網頁瀏覽器,提高你工作的效率,讓你可以專心",
     "description": "Description of the extension."
   },
 
   "sidebar_name": {
-    "message": "Grouped Tabs",
+    "message": "整理分頁",
     "description": "Name of the sidebar."
   },
 
   "onboarding_title": {
-    "message": "Welcome",
+    "message": "歡迎",
     "description": ""
   },
 
   "learn_more": {
-    "message": "Learn More",
+    "message": "資訊",
     "description": ""
   },
 
   "container_tabs_info_url": {
-    "message": "https://support.mozilla.org/en-US/kb/containers",
+    "message": "https://support.mozilla.org/zh-TW/kb/容器分頁功能",
     "description": ""
   },
 
   "options_section_preferences": {
-    "message": "Preferences",
+    "message": "設定",
     "description": ""
   },
 
   "options_section_data": {
-    "message": "Data",
+    "message": "資料",
     "description": ""
   },
 
   "options_section_debug": {
-    "message": "Debug",
+    "message": "調試工具",
     "description": ""
   },
 
   "options_theme": {
-    "message": "Theme",
+    "message": "主題",
     "description": ""
   },
 
   "options_theme_light": {
-    "message": "Light",
+    "message": "亮",
     "description": ""
   },
 
   "options_theme_dark": {
-    "message": "Dark",
+    "message": "暗",
     "description": ""
   },
 
   "options_theme_system": {
-    "message": "System",
+    "message": "",
     "description": ""
   },
 
   "options_sidebar_legend": {
-    "message": "Sidebar",
+    "message": "側邊攔",
     "description": ""
   },
 
   "options_sidebar_show_header": {
-    "message": "Show header bar",
+    "message": "顯示標題欄",
     "description": ""
   },
 
   "options_sidebar_show_tabs_count": {
-    "message": "Show tabs count on group",
+    "message": "顯示分頁數量",
     "description": ""
   },
 
   "options_sidebar_show_tabs": {
-    "message": "Show tabs",
+    "message": "顯示分頁",
     "description": ""
   },
 
   "options_sidebar_show_pinned_tabs": {
-    "message": "Show pinned tabs",
+    "message": "顯示固定標籤頁",
     "description": ""
   },
 
   "options_sidebar_show_tab_context": {
-    "message": "Show Multi-Account Containers",
+    "message": "顯示容器分頁功能",
     "description": ""
   },
 
   "options_sidebar_show_tab_icon_background": {
-    "message": "Show tab icon background",
+    "message": "顯示分頁符號",
     "description": ""
   },
 
   "options_use_sync_config": {
-    "message": "Save options to sync",
+    "message": "使用Firefox帳號",
     "description": ""
   },
 
   "tab_group_name_placeholder": {
-    "message": "Group $INDEX$",
+    "message": "群組 $INDEX$",
     "description": "This is used as a placeholder name for new groups",
     "placeholders": {
       "index": {
@@ -116,22 +116,22 @@
   },
 
   "tab_group_manage": {
-    "message": "Manage My Groups",
+    "message": "管理我的群組",
     "description": "Link to tab group page"
   },
 
   "tab_group_new": {
-    "message": "New Group",
+    "message": "新群組",
     "description": "Link to tab group page"
   },
 
   "tab_group_sidebar_action": {
-    "message": "Open the tab groups sidebar",
+    "message": "開啟分頁群組側邊攔",
     "description": "Open the tab groups sidebar"
   },
 
   "tabs_count_singular": {
-    "message": "$INDEX$ tab",
+    "message": "$INDEX$ 分頁",
     "description": "This is used where tab count is displayed",
     "placeholders": {
       "index": {
@@ -142,7 +142,7 @@
   },
 
   "tabs_count_plural": {
-    "message": "$INDEX$ tabs",
+    "message": "$INDEX$ 分頁",
     "description": "This is used where tab count is displayed",
     "placeholders": {
       "index": {
@@ -153,12 +153,12 @@
   },
 
   "window_new": {
-    "message": "New Window",
+    "message": "",
     "description": "Dropzone to create a new window"
   },
 
   "matched_tabs_count_singular": {
-    "message": "$INDEX$ found",
+    "message": "$INDEX$ 搜尋結果",
     "description": "This is used where tab count is displayed",
     "placeholders": {
       "index": {
@@ -169,7 +169,7 @@
   },
 
   "matched_tabs_count_plural": {
-    "message": "$INDEX$ found",
+    "message": "$INDEX$ 搜尋結果",
     "description": "This is used where tab count is displayed",
     "placeholders": {
       "index": {
@@ -180,7 +180,7 @@
   },
 
   "tab_search_placeholder": {
-    "message": "Search tabs…",
+    "message": "搜尋分頁",
     "description": "Placeholder for tab search field"
   }
 }

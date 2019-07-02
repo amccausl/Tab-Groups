@@ -14,7 +14,7 @@ export function createWindow( window_id, tab_groups, properties = {} ) {
     id: window_id,
     active_tab_group_id: tab_groups[ 1 ].id,
     active_tab_id: tab_groups[ 1 ].active_tab_id,
-    highlighted_tab_ids: [ tab_groups[ 1 ].active_tab_id ],
+    highlighted_tab_ids: [ tab_groups[ 1 ].active_tab_id ].filter( id => id != null ),
     tab_groups: tab_groups,
     ...properties
   }
@@ -26,7 +26,8 @@ export function createTabGroup( tab_group_id, tabs, active_tab_id ) {
     title: typeof browser != 'undefined' ? browser.i18n.getMessage( "tab_group_name_placeholder", [ tab_group_id ] ) : `Group ${ tab_group_id }`,
     active_tab_id: active_tab_id || ( tabs.length ? tabs[ 0 ].id : null ),
     tabs,
-    tabs_count: tabs.length
+    tabs_count: tabs.length,
+    last_active: undefined,
   }
 }
 

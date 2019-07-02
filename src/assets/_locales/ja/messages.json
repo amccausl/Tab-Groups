@@ -1,0 +1,186 @@
+{
+  "extension_name": {
+    "message": "Tabulate",
+    "description": "拡張機能の名前"
+  },
+
+  "extension_description": {
+    "message": "Tabulateでブラウザはいつも整理整頓。あなたの集中力と作業の効率が更にアップします。",
+    "description": "拡張機能の説明"
+  },
+
+  "sidebar_name": {
+    "message": "グループ化されたタブ",
+    "description": "サイドバーの名前"
+  },
+
+  "onboarding_title": {
+    "message": "ようこそ",
+    "description": ""
+  },
+
+  "learn_more": {
+    "message": "もっと詳しく",
+    "description": ""
+  },
+
+  "container_tabs_info_url": {
+    "message": "https://support.mozilla.org/ja/kb/containers",
+    "description": ""
+  },
+
+  "options_section_preferences": {
+    "message": "環境設定",
+    "description": ""
+  },
+
+  "options_section_data": {
+    "message": "データ",
+    "description": ""
+  },
+
+  "options_section_debug": {
+    "message": "デバッグ",
+    "description": ""
+  },
+
+  "options_theme": {
+    "message": "テーマ",
+    "description": ""
+  },
+
+  "options_theme_light": {
+    "message": "ライト",
+    "description": ""
+  },
+
+  "options_theme_dark": {
+    "message": "ダーク",
+    "description": ""
+  },
+
+  "options_theme_system": {
+    "message": "",
+    "description": ""
+  },
+
+  "options_sidebar_legend": {
+    "message": "サイドバー",
+    "description": ""
+  },
+
+  "options_sidebar_show_header": {
+    "message": "ヘッダーバーを表示",
+    "description": ""
+  },
+
+  "options_sidebar_show_tabs_count": {
+    "message": "グループ内のタブ数を表示",
+    "description": ""
+  },
+
+  "options_sidebar_show_tabs": {
+    "message": "タブを表示",
+    "description": ""
+  },
+
+  "options_sidebar_show_pinned_tabs": {
+    "message": "固定されたタブを表示",
+    "description": ""
+  },
+
+  "options_sidebar_show_tab_context": {
+    "message": "マルチアカウントのコンテナを表示",
+    "description": ""
+  },
+
+  "options_sidebar_show_tab_icon_background": {
+    "message": "タブアイコンの背景を表示",
+    "description": ""
+  },
+
+  "options_use_sync_config": {
+    "message": "同期用にオプションを保存",
+    "description": ""
+  },
+
+  "tab_group_name_placeholder": {
+    "message": "$INDEX$をグループ化",
+    "description": "新しいグループのプレースホルダー名に使用",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+
+  "tab_group_manage": {
+    "message": "マイグループの管理",
+    "description": "グループ化されたタブのページへのリンク"
+  },
+
+  "tab_group_new": {
+    "message": "新しいグループ",
+    "description": "グループ化されたタブのページへのリンク"
+  },
+
+  "tab_group_sidebar_action": {
+    "message": "グループ化されたタブのサイドバーを開ける",
+    "description": "グループ化されたタブのサイドバーを開ける"
+  },
+
+  "tabs_count_singular": {
+    "message": "$INDEX$タブ",
+    "description": "タブ数が表示されている場合に使用",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+
+  "tabs_count_plural": {
+    "message": "$INDEX$タブ",
+    "description": "タブ数が表示されている場合に使用",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+
+  "window_new": {
+    "message": "",
+    "description": "Dropzone to create a new window"
+  },
+
+  "matched_tabs_count_singular": {
+    "message": "$INDEX$ 件",
+    "description": "タブ数が表示されている場合に使用",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+
+  "matched_tabs_count_plural": {
+    "message": "$INDEX$ 件",
+    "description": "タブ数が表示されている場合に使用",
+    "placeholders": {
+      "index": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+
+  "tab_search_placeholder": {
+    "message": "タブを検索",
+    "description": "タブの検索フィールド用プレースフォルダー"
+  }
+}

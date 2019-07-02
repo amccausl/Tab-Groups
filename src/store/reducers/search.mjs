@@ -10,13 +10,15 @@ export function startWindowSearch( state, { window_id, search_text } ) {
       }
 
       let search_tabs = []
+      let total_tabs_count = 0
       for( let tab_group of window.tab_groups ) {
         search_tabs.push( ...tab_group.tabs )
+        total_tabs_count += tab_group.tabs.length
       }
 
       // Can incrementally restrict search results
       if( window.search != null && search_text.startsWith( window.search.text ) ) {
-        let search_tab_ids_set = new Set( window.search.matched_tab_ids.concat( window.search.queued_tab_ids || []) )
+        let search_tab_ids_set = new Set( window.search.matched_tab_ids.concat( window.search.queued_tab_ids || [] ) )
         if( search_tab_ids_set.size > 0 ) {
           search_tabs = search_tabs.filter( tab => search_tab_ids_set.has( tab.id ) )
         }
@@ -40,8 +42,9 @@ export function startWindowSearch( state, { window_id, search_text } ) {
         search: {
           text: search_text,
           resolved: ( queued_tab_ids.length === 0 ),
+          total_tabs_count,
           matched_tab_ids,
-          queued_tab_ids
+          queued_tab_ids,
         }
       }
     })

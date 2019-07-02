@@ -47,6 +47,16 @@ $tab-list-item--theme: (
     background-color: map-get( map-get( $tab-list-item--theme, dark ), __close-button--hover--background-color );
   }
 
+  @media (prefers-color-scheme: dark) {
+    &--theme-system &__icon--show-background {
+      margin-right: 2px;
+    }
+
+    &--theme-system &__icon--show-background:not(#{&}__icon--loading) {
+      background-color: map-get( map-get( $tab-list-item--theme, dark ), __close-button--hover--background-color );
+    }
+  }
+
   &__icon_img {
     height: 16px;
   }
@@ -85,6 +95,29 @@ $tab-list-item--theme: (
 
     &--theme-#{$theme} &__close-button:hover {
       background-color: map-get( $colors, __close-button--hover--background-color );
+    }
+
+    @media (prefers-color-scheme: $theme) {
+      &--theme-system {
+        background-color: map-get( $colors, --background-color );
+        border-bottom: solid 1px map-get( $colors, __separator-ink--color );
+      }
+
+      &--theme-system#{&}--active {
+        background-color: map-get( $colors, --active--background-color );
+      }
+
+      &--theme-system:not(#{&}--active):hover {
+        background-color: map-get( $colors, --hover--background-color );
+      }
+
+      &--theme-system &__close-icon {
+        fill: map-get( $colors, __close-button--color );
+      }
+
+      &--theme-system &__close-button:hover {
+        background-color: map-get( $colors, __close-button--hover--background-color );
+      }
     }
   }
 

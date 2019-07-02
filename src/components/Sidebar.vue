@@ -14,7 +14,7 @@
           :title="pinned_tab.title"
           @click.ctrl="toggleTabSelection( pinned_tab )"
           @click.exact="openTab( pinned_tab.id )"
-          @click.middle="closeTab( pinned_tab )"
+          @click.middle.exact="closeTab( pinned_tab )"
       >
         <span :class="[ `pinned-tabs-list--${ theme }__ink` ]"></span>
         <div :class="[ `pinned-tabs-list--${ theme }__tab` ]">
@@ -27,7 +27,7 @@
       </div>
     </div>
     <!-- <transition-group :class="[ `sidebar-tab_groups-list--${ theme }` ]" tag="div" :name="`sidebar-tab_groups-list--${ theme }__item--transition`" @click.right.prevent> -->
-    <div :class="[ `sidebar-tab_groups-list--${ theme }` ]" @click.right.prevent>
+    <div :class="[ `sidebar-tab_groups-list`, `sidebar-tab_groups-list--${ theme }` ]" @click.right.prevent>
       <div :class="bem( `sidebar-tab_groups-list--${ theme }__item-container`, { 'drag-source': isTabGroupDragSource( tab_group ), [`drag-${ drag_state.source.type }-target`]: ! isTabGroupDragSource( tab_group ) && isTabGroupDragTarget( tab_group ) } )"
           v-for="(tab_group, tab_group_index) in tab_groups" :key="tab_group.id"
       >
@@ -76,11 +76,11 @@
             </div>
           </div>
           <!-- <transition-group v-if="tab_group.open && show_tabs && ! isTabGroupDragSource( tab_group )" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]" tag="div" :name="`sidebar-tab-group-tabs-list--${ theme }__item--transition`"> -->
-          <div v-if="tab_group.open && show_tabs && tab_group.tabs.length" :class="[ bem( 'list-flex-col', { theme, 'is-dragging': is_dragging, 'is-searching': is_searching, 'is-max-height': true } ) ]">
-            <div :class="bem( `list-flex-col__item`, { 'active': tab.active, 'drag-target-index': drag_state.target.tab_id === tab.id && ! isSelected( tab ), 'drag-selected': isSelected( tab ), 'drag-source': is_dragging && isSelected( tab ), 'search': getTabSearchState( tab ) } )"
+          <div v-if="tab_group.open && show_tabs && tab_group.tabs.length" :class="[ bem( 'list-flex-col', { theme, 'is-dragging': drag_state.is_dragging, 'is-searching': is_searching, 'is-max-height': true } ) ]">
+            <div :class="bem( `list-flex-col__item`, { 'active': tab.active, 'drag-target-index': drag_state.target.tab_id === tab.id && ! isSelected( tab ), 'drag-selected': isSelected( tab ), 'drag-source': drag_state.is_dragging && isSelected( tab ), 'search': getTabSearchState( tab ) } )"
                 v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
                 :title="tab.title"
-                @click.ctrl="toggleTabSelection( tab )" @click.shift="toggleTabBatchSelection( tab )" @click.middle="closeTab( tab )" @click.exact="openTab( tab.id )"
+                @click.ctrl="toggleTabSelection( tab )" @click.shift="toggleTabBatchSelection( tab )" @click.middle.exact="closeTab( tab )" @click.exact="openTab( tab.id )"
                 @dragenter="onTabDragEnter( $event, tab_group, tab )"
                 @dragover.prevent
                 @dragleave="onTabDragLeave( $event, tab_group, tab )"
@@ -132,13 +132,13 @@
       </div>
     </div>
     <!-- </transition-group> -->
-    <div :class="bem( `empty-dropzone--${ theme }`, { [`drag-${ drag_state.source.type }-target`]: drag_state.target.tab_group_new } )"
+    <div :class="bem( `empty-dropzone--${ theme }`, { 'drag-tab-target': drag_state.source.type === 'tab' && drag_state.target.tab_group_new, 'drag-tab_group-target': drag_state.source.type === 'tab_group' && drag_state.target.tab_group_new } )"
         @click.right.prevent
         @dragenter="onTabGroupDragEnter( $event, null, null, 'dropzone' )"
         @dragover.prevent
         @dragleave="onTabGroupDragLeave"
         @dragend="onTabDragEnd"
-        @drop="onTabGroupDrop"
+        @drop="onTabGroupDrop( $event, null, null, 'dropzone' )"
     >
       <div :class="[ `empty-dropzone--${ theme }__drag-target-ink` ]"></div>
       <svg v-if="drag_state.target.tab_group_new && drag_state.source.type === 'tab'" :class="[ `empty-dropzone--${ theme }__drag-target-icon` ]" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
@@ -146,19 +146,19 @@
       </svg>
     </div>
     <div :class="bem( 'action-strip', { theme } )">
-      <div :class="bem( `action-strip__button`, { 'drag-target': drag_state.target.tab_group_new && drag_state.source.type !== 'tab_group' } )"
+      <div :class="bem( `action-strip__button`, { 'drag-target': ( drag_state.target.tab_group_new && ! drag_state.target.tab_group_last ) || drag_state.target.window_new } )"
           @click.left="createTabGroup()"
           @click.right.prevent
-          @dragenter="onTabGroupDragEnter"
+          @dragenter="onTabGroupDragEnter( $event, null, null, 'action_new' )"
           @dragover.prevent
           @dragleave="onTabGroupDragLeave"
-          @drop="onTabGroupDrop"
+          @drop="onTabGroupDrop( $event, null, null, 'action_new' )"
           @dragend="onTabDragEnd"
       >
         <svg :class="[ `action-strip__button-icon` ]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
           <path d="M14 7H9V2a1 1 0 0 0-2 0v5H2a1 1 0 1 0 0 2h5v5a1 1 0 0 0 2 0V9h5a1 1 0 0 0 0-2z"></path>
         </svg>
-        <span :class="[ `action-strip__button-text` ]" v-once>{{ __MSG_tab_group_new__ }}</span>
+        <span :class="[ `action-strip__button-text` ]">{{ drag_state.is_dragging && drag_state.source.type === "tab_group" ? __MSG_window_new__ : __MSG_tab_group_new__ }}</span>
       </div>
     </div>
     <div v-if="tab_group_context_menu.open" class="context-menu__ctx" @click="closeTabGroupMore"></div>
@@ -243,10 +243,10 @@ export default {
       window_id: window.current_window_id,
       active_tab_group_id: null,
       context_styles: {},
-      is_dragging: false,
       is_searching: false,
       is_tab_group_open: {},
       rename_tab_group_id: null,
+      // @todo move this to it's own object
       search_resolved: true,
       search_matched_tab_ids: [],
       search_missed_tab_ids: [],
@@ -261,6 +261,7 @@ export default {
       pinned_tabs: [],
       tab_groups: [],
       drag_state: {
+        is_dragging: false,
         source: {},
         target: {},
       },
@@ -270,7 +271,7 @@ export default {
   created() {
     let state0_window;
     onStateChange( state => {
-      this.theme = ( state.config.theme === 'light' ? 'light' : 'dark' )
+      this.theme = state.config.theme || "system"
       this.show_header = state.config.show_header
       this.show_tabs_count = state.config.show_tabs_count
       this.show_tabs = state.config.show_tabs
@@ -364,6 +365,9 @@ export default {
   computed: {
     __MSG_tab_group_new__() {
       return window.background.getMessage( "tab_group_new" )
+    },
+    __MSG_window_new__() {
+      return window.background.getMessage( "window_new" )
     },
   },
   filters: {
@@ -554,6 +558,11 @@ $--theme-dark: (
   transition-timing-function: cubic-bezier(.07,.95,0,1);
 }
 
+@mixin slow-transition {
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(.07,.95,0,1);
+}
+
 @mixin drag-target-index( $ink--color ) {
   position: absolute;
   top: -1px;
@@ -593,16 +602,28 @@ $sidebar__themes: (
   )
 );
 
+@mixin sidebar( $theme ) {
+  $colors: map-get( $map: $sidebar__themes, $key: $theme );
+
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  color: map-get( $colors, --color );
+  background-color: map-get( $colors, --background-color );
+}
+
 @each $theme, $colors in $sidebar__themes {
   .sidebar--#{$theme} {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    color: map-get( $colors, --color );
-    background-color: map-get( $colors, --background-color );
+    @include sidebar( $theme );
+  }
+
+  @media (prefers-color-scheme: $theme) {
+    .sidebar--system {
+      @include sidebar( $theme );
+    }
   }
 }
 
@@ -625,31 +646,43 @@ $empty-dropzone__themes: (
   )
 );
 
+@mixin empty-dropzone( $theme ) {
+  $colors: map-get( $map: $empty-dropzone__themes, $key: $theme );
+
+  @include slow-transition;
+  transition-property: background-color, margin-top;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  background-color: map-get( $colors, --background-color );
+  position: relative;
+
+  &__drag-target-icon {
+    @include slow-transition;
+    transition-property: fill, opacity;
+    position: absolute;
+  }
+
+  &--drag-tab-target {
+    background-color: map-get( $colors, --drag-target--background-color );
+    fill: map-get( $colors, --drag-target--color );
+  }
+
+  &--drag-tab_group-target &__drag-target-ink {
+    @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
+  }
+}
+
 @each $theme, $colors in $empty-dropzone__themes {
   .empty-dropzone--#{$theme} {
-    @extend %slow-transition;
-    transition-property: background-color, margin-top;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
-    background-color: map-get( $colors, --background-color );
-    position: relative;
+    @include empty-dropzone( $theme );
+  }
 
-    &__drag-target-icon {
-      @extend %slow-transition;
-      transition-property: fill, opacity;
-      position: absolute;
-    }
-
-    &--drag-tab-target {
-      background-color: map-get( $colors, --drag-target--background-color );
-      fill: map-get( $colors, --drag-target--color );
-    }
-
-    &--drag-tab_group-target &__drag-target-ink {
-      @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
+  @media (prefers-color-scheme: $theme) {
+    .empty-dropzone--system {
+      @include empty-dropzone( $theme );
     }
   }
 }
@@ -746,6 +779,36 @@ $action-strip__themes: (
 
     &--theme-#{$theme} &__spacer {
       background-color: map-get( $colors, __button--background-color );
+    }
+  }
+
+  @media (prefers-color-scheme: $theme) {
+    .action-strip {
+      &--theme-system {
+        background-color: map-get( $colors, --background-color );
+      }
+
+      &--theme-system &__button {
+        &--drag-target {
+          background-color: map-get( $colors, __button--drag-target--background-color );
+        }
+
+        &:hover {
+          background-color: map-get( $colors, __button--hover--background-color );
+        }
+      }
+
+      &--theme-system &__button-text {
+        color: map-get( $colors, __text--color );
+      }
+
+      &--theme-system &__button-icon {
+        fill: map-get( $colors, __text--color );
+      }
+
+      &--theme-system &__spacer {
+        background-color: map-get( $colors, __button--background-color );
+      }
     }
   }
 }
@@ -857,66 +920,78 @@ $sidebar-tab_groups-list__themes: (
   )
 );
 
+@mixin sidebar-tab_groups-list( $theme ) {
+  $colors: map-get( $map: $sidebar-tab_groups-list__themes, $key: $theme );
+
+  @include slow-transition;
+  transition-property: height;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  overflow-y: auto;
+  border-top: solid 1px map-get( $colors, separator--color );
+  scrollbar-color: map-get( $colors, scrollbar--color ) map-get( $colors, scrollbar--background-color );
+  scrollbar-size: thin;
+
+  &__item-container {
+    @include slow-transition;
+    transition-property: padding-top, padding-bottom, transform;
+    flex: 0;
+
+    /*
+    &--transition {
+      &-enter {
+        // max-height: 0;
+        transform: translate3d(0,-100%,0);
+        opacity: 0;
+        z-index: -1000;
+      }
+
+      &-enter-to {
+        transform: none;
+        opacity: 1;
+        z-index: 0;
+      }
+
+      &-leave {
+        opacity: 1;
+      }
+
+      &-leave-to {
+        max-height: 0;
+        opacity: 0;
+      }
+    }
+    */
+
+    &--drag-source {
+      opacity: $--drag-source--opacity;
+    }
+  }
+
+  &__drag-target-ink {
+    @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
+  }
+
+  &__item {
+    @include slow-transition;
+    transition-property: padding-top, padding-bottom, transform;
+
+    &--active {
+    }
+  }
+}
+
 @each $theme, $colors in $sidebar-tab_groups-list__themes {
   .sidebar-tab_groups-list--#{$theme} {
-    @extend %slow-transition;
-    transition-property: height;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    overflow-y: auto;
-    border-top: solid 1px map-get( $colors, separator--color );
-    scrollbar-color: map-get( $colors, scrollbar--color ) map-get( $colors, scrollbar--background-color );
-    scrollbar-size: thin;
+    @include sidebar-tab_groups-list( $theme );
+  }
 
-    &__item-container {
-      @extend %slow-transition;
-      transition-property: padding-top, padding-bottom, transform;
-      flex: 0;
-
-      /*
-      &--transition {
-        &-enter {
-          // max-height: 0;
-          transform: translate3d(0,-100%,0);
-          opacity: 0;
-          z-index: -1000;
-        }
-
-        &-enter-to {
-          transform: none;
-          opacity: 1;
-          z-index: 0;
-        }
-
-        &-leave {
-          opacity: 1;
-        }
-
-        &-leave-to {
-          max-height: 0;
-          opacity: 0;
-        }
-      }
-      */
-
-      &--drag-source {
-        opacity: $--drag-source--opacity;
-      }
-    }
-
-    &__drag-target-ink {
-      @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
-    }
-
-    &__item {
-      @extend %slow-transition;
-      transition-property: padding-top, padding-bottom, transform;
-
-      &--active {
-      }
+  @media (prefers-color-scheme: $theme) {
+    .sidebar-tab_groups-list--theme-system {
+      @include sidebar-tab_groups-list( $theme );
     }
   }
 }
@@ -944,147 +1019,159 @@ $tab-groups-list-item-header__themes: (
   )
 );
 
-@each $theme, $colors in $tab-groups-list-item-header__themes {
-  .tab-groups-list-item-header--#{$theme} {
-    @extend %slow-transition;
+@mixin tab-groups-list-item-header( $theme ) {
+  $colors: map-get( $map: $tab-groups-list-item-header__themes, $key: $theme );
+
+  @include slow-transition;
+  transition-property: background-color;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: $light-border-color 1px solid;
+  background-color: map-get( $colors, --background-color );
+  cursor: pointer;
+
+  &__container {
+    @include slow-transition;
+    position: relative;
     transition-property: background-color;
+    flex: 1;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    border-bottom: $light-border-color 1px solid;
-    background-color: map-get( $colors, --background-color );
-    cursor: pointer;
-
-    &__container {
-      @extend %slow-transition;
-      position: relative;
-      transition-property: background-color;
-      flex: 1;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-
-      &--drag-tab-target {
-        background-color: $purple-50;
-        color: $white-100;
-      }
-    }
-
-    &--active &__container::before {
-      content: '';
-      background-color: $light-border-color;
-      border-left: 1px solid map-get( $colors, --background-color );
-      height: 34px;
-      min-width: 4px;
-      margin-top: -1px;
-      margin-bottom: -1px;
-    }
-
-    &--active:not(#{&}--open) &__container::before {
-      background-color: $blue-50;
-    }
-
-    &--drag-tab_group-target &__drag-target-ink {
-      @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
-    }
 
     &--drag-tab-target {
       background-color: $purple-50;
       color: $white-100;
     }
+  }
 
-    &__main {
-      @extend %slow-transition;
-      transition-property: background-color, opacity;
-      padding: 8px 4px 8px 6px;
-      flex: 1;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      background-color: transparent;
+  &--active &__container::before {
+    content: '';
+    background-color: $light-border-color;
+    border-left: 1px solid map-get( $colors, --background-color );
+    height: 34px;
+    min-width: 4px;
+    margin-top: -1px;
+    margin-bottom: -1px;
+  }
+
+  &--active:not(#{&}--open) &__container::before {
+    background-color: $blue-50;
+  }
+
+  &--drag-tab_group-target &__drag-target-ink {
+    @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
+  }
+
+  &--drag-tab-target {
+    background-color: $purple-50;
+    color: $white-100;
+  }
+
+  &__main {
+    @include slow-transition;
+    transition-property: background-color, opacity;
+    padding: 8px 4px 8px 6px;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: transparent;
+  }
+
+  &__title {
+    flex: 1;
+    white-space: nowrap;
+    text-overflow: clip;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    mask-image: linear-gradient( to right, rgba(0, 0, 0, 1.0), rgba(0, 0, 0, 1.0) calc(100% - 10px), transparent );
+
+    // Reset the fade out while the field is editing to prevent odd gradient display on long titles (scrollable)
+    &--editing {
+      mask-image: none;
     }
+  }
 
-    &__title {
-      flex: 1;
-      white-space: nowrap;
-      text-overflow: clip;
-      overflow-x: hidden;
-      overflow-y: hidden;
-      mask-image: linear-gradient( to right, rgba(0, 0, 0, 1.0), rgba(0, 0, 0, 1.0) calc(100% - 10px), transparent );
+  &__title-editable {
+    max-height: 16px;
+    max-width: 10px;
+  }
 
-      // Reset the fade out while the field is editing to prevent odd gradient display on long titles (scrollable)
-      &--editing {
-        mask-image: none;
-      }
+  &__tabs-count {
+    max-height: 16px;
+    padding-left: 4px;
+    text-align: right;
+    flex-grow: 0;
+    white-space: nowrap;
+    color: map-get( $colors, secodary-text--color );
+  }
+
+  &--drag-tab-target &__tabs-count {
+    color: $white-100;
+  }
+
+  &__icon {
+    height: 16px;
+    width: 16px;
+    fill: map-get( $colors, primary-text--color );
+  }
+
+  &__carat-icon {
+    @include slow-transition;
+    transition-property: transform;
+    width: 6px;
+    margin: 0 8px 0 4px;
+    fill: map-get( $colors, primary-text--color );
+
+    &--open {
+      transform: rotate(90deg);
     }
+  }
 
-    &__title-editable {
-      max-height: 16px;
-      max-width: 10px;
+  &__more-button {
+    @include slow-transition;
+    transition-property: background-color;
+    padding: 8px;
+    display: flex;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+
+    // Remove the dotted outline inside the button on focus
+    &::-moz-focus-inner {
+      border: 0;
     }
+  }
 
-    &__tabs-count {
-      max-height: 16px;
-      padding-left: 4px;
-      text-align: right;
-      flex-grow: 0;
-      white-space: nowrap;
-      color: map-get( $colors, secodary-text--color );
-    }
+  &--drag-tab-target &__carat-icon,
+  &--drag-tab-target &__icon {
+    fill: $white-100;
+  }
 
-    &--drag-tab-target &__tabs-count {
-      color: $white-100;
-    }
+  // Separate hover effect for doorhanger
+  &__main:hover,
+  &__main:hover + &__more-button,
+  &__more-button:hover {
+    background-color: map-get( $colors, --hover--background-color );
+  }
+}
 
-    &__icon {
-      height: 16px;
-      width: 16px;
-      fill: map-get( $colors, primary-text--color );
-    }
+@each $theme, $colors in $tab-groups-list-item-header__themes {
+  .tab-groups-list-item-header--#{$theme} {
+    @include tab-groups-list-item-header( $theme );
+  }
 
-    &__carat-icon {
-      @extend %slow-transition;
-      transition-property: transform;
-      width: 6px;
-      margin: 0 8px 0 4px;
-      fill: map-get( $colors, primary-text--color );
-
-      &--open {
-        transform: rotate(90deg);
-      }
-    }
-
-    &__more-button {
-      @extend %slow-transition;
-      transition-property: background-color;
-      padding: 8px;
-      display: flex;
-      border: none;
-      background-color: transparent;
-      cursor: pointer;
-
-      // Remove the dotted outline inside the button on focus
-      &::-moz-focus-inner {
-        border: 0;
-      }
-    }
-
-    &--drag-tab-target &__carat-icon,
-    &--drag-tab-target &__icon {
-      fill: $white-100;
-    }
-
-    // Separate hover effect for doorhanger
-    &__main:hover,
-    &__main:hover + &__more-button,
-    &__more-button:hover {
-      background-color: map-get( $colors, --hover--background-color );
+  @media (prefers-color-scheme: $theme) {
+    .tab-groups-list-item-header--system {
+      @include tab-groups-list-item-header( $theme );
     }
   }
 }
@@ -1116,66 +1203,72 @@ $sidebar-tab-group-tabs-list__themes: (
   )
 );
 
-@each $theme, $colors in $sidebar-tab-group-tabs-list__themes {
-  .sidebar-tab-group-tabs-list--#{$theme} {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    max-height: 80vh;
-    overflow-y: auto;
-    border-bottom: solid 1px map-get( $colors, --border-color );
-    padding-top: 1px;
-    background-color: map-get( $colors, --background-color );
+@mixin sidebar-tab-group-tabs-list( $theme ) {
+  $colors: map-get( $map: $sidebar-tab-group-tabs-list__themes, $key: $theme );
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-bottom: solid 1px map-get( $colors, --border-color );
+  padding-top: 1px;
+  background-color: map-get( $colors, --background-color );
+  position: relative;
+
+  &__item-container {
+    @include slow-transition;
+    transition-property: height, padding-top;
+    width: 100%;
+    flex: 0;
+    min-height: 52px;
+    background-color: transparent;
     position: relative;
 
-    &__item-container {
-      @extend %slow-transition;
-      transition-property: height, padding-top;
-      width: 100%;
-      flex: 0;
-      min-height: 52px;
-      background-color: transparent;
-      position: relative;
+    &--drag-source {
+      opacity: $--drag-source--opacity;
+    }
+  }
 
-      &--drag-source {
-        opacity: $--drag-source--opacity;
+  &__item-container--drag-target &__drag-target-ink {
+    @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
+  }
+
+  &__item {
+    background-color: map-get( $colors, --background-color );
+
+    &--active {
+      background-color: map-get( $colors, --active--background-color );
+
+      &::before {
+        content: '';
+        background-color: $blue-50;
+        border-left: 1px solid map-get( $colors, --background-color );
+        height: 52px;
+        min-width: 4px;
       }
     }
 
-    &__item-container--drag-target &__drag-target-ink {
-      @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
+    &:not(#{&}--active):hover {
+      background-color: map-get( $colors, --hover--background-color );
     }
+  }
 
-    &__item {
-      background-color: map-get( $colors, --background-color );
+  &__item-close {
+    height: 24px;
+    padding: 4px;
+    margin-right: 4px;
+  }
 
-      &--active {
-        background-color: map-get( $colors, --active--background-color );
+  &__item-close-icon {
+    fill: map-get( $colors, --color );
+  }
+}
 
-        &::before {
-          content: '';
-          background-color: $blue-50;
-          border-left: 1px solid map-get( $colors, --background-color );
-          height: 52px;
-          min-width: 4px;
-        }
-      }
-
-      &:not(#{&}--active):hover {
-        background-color: map-get( $colors, --hover--background-color );
-      }
-    }
-
-    &__item-close {
-      height: 24px;
-      padding: 4px;
-      margin-right: 4px;
-    }
-
-    &__item-close-icon {
-      fill: map-get( $colors, --color );
-    }
+@each $theme, $colors in $sidebar-tab-group-tabs-list__themes {
+  .sidebar-tab-group-tabs-list--#{$theme} {
+    @include sidebar-tab-group-tabs-list( $theme );
   }
 
   // @todo should clean up this cross-component rule
@@ -1186,6 +1279,23 @@ $sidebar-tab-group-tabs-list__themes: (
 
     &::before {
       border-bottom: none;
+    }
+  }
+
+  @media (prefers-color-scheme: $theme) {
+    .sidebar-tab-group-tabs-list--system {
+      @include sidebar-tab-group-tabs-list( $theme );
+    }
+
+    // @todo should clean up this cross-component rule
+    .sidebar-tab_groups-list--system__item-container--drag-tab-target .list-flex-col__drag-target-ink--is-last {
+      @include drag-target-index( map-get( $colors, --drag-target--ink-color ) );
+      top: initial;
+      bottom: 0;
+
+      &::before {
+        border-bottom: none;
+      }
     }
   }
 }
@@ -1335,6 +1445,24 @@ $sidebar-tab-group-tabs-list__themes: (
   }
 }
 
+@media (prefers-color-scheme: light) {
+  .system {
+    .sidebar-header-search {
+      background-color: $white-100;
+      color: $ink-90;
+      border: 1px solid #ccc;
+    }
+
+    .sidebar-tab-view-item-title {
+      color: black;
+    }
+
+    .sidebar-tab-view-item-url {
+      color: $grey-50;
+    }
+  }
+}
+
 .dark {
   .sidebar-tab-view-item-title {
     color: $white-100;
@@ -1342,6 +1470,18 @@ $sidebar-tab-group-tabs-list__themes: (
 
   .sidebar-tab-view-item-url {
     color: $grey-50;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .system {
+    .sidebar-tab-view-item-title {
+      color: $white-100;
+    }
+
+    .sidebar-tab-view-item-url {
+      color: $grey-50;
+    }
   }
 }
 </style>

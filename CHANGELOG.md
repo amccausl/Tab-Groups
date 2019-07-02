@@ -1,3 +1,15 @@
+### v0.0.10
+
+#### Features
+- add "system" theme using `prefers-color-scheme` media
+- add locales for Japanese and Traditional Chinese
+- search style updates and progress indicator
+- add drag tab group to new window
+
+#### Bugs
+- text interaction weirdness for search
+- fix drag active group to other window
+
 ### v0.0.9
 
 #### Features

@@ -65,8 +65,8 @@
       "type": "object",
       "properties": {
         "theme": {
-          "enum": [ "light", "dark" ],
-          "default": "light"
+          "enum": [ "light", "dark", "system" ],
+          "default": "system"
         },
         "show_pinned_tabs": {
           "type": "boolean",
@@ -141,6 +141,9 @@
               },
               "resolved": {
                 "type": "boolean"
+              },
+              "total_tabs_count": {
+                "type": "number"
               },
               "matched_tab_ids": {
                 "type": "array",

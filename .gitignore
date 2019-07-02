@@ -151,6 +151,7 @@ ClientBin/
 *.[Pp]ublish.xml
 *.pfx
 *.publishsettings
+.nyc_output/
 
 bower_components/
 node_modules/

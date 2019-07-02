@@ -66,10 +66,6 @@ $__item-ink--width: 4px;
       }
     }
 
-    &--search-missed {
-      display: none;
-    }
-
     &--transition {
       &-enter {
         transform: translate3d(0, -100%, 0);
@@ -92,6 +88,10 @@ $__item-ink--width: 4px;
         opacity: 0;
       }
     }
+  }
+
+  &--is-searching &__item:not(#{&}__item--search-matched) {
+    display: none;
   }
 
   &__drag-target-ink {

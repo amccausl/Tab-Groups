@@ -1,3 +1,37 @@
 export * from "./firefox/index.mjs"
 export { TAB_GROUP_ID_KEY } from "./firefox/helpers.mjs"
 export { bindBrowserEvents } from "./firefox/event-handlers.mjs"
+
+export const LOCALE_KEYS = [
+  "extension_name",
+  "extension_description",
+  "sidebar_name",
+  "onboarding_title",
+  "learn_more",
+  "container_tabs_info_url",
+  "options_section_preferences",
+  "options_section_data",
+  "options_section_debug",
+  "options_theme",
+  "options_theme_light",
+  "options_theme_dark",
+  "options_theme_system",
+  "options_sidebar_legend",
+  "options_sidebar_show_header",
+  "options_sidebar_show_tabs_count",
+  "options_sidebar_show_tabs",
+  "options_sidebar_show_pinned_tabs",
+  "options_sidebar_show_tab_context",
+  "options_sidebar_show_tab_icon_background",
+  "options_use_sync_config",
+  "tab_group_name_placeholder",
+  "tab_group_manage",
+  "tab_group_new",
+  "window_new",
+  "tab_group_sidebar_action",
+  "tabs_count_singular",
+  "tabs_count_plural",
+  "matched_tabs_count_singular",
+  "matched_tabs_count_plural",
+  "tab_search_placeholder",
+]

@@ -90,19 +90,19 @@ function toDifferentWindow( t ) {
       createWindow( source_data.window_id, [
         createPinnedTabGroup( [] ),
         createTabGroup( 2, [
-          createTestTab({ id: 4 })
+          createTestTab({ id: 6 })
         ]),
-        createTabGroup( tab_group_id, [
-          createTestTab({ id: 5 })
+        createTabGroup( 3, [
+          createTestTab({ id: 7 })
         ])
       ]),
       createWindow( target_data.window_id, [
         createPinnedTabGroup( [] ),
-        createTabGroup( 2, [
-          createTestTab({ id: 6 })
+        createTabGroup( 4, [
+          createTestTab({ id: 8 })
         ]),
-        createTabGroup( tab_group_id, [
-          createTestTab({ id: 7 })
+        createTabGroup( 5, [
+          createTestTab({ id: 9 })
         ])
       ])
     ]
@@ -112,6 +112,54 @@ function toDifferentWindow( t ) {
 
   t.ok( validateState( state1 ), "state validates", validateState.errors )
   t.equal( state1.windows[ 0 ].tab_groups.length, 2 )
+  t.equal( state1.windows[ 1 ].tab_groups.length, 4 )
+  t.equal( state1.windows[ 1 ].tab_groups[ tab_group_index ].id, tab_group_id )
+
+  t.end()
+}
+
+function activeToDifferentWindow( t ) {
+  const tab_group_id = 2
+  const tab_group_index = 1
+  const source_data = {
+    window_id: 1,
+    tab_group_id
+  }
+  const target_data = {
+    window_id: 2,
+    tab_group_index
+  }
+
+  const state0 = {
+    config: {},
+    windows: [
+      createWindow( source_data.window_id, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( 2, [
+          createTestTab({ id: 6 })
+        ]),
+        createTabGroup( 3, [
+          createTestTab({ id: 7 })
+        ])
+      ]),
+      createWindow( target_data.window_id, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( 4, [
+          createTestTab({ id: 8 })
+        ]),
+        createTabGroup( 5, [
+          createTestTab({ id: 9 })
+        ])
+      ])
+    ]
+  }
+
+  const state1 = moveGroup( state0, { source_data, target_data } )
+
+  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.equal( state1.windows[ 0 ].tab_groups.length, 2 )
+  t.equal( state1.windows[ 0 ].active_tab_group_id, 3 )
+  t.equal( state1.windows[ 1 ].tab_groups.length, 4 )
   t.equal( state1.windows[ 1 ].tab_groups[ tab_group_index ].id, tab_group_id )
 
   t.end()
@@ -120,3 +168,4 @@ function toDifferentWindow( t ) {
 tap.test( toSameWindow )
 tap.test( toSameWindowDropZone )
 tap.test( toDifferentWindow )
+tap.test( activeToDifferentWindow )
