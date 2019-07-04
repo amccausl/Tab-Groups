@@ -165,11 +165,13 @@ table {
 }
 
 .section--conclusion__header {
+  text-align: center;
   font-size: 3em;
   padding: 16px;
 }
 
 .section--conclusion__subheader {
+  text-align: center;
   font-size: 2em;
   padding: 16px;
 }
