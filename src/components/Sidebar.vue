@@ -880,7 +880,7 @@ $sidebar-tab_groups-list__themes: (
   }
 
   @media (prefers-color-scheme: $theme) {
-    .sidebar-tab_groups-list--theme-system {
+    .sidebar-tab_groups-list--system {
       @include sidebar-tab_groups-list( $theme );
     }
   }
