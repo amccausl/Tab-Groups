@@ -1,74 +1,98 @@
-### v0.0.10
+# Changelog
+All notable changes to this project will be documented in this file.
 
-#### Features
-- add "system" theme using `prefers-color-scheme` media
-- add locales for Japanese and Traditional Chinese
-- search style updates and progress indicator
-- add drag tab group to new window
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-#### Bugs
+## [Unreleased]
+
+## [0.0.10] - 2019-07-01
+
+### Added
+- "system" theme using `prefers-color-scheme` media
+- locales for Japanese and Traditional Chinese
+- search progress indicator
+- drag tab group to new window
+
+### Changed
+- search style updates
+
+### Fixed
 - text interaction weirdness for search
-- fix drag active group to other window
+- drag active group to other window
 
-### v0.0.9
+## [0.0.9] - 2019-03-31
 
-#### Features
+### Added
 - use sync for config settings
-- incremental search results
+- incremental display search results
 - use native hilighted tabs for multi-drag
 
-#### Bugs
+### Fixed
 - scrollbar display on windows
 
-### v0.0.8
+## [0.0.8] - 2019-02-24
 
-#### Features
+### Added
 - integration for native browser highlighted tabs
+
+### Changed
 - default to dark theme
 
-#### Bugs
+### Fixed
 - skip search for `about:` urls
 
-### v0.0.7
+## [0.0.7] - 2018-10-14
 
-#### Features
-- action tab group open improvements
+### Added
 - hover for full group name
 - audible icon for tab group in action
 
-### v0.0.6
+### Changed
+- action tab group open improvements
 
-#### Features
+## [0.0.6] - 2018-08-29
+
+### Added
+- handling for favicons blocked by tracking protection
+
+### Changed
 - improve search interactions
-- add handling for favicons blocked by tracking protection
 - styling improvements to browser action
 - sidebar closed on launch
 
-#### Bugs
-- fix selection bug for drag & drop
+### Fixed
+- selection bug for drag & drop
 
-### v0.0.5
+## [0.0.5] - 2018-08-24
 
-#### Features
-- add browser action with group list
-- add icon
+### Added
+- browser action with group list
+- extension icon
 - shift-click for multiple select drag
+
+### Changed
 - minor UI improvements
 
-### v0.0.4
+## [0.0.4] - 2018-05-09
 
-#### Features
-- add support for multi-account containers
-- search styling updates and performance improvements
+### Added
+- support for multi-account containers
 - allow dragging to url bar, native tabs, library, and bookmarks
 
-#### Bugs
-- fix search clear error
+### Changed
+- search styling updates and performance improvements
+
+### Fixed
+- search clear error
 - consistency improvements to state load on browser launch
 
-### v0.0.3
+## [0.0.3] - 2018-04-29
 
-#### Features
+### Added
+- tab search
+- dynamic feature detection for contextual identities & tabhide
+
+### Changed
 - drag and drop improvements
   - drag over group to open
   - native drag handling
@@ -78,11 +102,19 @@
     - from bookmark folder
   - ctrl-click to select and drag multiple tabs at a time
   - ui animations
-- dynamic feature detection for contextual identities & tabhide
-- tab search
-- change to smaller tab view
+- smaller view for tabs
 
-#### Bugs
+### Fixed
 - improve native index handling of multi-tab moves
-- fix active tab group detection during move to new group
+- active tab group detection during move to new group
 - prevent closing last tab group in a window
+
+[Unreleased]: https://github.com/amccausl/tabulate/compare/master...develop
+[0.0.10]: https://github.com/amccausl/tabulate/compare/v0.0.9...v0.0.10
+[0.0.9]: https://github.com/amccausl/tabulate/compare/v0.0.8...v0.0.9
+[0.0.8]: https://github.com/amccausl/tabulate/compare/v0.0.7...v0.0.8
+[0.0.7]: https://github.com/amccausl/tabulate/compare/v0.0.6...v0.0.7
+[0.0.6]: https://github.com/amccausl/tabulate/compare/v0.0.5...v0.0.6
+[0.0.5]: https://github.com/amccausl/tabulate/compare/v0.0.4...v0.0.5
+[0.0.4]: https://github.com/amccausl/tabulate/compare/v0.0.3...v0.0.4
+[0.0.3]: https://github.com/Quicksaver/Tab-Groups/compare/master...amccausl:v0.0.3
