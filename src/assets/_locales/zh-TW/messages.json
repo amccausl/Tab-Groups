@@ -84,11 +84,6 @@
     "description": ""
   },
 
-  "options_sidebar_show_pinned_tabs": {
-    "message": "顯示固定標籤頁",
-    "description": ""
-  },
-
   "options_sidebar_show_tab_context": {
     "message": "顯示容器分頁功能",
     "description": ""

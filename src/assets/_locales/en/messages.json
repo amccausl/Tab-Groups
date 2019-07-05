@@ -84,11 +84,6 @@
     "description": ""
   },
 
-  "options_sidebar_show_pinned_tabs": {
-    "message": "Show pinned tabs",
-    "description": ""
-  },
-
   "options_sidebar_show_tab_context": {
     "message": "Show Multi-Account Containers",
     "description": ""

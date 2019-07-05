@@ -8,24 +8,6 @@
         </svg>
       </div>
     </div>
-    <div v-if="show_pinned_tabs" :class="[ `pinned-tabs-list--${ theme }` ]" @click.right.prevent>
-      <div v-for="pinned_tab in pinned_tabs" :key="pinned_tab.id"
-          :class="bem( `pinned-tabs-list--${ theme }__item`, { 'active': pinned_tab.active, 'selected': isSelected( pinned_tab ) } )"
-          :title="pinned_tab.title"
-          @click.ctrl="toggleTabSelection( pinned_tab )"
-          @click.exact="openTab( pinned_tab.id )"
-          @click.middle.exact="closeTab( pinned_tab )"
-      >
-        <span :class="[ `pinned-tabs-list--${ theme }__ink` ]"></span>
-        <div :class="[ `pinned-tabs-list--${ theme }__tab` ]">
-          <tab-icon :theme="theme" :tab="pinned_tab" size="16"></tab-icon>
-          <!-- @todo fade styling for pinned tabs if search -->
-          <!-- https://design.firefox.com/favicon.ico -->
-          <div v-if="pinned_tab.context_id" :class="[ `pinned-tabs-list--${ theme }__tab-context` ]" :style="context_styles[ pinned_tab.context_id ]"></div>
-        </div>
-        <!-- Add a span to fix centering for tab content -->
-      </div>
-    </div>
     <!-- <transition-group :class="[ `sidebar-tab_groups-list--${ theme }` ]" tag="div" :name="`sidebar-tab_groups-list--${ theme }__item--transition`" @click.right.prevent> -->
     <div :class="[ `sidebar-tab_groups-list`, `sidebar-tab_groups-list--${ theme }` ]" @click.right.prevent>
       <div :class="bem( `sidebar-tab_groups-list--${ theme }__item-container`, { 'drag-source': isTabGroupDragSource( tab_group ), [`drag-${ drag_state.source.type }-target`]: ! isTabGroupDragSource( tab_group ) && isTabGroupDragTarget( tab_group ) } )"
@@ -254,11 +236,9 @@ export default {
       show_header: true,
       show_tabs: true,
       show_tabs_count: true,
-      show_pinned_tabs: true,
       show_tab_context: true,
       show_tab_icon_background: true,
       tab_size: "sm",
-      pinned_tabs: [],
       tab_groups: [],
       drag_state: {
         is_dragging: false,
@@ -275,7 +255,6 @@ export default {
       this.show_header = state.config.show_header
       this.show_tabs_count = state.config.show_tabs_count
       this.show_tabs = state.config.show_tabs
-      this.show_pinned_tabs = false && this.show_tabs && state.config.show_pinned_tabs
       this.show_tab_context = this.show_tabs && state.config.show_tab_context
       this.show_tab_icon_background = this.show_tabs && state.config.show_tab_icon_background
 
@@ -356,7 +335,6 @@ export default {
       // Use the extended splice to trigger change detection
       Object.getPrototypeOf( this.search_missed_tab_ids ).splice.apply( this.search_missed_tab_ids, [ 0, this.search_missed_tab_ids.length, ...search_missed_tab_ids ] )
       Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...state_window.highlighted_tab_ids ] )
-      // Object.getPrototypeOf( this.pinned_tabs ).splice.apply( this.pinned_tabs, [ 0, this.pinned_tabs.length, ...tab_groups[ 0 ].tabs ] )
       Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length, ...tab_groups.slice( 1 ) ] )
 
       state0_window = state_window
@@ -809,94 +787,6 @@ $action-strip__themes: (
       &--theme-system &__spacer {
         background-color: map-get( $colors, __button--background-color );
       }
-    }
-  }
-}
-
-// =============================================================================
-// Pinned Tabs List
-// =============================================================================
-
-$pinned-tabs-list__item--width: 40px;
-
-// @todo use photon colors
-$pinned-tabs-list__themes: (
-  light: (
-    __item--background-color: #e3e4e6,
-    __item--active--background-color: #f5f6f7,
-    __ink--color: #a5a6a7,
-    __ink--hover--color: #cccdcf,
-    __ink--active--color: $blue-50,
-  ),
-  dark: (
-    __item--background-color: #0c0c0d,
-    __item--active--background-color: #323234,
-    __ink--color: #545455,
-    __ink--hover--color: #252526,
-    __ink--active--color: $blue-50,
-  )
-);
-
-// @todo may be tab-list--pinned or plural tabs
-
-@each $theme, $colors in $pinned-tabs-list__themes {
-  .pinned-tabs-list--#{$theme} {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, $pinned-tabs-list__item--width);
-    grid-auto-columns: min-content;
-    grid-auto-rows: max-content;
-    background-color: map-get( $colors, __item--background-color );
-
-    &__item {
-      margin-left: -1px;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      border-right: solid 1px transparent;
-      border-left: solid 1px transparent;
-      border-top: solid 1px transparent;
-
-      &:not(#{&}--active):hover {
-        cursor: pointer;
-        border-right-color: map-get( $colors, __ink--color );
-        border-left-color: map-get( $colors, __ink--color );
-        background-color: map-get( $colors, __ink--hover--color );
-      }
-
-      &--active {
-        border-top-color: map-get( $colors, __item--background-color );
-        border-right-color: map-get( $colors, __ink--color );
-        border-left-color: map-get( $colors, __ink--color );
-        background-color: map-get( $colors, __item--active--background-color );
-      }
-    }
-
-    &__ink {
-      min-width: 1px;
-      height: 24px;
-      margin-left: -1px;
-      background-color: map-get( $colors, __ink--color );
-    }
-
-    &__tab {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      width: $pinned-tabs-list__item--width;
-      padding: 6px 0;
-      border-top: solid 2px transparent;
-      border-top-color: map-get( $colors, __item--background-color );
-    }
-
-    &__item--active &__tab {
-      z-index: 5;
-      border-top-color: map-get( $colors, __ink--active--color );
-    }
-
-    &__item:not(#{&}__item--active):hover &__tab {
-      z-index: 10;
-      border-top-color: map-get( $colors, __ink--color );
     }
   }
 }

@@ -84,11 +84,6 @@
     "description": ""
   },
 
-  "options_sidebar_show_pinned_tabs": {
-    "message": "固定されたタブを表示",
-    "description": ""
-  },
-
   "options_sidebar_show_tab_context": {
     "message": "マルチアカウントのコンテナを表示",
     "description": ""
