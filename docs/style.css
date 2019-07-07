@@ -113,6 +113,7 @@ table {
   height: 95vh;
   min-height: 650px;
   background: linear-gradient(135deg, #F14200 0%, #FF8B00 40%, #B50080 100%);
+  text-shadow: rgb(0,0,0,0.2) 0 2px 4px;
 }
 
 .section--features {
@@ -144,7 +145,8 @@ table {
 }
 
 .section--interlude__text {
-  padding: 8px;
+  padding: 4px;
+  color: #2e4052;
   font-size: 2em;
 }
 
