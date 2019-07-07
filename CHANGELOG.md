@@ -5,11 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+- sidebar name & icon
+
 ### Fixed
 - scrollbar and fixed footer action in sidebar for system theme
 
 ### Removed
-- pinned tab rendering
+- pinned tab rendering code
 
 ## [0.0.10] - 2019-07-01
 

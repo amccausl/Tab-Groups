@@ -26,12 +26,30 @@
   },
   "browser_action": {
     "browser_style": true,
-    "default_icon": "icons/tabulate.svg",
+    "default_icon": {
+      "16": "icons/tabulate-16.svg",
+      "32": "icons/tabulate-32.svg"
+    },
     "default_title": "__MSG_extension_name__",
-    "default_popup": "action.html"
+    "default_popup": "action.html",
+    "theme_icons": [
+      {
+        "light": "icons/tabulate-16.svg",
+        "dark": "icons/tabulate-16.svg",
+        "size": 16
+      },
+      {
+        "light": "icons/tabulate-32.svg",
+        "dark": "icons/tabulate-32.svg",
+        "size": 32
+      }
+    ]
   },
   "sidebar_action": {
-    "default_icon": "icons/tabulate.svg",
+    "default_icon": {
+      "16": "icons/tabulate-16.png",
+      "32": "icons/tabulate-32.png"
+    },
     "default_title": "__MSG_sidebar_name__",
     "default_panel": "sidebar.html",
     "open_at_install": false
