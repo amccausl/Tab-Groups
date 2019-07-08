@@ -1,15 +1,22 @@
+#### p0
+- onboarding
+- performance for CPU leak
+- state recovery handling
+
 #### p1
+- animate search interaction, match update cadence to animation time
+- open group should create new tab
+- set context for group to control open new tab
+- move to logical events instead of native
+- add missing locale keys
+- add hotkey for "move to new group"
+- support for tab sequence
+- svelte test
 - shim around native drags
 - add flags to state for feature detection
-- styling for pinned
-  - background
-  - active indicator on pinned tabs
-  - sizing, spacing & separator
-  - contexts
-  - notifications & audio
+- drag to new window could be more efficient
 - bugs
   - hide/show
-    - pin if can't hide
     - closing all tabs in group and new tab
     - reopen closed tab should activate the group that contains it
     - should toggle states on launch
@@ -21,15 +28,11 @@
   - audio
     - on close tab playing, group still audible
   - context broken
-    - testing on main browser
     - use https://developer.mozilla.org/en-US/docs/Web/CSS/attr for styles
-  - target after start issue
-    - could fix with style change
   - when transitioning from discarded, if update clears favicon, keep open one
   - "new group" should open new tab in group, group should open
   - moving to same group should be noop
   - drag and drop
-    - pinned tab drag
     - from 1 window to another loses favicon
     - dragging from new doesn't clear the target class
     - styling is weird when dragging to a sticky tab
@@ -41,12 +44,9 @@
     - from app to native tab bar
     - dragging many tabs to a later group sometimes misses target
   - native drag
-    - swap for first tabs after pinned has no affect
     - drag from new window to existing
   - sidebar
-    - bind right click for empty space
     - group toggle is odd if group moves above the fold, should scroll container so both headers visible
-    - active style should only be displayed if group also active
     - drag preview image issue
     - context display is broken
     - icons
@@ -56,25 +56,15 @@
   - add process to suspend tabs
   - tab context menu
     - move to group
-  - group header
-    - group header shouldn't wrap
-  - rename
-    - opening new group should focus the name for edit
-    - should select text on focus
-  - pinned tabs
-    - icon sizing should match native for consistency
-    - update styling to match tab bar
-    - open new tab from pinned tab while in long group scrolls to beginning and adds to end in native bar
   - tab item
     - visual style for suspend
     - loading indicator
     - status indication and bubbling
       - audio playing, muted
-      - pinned
       - loading
       - notifications?
     - ensure new tab is visible (scroll, open group)
-      - sometimes not clear there are more items under stick header
+      - sometimes not clear there are more items under sticky header
     - text overflow gradient
     - copy tab bar active style with blue bar
   - favicon scan for context styles
@@ -82,11 +72,7 @@
     - index based tab dragging
       - style cleanup
       - drop animation looks janky
-      - drag over last item moves to the wrong index
-    - index based group dragging
-    - between pinned tabs
   - native drag
-    - drag from native tab to sidebar
     - drag from bookmarks to sidebar
     - drag from link to sidebar
     - [Recommended drag types](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types)
@@ -102,10 +88,6 @@
     - j+k hotkeys to change group selection
 - options
   - base styling
-  - toggles
-    - features
-      - search
-      - sync
   - fix field tabbing
   - open tools on debug
 - validation
@@ -114,13 +96,15 @@
   - validate audible flag
 - private browsing
 - publish
-  - setup self-hosted with unique id on github
-  - clean up console messaging
   - clear out repo
   - review @todos
   - determine min version
   - turn on vuejs production mode
   - fix id
+- hotkeys
+  - move to new group
+  - next group
+  - previous group
 
 #### p2
 - testing
@@ -145,11 +129,9 @@
   - keyboard navigation (arrows, hotkeys & enter)
 - integration with time tracker API
 - bugs
-  - search text weirdness
   - action
     - fix icon theming
     - groups should be selectable
-    - pinned tab rendering
 - archived groups
 - test with typescript
   - pull in types for redux, web-extensions
@@ -161,23 +143,12 @@
   - 2nd screen for open tabs
   - 2nd screen for config
   - scrollable
-  - dark theme
-- replace tab navigation hotkeys for more consistent group handling
 - investigate mobile version
-- sync
 - load/save backup
-- update tests for new state schema
-- drag and drop
-  - groups in sidebar
-  - between windows
-  - handle external url list drop
 - sidebar
   - detect if favicons require background
   - bubbling audio indicator
-  - tab search clear
-  - tab close button
   - fade for overflow
-  - out of window drop target makes new window?
 - open main tab groups page with hotkey
 - add interval to detect state drift
 

@@ -10,7 +10,7 @@
   },
 
   "sidebar_name": {
-    "message": "Grouped Tabs",
+    "message": "Tabulate",
     "description": "Name of the sidebar."
   },
 
@@ -81,11 +81,6 @@
 
   "options_sidebar_show_tabs": {
     "message": "Show tabs",
-    "description": ""
-  },
-
-  "options_sidebar_show_pinned_tabs": {
-    "message": "Show pinned tabs",
     "description": ""
   },
 

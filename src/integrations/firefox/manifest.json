@@ -2,10 +2,11 @@
   "manifest_version": 2,
   "name": "__MSG_extension_name__",
   "description": "__MSG_extension_description__",
-  "version": "0.0.10",
-  "applications": {
+  "version": "0.0.11",
+  "browser_specific_settings": {
     "gecko": {
-      "id": "{65afae73-8786-42d1-a6e7-95dc884dfb3a}"
+      "id": "{65afae73-8786-42d1-a6e7-95dc884dfb3a}",
+      "strict_min_version": "67.0"
     }
   },
   "permissions": [
@@ -26,12 +27,30 @@
   },
   "browser_action": {
     "browser_style": true,
-    "default_icon": "icons/tabulate.svg",
+    "default_icon": {
+      "16": "icons/tabulate-16.svg",
+      "32": "icons/tabulate-32.svg"
+    },
     "default_title": "__MSG_extension_name__",
-    "default_popup": "action.html"
+    "default_popup": "action.html",
+    "theme_icons": [
+      {
+        "light": "icons/tabulate-16.svg",
+        "dark": "icons/tabulate-16.svg",
+        "size": 16
+      },
+      {
+        "light": "icons/tabulate-32.svg",
+        "dark": "icons/tabulate-32.svg",
+        "size": 32
+      }
+    ]
   },
   "sidebar_action": {
-    "default_icon": "icons/tabulate.svg",
+    "default_icon": {
+      "16": "icons/tabulate-16.svg",
+      "32": "icons/tabulate-32.svg"
+    },
     "default_title": "__MSG_sidebar_name__",
     "default_panel": "sidebar.html",
     "open_at_install": false

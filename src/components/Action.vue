@@ -75,7 +75,6 @@ export default {
       show_tabs: true,
       show_tabs_count: true,
       tab_size: "sm",
-      pinned_tabs: [],
       tab_groups: [],
       theme: null
     }
@@ -159,7 +158,6 @@ export default {
       // Use the extended splice to trigger change detection
       Object.getPrototypeOf( this.search_missed_tab_ids ).splice.apply( this.search_missed_tab_ids, [ 0, this.search_missed_tab_ids.length, ...search_missed_tab_ids ] )
       Object.getPrototypeOf( this.selected_tab_ids ).splice.apply( this.selected_tab_ids, [ 0, this.selected_tab_ids.length, ...new_selected_tab_ids ] )
-      // Object.getPrototypeOf( this.pinned_tabs ).splice.apply( this.pinned_tabs, [ 0, this.pinned_tabs.length, ...tab_groups[ 0 ].tabs ] )
       Object.getPrototypeOf( this.tab_groups ).splice.apply( this.tab_groups, [ 0, this.tab_groups.length, ...tab_groups.slice( 1 ) ] )
 
       state0_window = state_window

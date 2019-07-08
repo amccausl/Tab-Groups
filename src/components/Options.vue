@@ -61,12 +61,6 @@
                 <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_tabs__ }}</span>
               </label>
 
-              <!-- <label v-if="show_tabs" class="checkbox checkbox--nested">
-                <input class="checkbox__input" type="checkbox" v-model="show_pinned_tabs">
-                <span class="checkbox__icon"></span>
-                <span class="checkbox__label" v-once>{{ __MSG_options_sidebar_show_pinned_tabs__ }}</span>
-              </label> -->
-
               <label v-if="show_tabs && features_contexual_identities_enabled" class="checkbox checkbox--nested">
                 <input class="checkbox__input" type="checkbox" v-model="show_tab_context">
                 <span class="checkbox__icon"></span>
@@ -121,7 +115,6 @@ export default {
         show_header: true,
         show_tabs_count: false,
         show_tabs: false,
-        show_pinned_tabs: false,
         show_tab_context: false,
         show_tab_icon_background: false,
       },
@@ -168,9 +161,6 @@ export default {
     __MSG_options_sidebar_show_tabs__() {
       return window.background.getMessage( "options_sidebar_show_tabs" )
     },
-    __MSG_options_sidebar_show_pinned_tabs__() {
-      return window.background.getMessage( "options_sidebar_show_pinned_tabs" )
-    },
     __MSG_options_sidebar_show_tab_context__() {
       return window.background.getMessage( "options_sidebar_show_tab_context" )
     },
@@ -202,14 +192,6 @@ export default {
       },
       set( value ) {
         window.background.setConfig( 'show_tabs_count', value )
-      }
-    },
-    show_pinned_tabs: {
-      get() {
-        return this.preferences.show_pinned_tabs
-      },
-      set( value ) {
-        window.background.setConfig( 'show_pinned_tabs', value )
       }
     },
     show_tab_context: {

@@ -20,7 +20,6 @@ export const LOCALE_KEYS = [
   "options_sidebar_show_header",
   "options_sidebar_show_tabs_count",
   "options_sidebar_show_tabs",
-  "options_sidebar_show_pinned_tabs",
   "options_sidebar_show_tab_context",
   "options_sidebar_show_tab_icon_background",
   "options_use_sync_config",
