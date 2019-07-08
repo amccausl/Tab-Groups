@@ -111,21 +111,73 @@ table {
 
 .section--hero {
   height: 95vh;
+  min-height: 650px;
   background: linear-gradient(135deg, #F14200 0%, #FF8B00 40%, #B50080 100%);
+  text-shadow: rgb(0,0,0,0.2) 0 2px 4px;
 }
 
-.section--version {
+.section--features {
   height: 95vh;
-  background: linear-gradient(90deg, #1aa8b0 0%, #1aa8b0 20%, #082b60 100%);
+  background: linear-gradient(60deg, #0144a8 0%, #082b60 40%, #b5017e 100%);
   color: #e4e4e4;
 }
 
 .section--hero__header {
   color: var(--text-color);
+  font-size: 3em;
+  padding: 16px;
 }
 
 .section--hero__subheader {
   color: var(--text-color);
   font-weight: bold;
   text-transform: uppercase;
+  font-size: 2em;
+  padding: 16px;
+}
+
+.section--hero__addon-button-image {
+  padding: 16px;
+}
+
+.section--interlude {
+  padding: 32px;
+}
+
+.section--interlude__text {
+  padding: 4px;
+  color: #2e4052;
+  font-size: 2em;
+}
+
+.section--interlude__text--lighter {
+  font-weight: lighter;
+}
+
+.section--interlude__text--bolder {
+  font-weight: bolder;
+}
+
+.section--features {
+}
+
+.section--conclusion {
+  min-height: 65vh;
+  padding: 40px 0;
+}
+
+.section--conclusion__header {
+  text-align: center;
+  font-size: 3em;
+  padding: 16px;
+}
+
+.section--conclusion__subheader {
+  text-align: center;
+  font-size: 2em;
+  padding: 16px;
+}
+
+.footer {
+  background: linear-gradient(90deg, #b5017e 0%, #082b60 100%);
 }

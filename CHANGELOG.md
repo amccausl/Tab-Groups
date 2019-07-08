@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.0.11] - 2019-07-07
+
 ### Changed
 - sidebar name & icon
 
@@ -119,6 +121,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - prevent closing last tab group in a window
 
 [Unreleased]: https://github.com/amccausl/tabulate/compare/master...develop
+[0.0.11]: https://github.com/amccausl/tabulate/compare/v0.0.10...v0.0.11
 [0.0.10]: https://github.com/amccausl/tabulate/compare/v0.0.9...v0.0.10
 [0.0.9]: https://github.com/amccausl/tabulate/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/amccausl/tabulate/compare/v0.0.7...v0.0.8
