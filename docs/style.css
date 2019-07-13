@@ -98,6 +98,10 @@ table {
   color: var(--text-color);
 }
 
+.header-nav__icon {
+  color: var(--text-color);
+}
+
 /* Sections */
 
 .section {
@@ -134,6 +138,10 @@ table {
   text-transform: uppercase;
   font-size: 2em;
   padding: 16px;
+}
+
+.section--hero__addon-button {
+  color: var(--text-color);
 }
 
 .section--hero__addon-button-image {
