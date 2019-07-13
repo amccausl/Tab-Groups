@@ -11,8 +11,9 @@
     "debug": "$(npm bin)/web-ext --source-dir dist run --verbose",
     "debug-de": "$(npm bin)/web-ext --source-dir dist run --verbose --firefox firefox-de",
     "lint": "$(npm bin)/eslint src/**/*.mjs",
-    "postinstall": "$(npm bin)/bower install",
-    "pack": "$(npm bin)/web-ext build --source-dir dist"
+    "ext:lint": "cd dist && $(npm bin)/web-ext lint",
+    "ext:pack": "$(npm bin)/web-ext build --source-dir dist",
+    "postinstall": "$(npm bin)/bower install"
   },
   "author": "Alex McCausland <alex.mccausland+tabulate@gmail.com>",
   "license": "MPL-2.0",
