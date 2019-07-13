@@ -180,4 +180,28 @@ table {
 
 .footer {
   background: linear-gradient(90deg, #b5017e 0%, #082b60 100%);
+  display: flex;
+  justify-content: space-around;
+}
+
+.footer-section {
+  display: flex;
+  color: white;
+  padding: 24px;
+}
+
+.footer-section__header {
+  text-transform: uppercase;
+  color: white;
+  padding: 2px;
+}
+
+.footer-section__link-item {
+  padding: 2px;
+}
+
+.footer-section__link {
+  color: white;
+  text-decoration: none;
+  padding: 2px 12px
 }
