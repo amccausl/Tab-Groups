@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 - audio icon on sidebar tab in system theme
+- fix themed handling for favicons
 
 ## [0.0.11] - 2019-07-07
 

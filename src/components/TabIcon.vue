@@ -1,6 +1,9 @@
 <template>
   <div :class="bem( 'tab-icon', { 'is-loading': tab.status === 'loading' } )">
-    <img v-if="error_url !== icon_url" class="tab-icon__img" :src="icon_url" :style="{ height: `${ size }px`, width: `${ size }px` }" @error="onIconLoadError"/>
+    <img v-if="! icon.is_svg && error_url !== icon.url" class="tab-icon__img" :src="icon.url" :style="{ height: `${ size }px`, width: `${ size }px` }" @error="onIconLoadError"/>
+    <svg v-if="icon.is_svg" :class="bem( 'tab-icon__img', { 'is-svg': true, theme } )">
+      <use :xlink:href="`${ icon.url }#icon`"></use>
+    </svg>
     <svg v-if="tab.muted" :class="[ bem( 'tab-icon__state', { theme } ), 'audio-mute-icon']" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
         @click.prevent="unmuteTab( $event, tab.id )"
     >
@@ -45,46 +48,42 @@ export default {
   data() {
     return {
       error_url: null,
-      window_id: window.current_window_id,
     }
   },
   computed: {
-    icon_url() {
+    icon() {
+      // Handle icons blocked by app security
       switch( this.tab.icon_url ) {
         case "chrome://mozapps/skin/extensions/extensionGeneric-16.svg":
-          return "/favicons/extensionGeneric.svg"
+          return { is_svg: true, url: "/favicons/firefox-addon.svg" }
         case "chrome://branding/content/icon32.png":
-          // @todo handle system theme
-          if( this.theme === "dark" ) {
-            return `/favicons/firefox-logo-glyph.svg`
-          }
-      }
-
-      // Add mapping for icons blocked by tracking protection
-      // Twitter
-      if( this.tab.url.startsWith( "https://twitter.com" ) ) {
-        return `/favicons/twitter.svg`
-      }
-      // Google
-      if( this.tab.url.startsWith( "https://mail.google.com" ) ) {
-        return `/favicons/google/mail.ico`
-      }
-      if( this.tab.url.startsWith( "https://docs.google.com/document" ) ) {
-        return `/favicons/google/document.ico`
-      }
-      if( this.tab.url.startsWith( "https://docs.google.com/presentation" ) ) {
-        return `/favicons/google/presentation.ico`
+          return { is_svg: true, url: "/favicons/firefox-logo.svg" }
       }
 
       if( this.tab.url.startsWith( "about:" ) ) {
         if( this.tab.url === 'about:debugging' || this.tab.url === 'about:config' || this.tab.url === 'about:newtab' ) {
-          // @todo handle system theme
-          if( this.theme === "dark" ) {
-            return `/favicons/firefox-logo-glyph.svg`
-          }
+          return { is_svg: true, url: "/favicons/firefox-logo.svg" }
         }
       }
-      return this.tab.icon_url
+
+      // Handle icons blocked by tracking protection
+      // Twitter
+      if( this.tab.url.startsWith( "https://twitter.com" ) ) {
+        return { is_svg: false, url: "/favicons/twitter.svg" }
+      }
+      // Google
+      if( this.tab.url.startsWith( "https://mail.google.com" ) ) {
+        return { is_svg: false, url: "/favicons/google/mail.ico" }
+      }
+      if( this.tab.url.startsWith( "https://docs.google.com/document" ) ) {
+        return { is_svg: false, url: "/favicons/google/document.ico" }
+      }
+      if( this.tab.url.startsWith( "https://docs.google.com/presentation" ) ) {
+        return { is_svg: false, url: "/favicons/google/presentation.ico" }
+      }
+
+      // Remaining icons
+      return { is_svg: false, url: this.tab.icon_url }
     },
   },
   created() {
@@ -94,12 +93,12 @@ export default {
     muteTab( event ) {
       console.info('muteTab', this.tab.id)
       event.stopPropagation()
-      window.background.muteTab( window.store, this.window_id, this.tab.id )
+      window.background.muteTab( window.store, window.current_window_id, this.tab.id )
     },
     unmuteTab( event ) {
       console.info('unmuteTab', this.tab.id)
       event.stopPropagation()
-      window.background.unmuteTab( window.store, this.window_id, this.tab.id )
+      window.background.unmuteTab( window.store, window.current_window_id, this.tab.id )
     },
     onIconLoadError( event ) {
       console.info('onIconLoadError', event, this.tab.id, this.tab.icon_url)
@@ -132,6 +131,26 @@ $tab-icon__state--size: 12px !default;
   &__img {
     width: $tab-icon--size;
     height: $tab-icon--size;
+
+    &--is-svg#{&}--theme-dark {
+      fill: $grey-30;
+    }
+
+    &--is-svg#{&}--theme-light {
+      fill: $ink-90;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      &--is-svg#{&}--theme-system {
+        fill: $grey-30;
+      }
+    }
+
+    @media (prefers-color-scheme: light) {
+      &--is-svg#{&}--theme-system {
+        fill: $ink-90;
+      }
+    }
   }
 
   &__state {
