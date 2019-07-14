@@ -130,7 +130,6 @@
 - integration with time tracker API
 - bugs
   - action
-    - fix icon theming
     - groups should be selectable
 - archived groups
 - test with typescript
@@ -139,7 +138,6 @@
 - revisit tab design
   - with mobile and new tab page layouts
 - action
-  - update icons for dynamic colours
   - 2nd screen for open tabs
   - 2nd screen for config
   - scrollable

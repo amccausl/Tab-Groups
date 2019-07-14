@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.0.12] - 2019-07-14
+
+### Fixed
+- audio icon on sidebar tab in system theme
+- fix themed handling for favicons
+
 ## [0.0.11] - 2019-07-07
 
 ### Changed
@@ -121,6 +127,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - prevent closing last tab group in a window
 
 [Unreleased]: https://github.com/amccausl/tabulate/compare/master...develop
+[0.0.12]: https://github.com/amccausl/tabulate/compare/v0.0.11...v0.0.12
 [0.0.11]: https://github.com/amccausl/tabulate/compare/v0.0.10...v0.0.11
 [0.0.10]: https://github.com/amccausl/tabulate/compare/v0.0.9...v0.0.10
 [0.0.9]: https://github.com/amccausl/tabulate/compare/v0.0.8...v0.0.9
