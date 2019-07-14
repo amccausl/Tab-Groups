@@ -6,6 +6,8 @@
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css?family=Work+Sans:300,400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <title>Tabulate Add-On</title>
   </head>
   <body>
@@ -25,39 +27,69 @@
           <li class="header-nav__item"><a class="header-nav__item-link" href="mailto:alex.mccausland+tabulate@gmail.com">Feedback</a></li>
           <li class="header-nav__item"><a class="header-nav__item-link" href="https://github.com/amccausl/Tabulate/issues">Support</a></li>
         </ul>
-        <a href="https://github.com/amccausl/Tabulate"><img src="assets/github-logo.svg" height="32px" width="32px" alt="github"></a>
+        <a class="header-nav__icon" href="https://github.com/amccausl/Tabulate"><img src="assets/github-logo.svg" height="32px" width="32px" alt="github"></a>
       </nav>
     </header>
     <main>
       <section class="section section--hero">
         <div>
           <h2 class="section__header section--hero__header">A Firefox extension<br>that lets you organize tabs</h2>
-          <h3 class="section__subheader section--hero__subheader">Take control of your browser!</h3>
+          <p class="section__subheader section--hero__subheader">Take control of your browser!</p>
           <a class="section_addon-button section--hero__addon-button" href="https://addons.mozilla.org/en-US/firefox/addon/tabulate/">
             <img src="assets/get-addon-logo.png" class="section_addon-button-image section--hero__addon-button-image" height="90px" width="181px" alt="Get the add-on">
           </a>
         </div>
       </section>
       <section class="section section--interlude">
-        <div class="section__text section--interlude__text section--interlude__text--lighter">Lots of tabs</div>
-        <div class="section__text section--interlude__text">adding</div>
-        <div class="section__text section--interlude__text section--interlude__text--bolder">up?</div>
+        <p>
+          <div class="section__text section--interlude__text section--interlude__text--lighter">Lots of tabs</div>
+          <div class="section__text section--interlude__text">adding</div>
+          <div class="section__text section--interlude__text section--interlude__text--bolder">up?</div>
+        </p>
       </section>
       <section class="section section--features">
-        <div>Tabulate lets you gather related tabs into groups, so that you can focus on your project</div>
-        <div>Using tabs in the sidebar lets you see more, and deftly move between groups</div>
-        <div>Save groups for later</div>
-        <div>Mute entire groups</div>
+        <p>Tabulate lets you gather related tabs into groups, so that you can focus on your project</p>
+        <p>Using tabs in the sidebar lets you see more, and deftly move between groups</p>
+        <p>Save groups for later</p>
+        <p>Mute entire groups</p>
       </section>
       <section class="section section--conclusion">
-        <h2 class="section__header section--conclusion__header">Everything we do happens in a browser</h2>
-        <h3 class="section__subheader section--conclusion__subheader">Tabulate lets you focus on your task</h3>
-        <h3 class="section__subheader section--conclusion__subheader">No matter the size</h3>
+        <p class="section__header section--conclusion__header">Everything we do happens in a browser</p>
+        <p class="section__subheader section--conclusion__subheader">Tabulate lets you focus on your task</p>
+        <p class="section__subheader section--conclusion__subheader">No matter the size</p>
         <a href="https://addons.mozilla.org/en-US/firefox/addon/tabulate/"><img src="assets/get-addon-logo.png" height="90px" width="181px" alt="Get the add-on"></a>
       </section>
     </main>
     <footer class="footer">
-      <br>
+      <section class="footer-section">
+        <h3 class="footer-section__header">Find Out More</h3>
+        <ul>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://addons.mozilla.org/en-US/firefox/addon/tabulate">Tabulate on Mozilla</a></li>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://github.com/amccausl/Tabulate">Tabulate on GitHub</a></li>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://github.com/amccausl/Tabulate/releases">Changelog</a></li>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://github.com/amccausl/Tabulate/wiki/Contribute">Contribute</a></li>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://github.com/amccausl/Tabulate/wiki/About">About Tabulate</a></li>
+        </ul>
+      </section>
+      <section class="footer-section">
+        <h3 class="footer-section__header">Support</h3>
+        <ul>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://github.com/amccausl/Tabulate/wiki/Tutorials">Tutorials</a></li>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://github.com/amccausl/Tabulate/wiki/Installation-Guide">Installation Guide</a></li>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://github.com/amccausl/Tabulate/wiki/Feedback">Feedback</a></li>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://github.com/amccausl/Tabulate/wiki/FAQ">FAQ</a></li>
+        </ul>
+      </section>
+      <section class="footer-section">
+        <h3 class="footer-section__header">Information</h3>
+        <ul>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://github.com/amccausl/Tabulate/wiki/Privacy">Data Privacy</a></li>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://www.mozilla.org/en-US/MPL/">Mozilla Public License 2.0</a></li>
+          <li class="footer-section__link-item"><a class="footer-section__link" href="https://github.com/amccausl/Tabulate/wiki/Terms-and-Conditions">Terms &amp; Conditions</a></li>
+        </ul>
+      </section>
+      <section class="footer-section">
+      </section>
     </footer>
   </body>
 </html>
