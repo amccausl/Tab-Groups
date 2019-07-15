@@ -55,6 +55,7 @@
                   <path d="M2 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"></path>
                 </svg>
               </button>
+              <div v-if="is_searching" :class="[ `tab-groups-list-item-header--${ theme }__search-progress-ink` ]" :style="{ width: `calc( ( ${ active_tab_group_id === tab_group.id ? '100vw - 5px' : '100vw' } ) * ${ 1 - tab_group.search_queued_tabs_count / tab_group.tabs.length } )` }"></div>
             </div>
           </div>
           <!-- <transition-group v-if="tab_group.open && show_tabs && ! isTabGroupDragSource( tab_group )" :class="[ `sidebar-tab-group-tabs-list--${ theme }` ]" tag="div" :name="`sidebar-tab-group-tabs-list--${ theme }__item--transition`"> -->
@@ -309,6 +310,7 @@ export default {
 
         let is_group_audible = false
         if( this.is_searching ) {
+          tab_group.search_queued_tabs_count = 0
           tab_group.search_matched_tabs_count = 0
         }
         tab_group.tabs.forEach( tab => {
@@ -318,6 +320,8 @@ export default {
             }
             if( ! state_window.search.queued_tab_ids.includes( tab.id ) ) {
               search_missed_tab_ids.push( tab.id )
+            } else {
+              tab_group.search_queued_tabs_count++
             }
           }
           if( tab.id === state_window.active_tab_id ) {
@@ -1044,6 +1048,21 @@ $tab-groups-list-item-header__themes: (
   &--drag-tab-target &__carat-icon,
   &--drag-tab-target &__icon {
     fill: $white-100;
+  }
+
+  &__search-progress-ink {
+    @include slow-transition;
+    transition-property: width;
+    width: 0;
+    height: 4px;
+    background-color: $magenta-50;
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+  }
+
+  &--active &__search-progress-ink {
+    left: 5px;
   }
 
   // Separate hover effect for doorhanger
