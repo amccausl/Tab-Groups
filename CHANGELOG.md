@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 - display bug for missing favicons
+- "new window" Chinese translation
 
 ## [0.0.12] - 2019-07-14
 
