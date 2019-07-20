@@ -5,9 +5,7 @@ const debug = createDebug( "tabulate:integrations:helpers" )
 // @todo need way to clean this up
 const tab_group_id_map = new Map()
 
-/**
- * Fetch the group id for a tab from session storage
- */
+/** Fetch the group id for a tab from session storage */
 export function getTabGroupId( tab_id ) {
   debug( `browser.sessions.getTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY } )` )
   return new Promise( ( resolve, reject ) => {
@@ -21,9 +19,7 @@ export function getTabGroupId( tab_id ) {
   })
 }
 
-/**
- * Save the tab preview image and details to the
- */
+/** Save the tab preview image and details to the session */
 export function setTabGroupId( tab_id, tab_group_id ) {
   debug( `browser.sessions.setTabValue( ${ tab_id }, ${ TAB_GROUP_ID_KEY }, ${ tab_group_id } )` )
   tab_group_id_map.set( tab_id, tab_group_id )
