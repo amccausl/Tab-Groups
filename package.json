@@ -43,9 +43,9 @@
     "rollup-plugin-node-resolve": "5.2.0",
     "rollup-plugin-replace": "2.2.0",
     "rollup-plugin-vue": "5.0.1",
-    "sass": "1.22.5",
-    "tap": "14.4.1",
+    "sass": "1.22.7",
+    "tap": "14.4.2",
     "vue-template-compiler": "2.6.10",
-    "web-ext": "3.1.0"
+    "web-ext": "3.1.1"
   }
 }
