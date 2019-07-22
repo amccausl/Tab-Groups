@@ -350,7 +350,7 @@ export function getTabMoveData( state, source_data, target_data ) {
           break
         }
         // Reset the state, try again
-        source_data.fill( null )
+        source_data.tabs.fill( null )
       }
       // @todo if scan doesn't find anything, dragging from another instance of firefox, can process as URL
     } else {

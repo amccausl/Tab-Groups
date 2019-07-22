@@ -329,7 +329,9 @@ export function openTabGroupsPage() {
   browser.tabs.create( { url } )
     .then( () => {
       // We don't want to sync this URL ever nor clutter the users history
-      browser.history.deleteUrl( { url } )
+      if( browser.history != null ) {
+        browser.history.deleteUrl( { url } )
+      }
     })
 }
 
@@ -341,7 +343,9 @@ export function openWelcomePage() {
   browser.tabs.create( { url } )
     .then( () => {
       // We don't want to sync this URL ever nor clutter the users history
-      browser.history.deleteUrl( { url } )
+      if( browser.history != null ) {
+        browser.history.deleteUrl( { url } )
+      }
     })
 }
 
