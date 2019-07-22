@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - display bug for missing favicons
 - "new window" Chinese translation
 - "system theme" Japanese translation
+- error on native drag for all tabs from 2nd to 1st window
+- move active tab to other window
 
 ## [0.0.12] - 2019-07-14
 

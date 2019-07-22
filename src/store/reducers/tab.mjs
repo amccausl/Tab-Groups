@@ -302,9 +302,9 @@ export function moveTab( state, { tab_id, window_id, index } ) {
 }
 
 /**
- * Return a copy of state with tab identified by source_data moved to the target
+ * Return a copy of state with tabs identified by source_data moved to the target
  * @todo what if source location doesn't match info
- * @param state
+ * @param state0
  * @param source_data
  *   { window_id, tab_ids }
  *   { window_id, index, pinned }
@@ -316,8 +316,8 @@ export function moveTab( state, { tab_id, window_id, index } ) {
  *   { window_id, tab_group_id, tab_group_index }
  *   { window_id, tab_group }
  */
-export function moveTabs( state, { source_data, target_data } ) {
-  let { windows } = state
+export function moveTabs( state0, { source_data, target_data } ) {
+  let { windows } = state0
 
   // Target is new window
   if( target_data.window ) {
@@ -327,101 +327,138 @@ export function moveTabs( state, { source_data, target_data } ) {
   // @todo If source is same as target, noop
   // @todo if active tab is moved, switch to next one
   // @todo if active tab is moved, update last active
-  return {
-    ...state,
-    windows: windows.map( window => {
-      if( window.id !== source_data.window_id && window.id !== target_data.window_id ) {
-        return window
-      }
 
-      let active_tab_group_id = window.active_tab_group_id
-      let window_active_tab_id = window.active_tab_id || null
-      let tab_groups = window.tab_groups.map( tab_group => {
-        let { tabs, active_tab_id, last_active } = tab_group
+  windows = windows.map( window0 => {
+    if( window0.id !== source_data.window_id && window0.id !== target_data.window_id ) {
+      return window0
+    }
 
-        if( tabs.some( tab => source_data.tabs.includes( tab ) ) ) {
-          const filtered_tabs = []
+    let active_tab_group_id = window0.active_tab_group_id
+    let window_active_tab_id = window0.active_tab_id || null
+    let tab_groups = window0.tab_groups.map( tab_group0 => {
+      let { tabs, active_tab_id, last_active } = tab_group0
 
-          for( let tab of tabs ) {
-            if( ! source_data.tabs.includes( tab ) ) {
-              filtered_tabs.push( tab )
-              if( active_tab_id == null ) {
-                active_tab_id = tab.id
-                if( window_active_tab_id == null ) {
-                  window_active_tab_id = tab.id
-                }
-              }
-            } else {
-              if( tab.id === active_tab_id && tab_group.id !== target_data.tab_group_id ) {
-                active_tab_id = null
-                // If the active tab in the active group is moving, activate new group
-                if( active_tab_group_id === tab_group.id && target_data.tab_group_id !== 0 ) {
-                  active_tab_group_id = target_data.tab_group_id
-                }
-              }
+      if( tabs.some( tab => source_data.tabs.includes( tab ) ) ) {
+        const filtered_tabs = []
 
-              if( tab.id === window_active_tab_id && source_data.window_id !== target_data.window_id ) {
-                window_active_tab_id = null
+        for( let tab of tabs ) {
+          if( ! source_data.tabs.includes( tab ) ) {
+            filtered_tabs.push( tab )
+            if( active_tab_id == null ) {
+              active_tab_id = tab.id
+              if( window_active_tab_id == null ) {
+                window_active_tab_id = tab.id
               }
             }
-          }
-
-          if( active_tab_id == null && filtered_tabs.length ) {
-            active_tab_id = filtered_tabs[ filtered_tabs.length - 1 ].id
-          }
-
-          if( window_active_tab_id == null && filtered_tabs.length ) {
-            window_active_tab_id = filtered_tabs[ filtered_tabs.length - 1 ].id
-          }
-
-          tabs = filtered_tabs
-        }
-
-        if( target_data.tab_group_id === tab_group.id ) {
-          tabs = [ ...tabs ]
-          if( target_data.tab_group_index == null ) {
-            tabs.push( ...source_data.tabs )
           } else {
-            tabs.splice( target_data.tab_group_index, 0, ...source_data.tabs )
-          }
-          if( window_active_tab_id && tabs.some( tab => tab.id === window_active_tab_id ) ) {
-            active_tab_id = window_active_tab_id
-            last_active = ( new Date() ).getTime()
-          }
-        }
+            if( tab.id === active_tab_id && tab_group0.id !== target_data.tab_group_id ) {
+              active_tab_id = null
+              // If the active tab in the active group is moving, activate new group
+              if( active_tab_group_id === tab_group0.id && target_data.tab_group_id !== 0 && source_data.window_id === target_data.window_id ) {
+                active_tab_group_id = target_data.tab_group_id
+              }
+            }
 
-        if( tabs !== tab_group.tabs ) {
-          tab_group = {
-            ...tab_group,
-            active_tab_id,
-            last_active,
-            tabs,
-            tabs_count: tabs.length
+            if( tab.id === window_active_tab_id && source_data.window_id !== target_data.window_id ) {
+              window_active_tab_id = null
+            }
           }
         }
 
-        return tab_group
-      })
-
-      if( window.id === target_data.window_id && target_data.tab_group ) {
-        const tab_group = { ...target_data.tab_group }
-
-        if( tab_group.tabs.some( tab => tab.id === window_active_tab_id ) ) {
-          tab_group.active_tab_id = window_active_tab_id
-          tab_group.last_active = ( new Date() ).getTime()
-          active_tab_group_id = tab_group.id
+        if( active_tab_id == null && filtered_tabs.length ) {
+          active_tab_id = filtered_tabs[ filtered_tabs.length - 1 ].id
         }
-        tab_groups.push( tab_group )
+
+        if( window_active_tab_id == null && filtered_tabs.length ) {
+          window_active_tab_id = filtered_tabs[ filtered_tabs.length - 1 ].id
+        }
+
+        tabs = filtered_tabs
       }
 
-      return {
-        ...window,
-        tab_groups,
-        active_tab_group_id,
-        active_tab_id: window_active_tab_id
+      if( target_data.tab_group_id === tab_group0.id ) {
+        tabs = [ ...tabs ]
+        if( target_data.tab_group_index == null ) {
+          tabs.push( ...source_data.tabs )
+        } else {
+          tabs.splice( target_data.tab_group_index, 0, ...source_data.tabs )
+        }
+        if( window_active_tab_id && tabs.some( tab => tab.id === window_active_tab_id ) ) {
+          active_tab_id = window_active_tab_id
+          last_active = ( new Date() ).getTime()
+        }
       }
+
+      if( tabs === tab_group0.tabs ) {
+        return tab_group0
+      }
+
+      if( tabs.length === 0 ) {
+        active_tab_id = null
+      } else if( active_tab_id == null ) {
+        active_tab_id = tabs[ tabs.length - 1 ].id
+      }
+
+      const tab_group1 = {
+        ...tab_group0,
+        active_tab_id,
+        last_active,
+        tabs,
+        tabs_count: tabs.length
+      }
+
+      return tab_group1
     })
+
+    if( window0.id === target_data.window_id && target_data.tab_group ) {
+      const tab_group = { ...target_data.tab_group }
+
+      if( tab_group.tabs.some( tab => tab.id === window_active_tab_id ) ) {
+        tab_group.active_tab_id = window_active_tab_id
+        tab_group.last_active = ( new Date() ).getTime()
+        active_tab_group_id = tab_group.id
+      }
+      tab_groups.push( tab_group )
+    }
+
+    if( window_active_tab_id == null && active_tab_group_id != null ) {
+      const active_tab_group = tab_groups.find( tab_group => tab_group.id === active_tab_group_id )
+      if( active_tab_group ) {
+        window_active_tab_id = active_tab_group.active_tab_id
+      }
+    }
+
+    const window1 = {
+      ...window0,
+      tab_groups,
+      active_tab_group_id,
+    }
+
+    window1.active_tab_id = window_active_tab_id
+    if( window_active_tab_id != null ) {
+      window1.highlighted_tab_ids = [ window_active_tab_id ]
+    } else {
+      window1.highlighted_tab_ids = []
+    }
+
+    return window1
+  })
+
+  windows = windows.filter( window => {
+    for( const tab_group of window.tab_groups ) {
+      if( tab_group.tabs_count > 0 ) {
+        return true
+      }
+    }
+    return false
+  })
+
+  const state1 = {
+    ...state0,
+    windows,
   }
+
+  return state1
 }
 
 export function removeTab( state, { tab_id, window_id } ) {
