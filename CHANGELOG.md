@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.0.13] - 2019-07-21
+
+### Added
+- open welcome page on install
+
+### Changed
+- search progress UI
+
+### Fixed
+- display bug for missing favicons
+- "new window" Chinese translation
+- "system theme" Japanese translation
+- error on native drag for all tabs from 2nd to 1st window
+- move active tab to other window
+
 ## [0.0.12] - 2019-07-14
 
 ### Fixed
@@ -127,6 +142,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - prevent closing last tab group in a window
 
 [Unreleased]: https://github.com/amccausl/tabulate/compare/master...develop
+[0.0.13]: https://github.com/amccausl/tabulate/compare/v0.0.12...v0.0.13
 [0.0.12]: https://github.com/amccausl/tabulate/compare/v0.0.11...v0.0.12
 [0.0.11]: https://github.com/amccausl/tabulate/compare/v0.0.10...v0.0.11
 [0.0.10]: https://github.com/amccausl/tabulate/compare/v0.0.9...v0.0.10

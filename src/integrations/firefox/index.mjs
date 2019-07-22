@@ -9,7 +9,7 @@ import {
   moveGroupAction,
   muteGroupAction,
   unmuteGroupAction,
-} from '../../store/actions.mjs'
+} from "../../store/actions.mjs"
 import {
   createTabGroup,
   default_config,
@@ -17,7 +17,7 @@ import {
   getNewTabGroupId,
   getTabMoveData,
   getWindow,
-} from '../../store/helpers.mjs'
+} from "../../store/helpers.mjs"
 
 import {
   ignorePendingMove,
@@ -29,10 +29,10 @@ import {
 } from "./helpers.mjs"
 
 const debug = createDebug( "tabulate:integrations" )
-export const LOCAL_CONFIG_KEY = 'config'
-export const SYNC_CONFIG_KEY = 'config'
-export const WINDOW_TAB_GROUPS_KEY = 'tab_groups'
-export const TAB_PREVIEW_IMAGE_KEY = 'preview_image'
+export const LOCAL_CONFIG_KEY = "config"
+export const SYNC_CONFIG_KEY = "config"
+export const WINDOW_TAB_GROUPS_KEY = "tab_groups"
+export const TAB_PREVIEW_IMAGE_KEY = "preview_image"
 
 export { runTabSearch } from "./search.mjs"
 
@@ -132,7 +132,7 @@ export function isTabHideEnabled( browser_tabs ) {
       },
       ( error ) => {
         if( error.fileName === "chrome://browser/content/ext-tabs.js" && error.lineNumber === 0 ) {
-          debug('detected tabhide disabled', error)
+          debug( "detected tabhide disabled", error )
           return false
         }
         return true
@@ -161,7 +161,7 @@ export function getTabState( browser_tab ) {
     // @todo highlighted?
   }
 
-  if( browser_tab.hasOwnProperty( 'audible' ) && browser_tab.audible ) {
+  if( browser_tab.hasOwnProperty( "audible" ) && browser_tab.audible ) {
     tab.audible = true
   }
 
@@ -303,18 +303,16 @@ export function openOptionsPage() {
 export function openSidebarPage() {
   const url = browser.extension.getURL( "sidebar.html" )
 
-  browser.tabs.create({ url })
+  browser.tabs.create( { url } )
     .then( () => {
       // We don't want to sync this URL ever nor clutter the users history
       if( browser.history != null ) {
-        browser.history.deleteUrl({ url })
+        browser.history.deleteUrl( { url } )
       }
     })
 }
 
-/**
- * Open the extension tab groups page in new tab
- */
+/** Open the extension tab groups page in new tab */
 export function openTabGroupsPage() {
   // Using sidebar for now
   // browser.sidebarAction.open()
@@ -325,19 +323,33 @@ export function openTabGroupsPage() {
   //     }
   //   )
 
-  const url = browser.extension.getURL( "tab-groups.html" )
+  const url = browser.extension.getURL( "sidebar.html" )
 
-  debug('browser.tabs.create', { url })
-  browser.tabs.create({ url })
+  debug( "browser.tabs.create", { url } )
+  browser.tabs.create( { url } )
     .then( () => {
       // We don't want to sync this URL ever nor clutter the users history
-      browser.history.deleteUrl({ url })
+      if( browser.history != null ) {
+        browser.history.deleteUrl( { url } )
+      }
     })
 }
 
-/**
- * Open a given tab group
- */
+/** Open the onboarding page in a new tab */
+export function openWelcomePage() {
+  const url = "https://tabulate.app/welcome"
+
+  debug( "browser.tabs.create", { url } )
+  browser.tabs.create( { url } )
+    .then( () => {
+      // We don't want to sync this URL ever nor clutter the users history
+      if( browser.history != null ) {
+        browser.history.deleteUrl( { url } )
+      }
+    })
+}
+
+/** Open a given tab group */
 export function openTabGroup( store, window_id, target_tab_group_id ) {
   const state0 = store.getState()
   const window0 = getWindow( state0, window_id )
@@ -403,24 +415,24 @@ export function setTabActive( store, window_id, tab_id ) {
  * Close the given tab
  */
 export function closeTab( store, tab_id ) {
-  debug('browser.tabs.remove', [ tab_id ])
+  debug( "browser.tabs.remove", [ tab_id ] )
   return browser.tabs.remove( [ tab_id ] )
 }
 
 export function muteTab( store, window_id, tab_id ) {
   const change_info = { muted: true }
-  debug('browser.tabs.update', tab_id, change_info)
+  debug( "browser.tabs.update", tab_id, change_info )
   return browser.tabs.update( tab_id, change_info )
 }
 
 export function unmuteTab( store, window_id, tab_id ) {
   const change_info = { muted: false }
-  debug('browser.tabs.update', tab_id, change_info)
+  debug( "browser.tabs.update", tab_id, change_info )
   return browser.tabs.update( tab_id, change_info )
 }
 
 export function createGroup( store, window_id, source_data ) {
-  debug(`background.createGroup( ${ window_id } )`, source_data)
+  debug( `background.createGroup( ${ window_id } )`, source_data )
   const state = store.getState()
   const tab_group = createTabGroup( getNewTabGroupId( state ), [] )
 
@@ -453,7 +465,7 @@ export function createGroup( store, window_id, source_data ) {
 }
 
 export async function closeTabGroup( store, window_id, tab_group_id ) {
-  debug('closeTabGroup', window_id, tab_group_id)
+  debug( "closeTabGroup", window_id, tab_group_id )
   const state = store.getState()
   for( let window of state.windows ) {
     if( window.id !== window_id ) {
@@ -466,7 +478,7 @@ export async function closeTabGroup( store, window_id, tab_group_id ) {
       return store.dispatch( removeGroupAction( tab_group_id, window.id ) )
     }
   }
-  console.warn('closeTabGroup: group not found')
+  console.warn( "closeTabGroup: group not found" )
   // @todo return empty promise
 }
 
@@ -478,7 +490,7 @@ export function muteTabGroup( store, window_id, tab_group_id ) {
     return
   }
   const change_info = { muted: true }
-  debug('browser.tabs.update', change_info)
+  debug( "browser.tabs.update", change_info )
   return Promise.all(
     tab_group.tabs
       .filter( tab => tab.audible && ! tab.muted )
@@ -496,10 +508,10 @@ export function unmuteTabGroup( store, window_id, tab_group_id ) {
     return
   }
   const change_info = { muted: false }
-  debug('browser.tabs.update', change_info)
+  debug( "browser.tabs.update", change_info )
   return Promise.all(
     tab_group.tabs
-      .filter( tab => tab.hasOwnProperty( 'muted' ) )
+      .filter( tab => tab.hasOwnProperty( "muted" ) )
       .map( tab => browser.tabs.update( tab.id, change_info ) )
   ).then( () => {
     store.dispatch( unmuteGroupAction( tab_group_id, window_id ) )
@@ -528,7 +540,7 @@ export function setHighlightedTabIds( store, window_id, tab_ids ) {
       tab_index++
     }
   }
-  debug('browser.tabs.highlight', { windowId: window_id, tabs: tab_indices })
+  debug( "browser.tabs.highlight", { windowId: window_id, tabs: tab_indices } )
   browser.tabs.highlight( { windowId: window_id, tabs: tab_indices } )
 }
 
@@ -541,7 +553,7 @@ export function setHighlightedTabIds( store, window_id, tab_ids ) {
  * @param target_data
  */
 export function moveTabsToGroup( store, source_data, target_data ) {
-  debug('background.moveTabsToGroup', source_data, target_data)
+  debug( "background.moveTabsToGroup", source_data, target_data )
   const updates = []
 
   if( source_data.links != null ) {
@@ -571,7 +583,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
 
   return Promise.all( updates )
     .then( browser_tabs => {
-      debug('browser_tabs', browser_tabs)
+      debug( "browser_tabs", browser_tabs )
 
       if( browser_tabs.length > 0 ) {
         source_data = {
@@ -611,7 +623,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
           move_properties.windowId = target_data.window_id
         }
         ignorePendingMove( tab_ids )
-        debug( 'browser.tabs.move', tab_ids, move_properties )
+        debug( "browser.tabs.move", tab_ids, move_properties )
         updates.push( browser.tabs.move( tab_ids, move_properties ) )
       }
 
@@ -631,7 +643,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
  *   window_new
  */
 export async function moveTabGroup( store, source_data, target_data ) {
-  debug('moveTabGroup', source_data, target_data)
+  debug( "moveTabGroup", source_data, target_data )
 
   const state0 = store.getState()
   const source_window = state0.windows.find( window => window.id === source_data.window_id )

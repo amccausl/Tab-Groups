@@ -1,6 +1,6 @@
 <template>
   <div :class="bem( 'tab-icon', { 'is-loading': tab.status === 'loading' } )">
-    <img v-if="! icon.is_svg && error_url !== icon.url" class="tab-icon__img" :src="icon.url" :style="{ height: `${ size }px`, width: `${ size }px` }" @error="onIconLoadError"/>
+    <img v-if="icon.url && ! icon.is_svg && error_url !== icon.url" class="tab-icon__img" :src="icon.url" :style="{ height: `${ size }px`, width: `${ size }px` }" @error="onIconLoadError"/>
     <svg v-if="icon.is_svg" :class="bem( 'tab-icon__img', { 'is-svg': true, theme } )">
       <use :xlink:href="`${ icon.url }#icon`"></use>
     </svg>

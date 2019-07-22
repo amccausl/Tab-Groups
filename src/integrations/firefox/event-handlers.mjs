@@ -41,7 +41,6 @@ export function ignorePendingMove( tab_ids ) {
  * Bind change events for the browser to dispatch operations on the store
  */
 export function bindBrowserEvents( browser, browser_state, store ) {
-  // @todo need way to turn off console
   const hide_tab_ids = new Set()
   const show_tab_ids = new Set()
 
@@ -49,10 +48,10 @@ export function bindBrowserEvents( browser, browser_state, store ) {
   let last_change = null
   const event_handlers = new Map([
     [ "sessions.onChanged", function onSessionChanged() {
-      debug( 'sessions.onChanged' )
+      debug( "sessions.onChanged" )
     }],
     [ "storage.onChanged", function onStorageChanged( store, changes, area ) {
-      if( area === 'local' && changes[ LOCAL_CONFIG_KEY ] ) {
+      if( area === "local" && changes[ LOCAL_CONFIG_KEY ] ) {
         const config = changes[ LOCAL_CONFIG_KEY ].newValue || {}
         for( let key of Object.keys( default_config ) ) {
           if( ! config.hasOwnProperty( key ) ) {
@@ -63,7 +62,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       }
     }],
     [ "windows.onCreated", function onWindowCreated( store, browser_window ) {
-      if( browser_window.type === 'normal' ) {
+      if( browser_window.type === "normal" ) {
         store.dispatch( addWindowAction( browser_window ) )
       }
     }],
@@ -80,7 +79,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       } else {
         const { index } = getCreateTabTarget( state, browser_tab )
         if( browser_tab.index !== index ) {
-          debug( 'browser.tabs.move', [ browser_tab.id ], { index } )
+          debug( "browser.tabs.move", [ browser_tab.id ], { index } )
           browser.tabs.move( [ browser_tab.id ], { index } )
         }
       }
@@ -101,7 +100,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
     [ "tabs.onUpdated", function onTabUpdated( store, tab_id, change_info, browser_tab ) {
       const state = store.getState()
       // If change_info.audible && tab_group.muted, mute tab
-      if( change_info.hasOwnProperty( 'audible' ) ) {
+      if( change_info.hasOwnProperty( "audible" ) ) {
         for( let window of state.windows ) {
           if( window.id !== browser_tab.windowId ) {
             continue
@@ -125,10 +124,10 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       if( change_info.hasOwnProperty( "discarded" ) ) {
         return
       }
-      if( change_info.hasOwnProperty( 'isArticle' ) ) {
+      if( change_info.hasOwnProperty( "isArticle" ) ) {
         return
       }
-      if( change_info.hasOwnProperty( 'sharingState' ) ) {
+      if( change_info.hasOwnProperty( "sharingState" ) ) {
         return
       }
       const change_info_json = JSON.stringify( change_info )
@@ -137,7 +136,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
         return
       }
       last_change = { tab_id, change_info_json }
-      if( change_info.hasOwnProperty( 'hidden' ) ) {
+      if( change_info.hasOwnProperty( "hidden" ) ) {
         debug( `onTabUpdated( tab_id=${ tab_id }, change_info=${ change_info_json } )`, browser_tab )
         if( change_info.hidden ) {
           hide_tab_ids.add( tab_id )
@@ -164,7 +163,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       const ignore_index = ignore_moves.indexOf( tab_id )
       if( ignore_index > -1 ) {
         ignore_moves.splice( ignore_index, 1 )
-        debug( 'onTabMoved: ignoring event' )
+        debug( "onTabMoved: ignoring event" )
       } else {
         store.dispatch( moveTabAction( tab_id, windowId, toIndex ) )
         // @todo update succession if required
@@ -272,7 +271,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
   store.subscribe( () => {
     const state = store.getState()
     if( browser.tabs.hide && browser.tabs.show ) {
-      debug( 'updating tab show state' )
+      debug( "updating tab show state" )
       const show_ids = []
       const hide_ids = []
       const updates = []
@@ -280,7 +279,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       for( let window of state.windows ) {
         // @todo check for noop
         for( let tab_group of window.tab_groups ) {
-          if( tab_group.hasOwnProperty( 'pinned' ) ) {
+          if( tab_group.hasOwnProperty( "pinned" ) ) {
             continue
           }
           if( window.active_tab_group_id === tab_group.id ) {
@@ -309,7 +308,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
     pause() {
       is_paused = true
     },
-    async resume() {
+    resume() {
       is_paused = false
       return runQueuedEvents()
     },

@@ -21,6 +21,7 @@ import {
   openOptionsPage,
   openSidebarPage,
   openTabGroup,
+  openWelcomePage,
   resetBrowserState,
   runTabSearch,
   setConfig,
@@ -34,6 +35,27 @@ function onError( error ) {
 }
 
 const debug = createDebug( "tabulate:background" )
+
+function handleInstalled( { reason } ) {
+  debug( "runtime.onInstalled", reason )
+  switch( reason ) {
+    case "install":
+      openWelcomePage()
+      break
+    case "update":
+      // @todo open release notes?
+      // @todo should be config settings
+      break
+    case "browser_update":
+      // @todo update features
+      break
+    case "shared_module_update":
+      break
+  }
+}
+
+// Need to add this handler syncronously to trigger on install
+browser.runtime.onInstalled.addListener( handleInstalled )
 
 const store_promise = loadBrowserState()
   .then( browser_state => {
@@ -68,7 +90,7 @@ const store_promise = loadBrowserState()
 window.syncState = () => {
   return Promise.all( [ window.getStore(), loadBrowserState() ] )
     .then( ( [ store, browser_state ] ) => {
-      debug('browser_state', JSON.stringify( browser_state ))
+      debug( "browser_state", JSON.stringify( browser_state ) )
       store.dispatch( initAction( browser_state ) )
     })
 }

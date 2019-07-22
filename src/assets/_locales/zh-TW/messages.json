@@ -148,7 +148,7 @@
   },
 
   "window_new": {
-    "message": "",
+    "message": "開新視窗",
     "description": "Dropzone to create a new window"
   },
 
