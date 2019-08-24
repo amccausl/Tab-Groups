@@ -924,7 +924,7 @@ $tab-groups-list-item-header__themes: (
   align-items: center;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
   border-bottom: $light-border-color 1px solid;
   background-color: map-get( $colors, --background-color );
   cursor: pointer;
