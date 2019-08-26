@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 - header overlap for drag target position ink
 - new group icon display edge case
+- active tab display in blue
 
 ## [0.0.13] - 2019-07-21
 
