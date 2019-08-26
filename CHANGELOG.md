@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - header overlap for drag target position ink
 - new group icon display edge case
 - active tab display in blue
+- drag styling on hilighted tabs while group is moving
 
 ## [0.0.13] - 2019-07-21
 
