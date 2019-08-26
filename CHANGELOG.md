@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+- performance improvement for unchanged dispatch
+
 ### Fixed
 - header overlap for drag target position ink
 - new group icon display edge case

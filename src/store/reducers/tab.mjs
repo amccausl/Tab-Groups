@@ -509,7 +509,28 @@ export function removeTab( state, { tab_id, window_id } ) {
   return new_state
 }
 
+function isArrayEqual( arr1, arr2 ) {
+  if( arr1.length !== arr2.length ) {
+    return false
+  }
+  for( let i = arr1.length; i >= 0; i-- ) {
+    if( arr1[ i ] !== arr2[ i ] ) {
+      return false
+    }
+  }
+  return true
+}
+
 export function highlightTabs( state, { window_id, tab_ids } ) {
+  const window_index = state.windows.findIndex( window => window.id === window_id )
+  if( window_index === -1 ) {
+    return state
+  }
+
+  if( isArrayEqual( state.windows[ window_index ].highlighted_tab_ids, tab_ids ) ) {
+    return state
+  }
+
   const windows = state.windows.map( window => {
     if( window.id !== window_id ) {
       return window
