@@ -158,6 +158,10 @@ export function activateTab( state, { tab_id, window_id } ) {
             active_tab_id,
             tab_groups
           }
+
+          if( window.highlighted_tab_ids && ! window.highlighted_tab_ids.includes( active_tab_id ) ) {
+            window.highlighted_tab_ids = [ active_tab_id ]
+          }
         }
       }
       return window
