@@ -35,7 +35,7 @@ export function validateState( state ) {
               errors.push({
                 keyword: "link",
                 dataPath: `window[${ window_index }].tab_groups[${ tab_group_index }].active_tab_id`,
-                message: `Window active tab "${ window.active_tab_id }" isn't active in tab group`
+                message: `Window active tab "${ window.active_tab_id }" isn't active in the tab group`
               })
             }
           }
@@ -46,7 +46,7 @@ export function validateState( state ) {
         errors.push({
           keyword: "link",
           dataPath: `window[${ window_index }].active_tab_group_id`,
-          message: `Active tab group "${ window.active_tab_group_id }" isn't in tab groups array`
+          message: `Active tab group "${ window.active_tab_group_id }" isn't in the tab groups array`
         })
       }
 
@@ -54,7 +54,15 @@ export function validateState( state ) {
         errors.push({
           keyword: "link",
           dataPath: `window[${ window_index }].active_tab_id`,
-          message: `Active tab "${ window.active_tab_id }" isn't in tabs array`
+          message: `Active tab "${ window.active_tab_id }" isn't in the tabs array`
+        })
+      }
+
+      if( ! window.highlighted_tab_ids.includes( window.active_tab_id ) ) {
+        errors.push({
+          keyword: "link",
+          dataPath: `window[${ window_index }].highlighted_tab_ids`,
+          message: `Active tab "${ window.active_tab_id }" isn't in the highlighted tabs array`
         })
       }
     }

@@ -43,17 +43,17 @@ $__item-ink--width: 4px;
       }
     }
 
-    &--active {
-      &::before {
-        width: $__item-ink--width;
-        background-color: $__item-ink--active--color;
-      }
-    }
-
     &--drag-selected {
       &::before {
         width: $__item-ink--width;
         background-color: $__item-ink--drag-selected--color;
+      }
+    }
+
+    &--active {
+      &::before {
+        width: $__item-ink--width;
+        background-color: $__item-ink--active--color;
       }
     }
 
@@ -102,7 +102,7 @@ $__item-ink--width: 4px;
     height: 2px;
     width: 0;
     background-color: $__drag-target-ink--color;
-    z-index: 10;
+    z-index: 1;
 
     &::before {
       @extend %fast-transition;

@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.0.14] - 2019-08-26
+
+### Changed
+- performance improvement for unchanged dispatch
+
+### Fixed
+- header overlap for drag target position ink
+- new group icon display edge case
+- active tab display in blue
+- drag styling on hilighted tabs while group is moving
+- flash of drag styling on active tab switch
+
 ## [0.0.13] - 2019-07-21
 
 ### Added
@@ -142,6 +154,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - prevent closing last tab group in a window
 
 [Unreleased]: https://github.com/amccausl/tabulate/compare/master...develop
+[0.0.14]: https://github.com/amccausl/tabulate/compare/v0.0.13...v0.0.14
 [0.0.13]: https://github.com/amccausl/tabulate/compare/v0.0.12...v0.0.13
 [0.0.12]: https://github.com/amccausl/tabulate/compare/v0.0.11...v0.0.12
 [0.0.11]: https://github.com/amccausl/tabulate/compare/v0.0.10...v0.0.11
