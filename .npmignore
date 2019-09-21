@@ -1,0 +1,8 @@
+bower_components/
+designs/
+dist/
+node_modules/
+package-lock.json
+src/schemas/*.js
+web-ext-artifacts/
+*.tgz
