@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+- highlighted tab handling during updates
+
 ## [0.0.14] - 2019-08-26
 
 ### Changed

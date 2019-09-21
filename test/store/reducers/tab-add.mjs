@@ -167,6 +167,7 @@ function testOpenNewTabInOtherGroup( t ) {
     windowId: 1,
     openerTabId: 5,
     active: true,
+    highlighted: true,
     session: {
       tab_group_id: 3
     },

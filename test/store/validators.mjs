@@ -46,6 +46,7 @@ function shouldFailWhenActiveTabNotInActiveGroup( t ) {
   }
   state0.windows[ 0 ].active_tab_group_id = 2
   state0.windows[ 0 ].active_tab_id = 7
+  state0.windows[ 0 ].highlighted_tab_ids = [ 7 ]
 
   t.equal( validateState( state0 ), false )
   t.same( validateState.errors, [

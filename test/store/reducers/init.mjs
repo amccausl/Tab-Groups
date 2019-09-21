@@ -107,6 +107,7 @@ function testSingleWindowMultiGroupDetectActive( t ) {
       }),
       createBrowserTab({
         active: true,
+        highlighted: true,
         id: 4,
         index: 3,
         windowId: 1
@@ -169,6 +170,7 @@ function testSingleWindowSessionLoad( t ) {
       }),
       createBrowserTab({
         active: true,
+        highlighted: true,
         id: 4,
         index: 3,
         windowId: 1,
