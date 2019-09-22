@@ -1,4 +1,3 @@
-import alias from 'rollup-plugin-alias'
 import vue from 'rollup-plugin-vue'
 import buble from 'rollup-plugin-buble'
 import nodeResolve from 'rollup-plugin-node-resolve'
@@ -13,9 +12,6 @@ const config = {
     sourcemap: true
   },
   plugins: [
-    alias({
-      vue$: 'vue/dist/vue.common.js'
-    }),
     vue({
       css: './dist/css/app.css'
     }),
