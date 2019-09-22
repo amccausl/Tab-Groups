@@ -1072,7 +1072,7 @@ $tab-groups-list-item-header__themes: (
     @include slow-transition;
     transition-property: width;
     width: 0;
-    height: 4px;
+    height: 2px;
     background-color: $magenta-50;
     position: absolute;
     bottom: -1px;

@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+- style update to search progress
+
 ### Fixed
 - highlighted tab handling during updates
 
