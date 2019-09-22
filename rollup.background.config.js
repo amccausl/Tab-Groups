@@ -1,6 +1,5 @@
-// @todo most of this isn't required, can be cleaned up
-import nodeResolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
+import nodeResolve from 'rollup-plugin-node-resolve'
 
 const config = {
   input: './src/background.mjs',
