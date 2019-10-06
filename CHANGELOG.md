@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 - highlighted tab handling during updates
 - "system theme" Chinese translation
+- placement for group "more" menu on icon click
 
 ## [0.0.14] - 2019-08-26
 

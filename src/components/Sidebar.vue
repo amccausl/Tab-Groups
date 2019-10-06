@@ -375,9 +375,18 @@ export default {
       })
     },
     openTabGroupMore( event, tab_group ) {
+      if( this.tab_group_context_menu.open ) {
+        this.closeTabGroupMore()
+        return
+      }
       console.info('openTabGroupMore', event, tab_group )
       this.tab_group_context_menu.open = true
-      const box = event.target.getBoundingClientRect()
+      let button_element = event.target
+      // Detect if child element is clicked, find button parent
+      while( button_element.tagName !== "BUTTON" && button_element.parentElement ) {
+        button_element = button_element.parentElement
+      }
+      const box = button_element.getBoundingClientRect()
       this.tab_group_context_menu.x = document.body.clientWidth - box.right + 3
       this.tab_group_context_menu.y = box.bottom + 5
       this.tab_group_context_menu.tab_group_id = tab_group.id
