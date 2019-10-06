@@ -243,7 +243,7 @@ export default {
 .icon {
   height: 16px;
   width: 16px;
-  margin-right: 4px;
+  margin-right: 8px;
 }
 
 $action__theme: (
