@@ -153,7 +153,7 @@
     </div>
     <div v-if="tab_group_context_menu.open" class="context-menu__ctx" @click="closeTabGroupMore"></div>
     <!-- @todo animate -->
-    <div v-if="tab_group_context_menu.open" class="context-menu__content" :style="{ top: tab_group_context_menu.y + 'px', right: tab_group_context_menu.x + 'px' }">
+    <div v-if="tab_group_context_menu.open" :class="bem( `context-menu__content`, { position: tab_group_context_menu.position } )" :style="tab_group_context_menu.style">
       <!-- @todo localize -->
       <!-- @todo icons -->
       <!-- <div class="context-menu__item"><span>R</span>eload Tabs</div> -->
@@ -226,8 +226,8 @@ export default {
     return {
       tab_group_context_menu: {
         open: false,
-        x: 0,
-        y: 0,
+        position: "bottom",
+        style: {},
         tab_group_id: null
       },
       window_id: window.current_window_id,
@@ -375,11 +375,33 @@ export default {
       })
     },
     openTabGroupMore( event, tab_group ) {
+      if( this.tab_group_context_menu.open && this.tab_group_context_menu.tab_group_id === tab_group.id ) {
+        this.closeTabGroupMore()
+        return
+      }
       console.info('openTabGroupMore', event, tab_group )
       this.tab_group_context_menu.open = true
-      const box = event.target.getBoundingClientRect()
-      this.tab_group_context_menu.x = document.body.clientWidth - box.right + 3
-      this.tab_group_context_menu.y = box.bottom + 5
+      let button_element = event.target
+      // Detect if child element is clicked, find button parent
+      while( button_element.tagName !== "BUTTON" && button_element.parentElement ) {
+        button_element = button_element.parentElement
+      }
+      const box = button_element.getBoundingClientRect()
+      if( document.body.clientHeight - box.top > 130 ) {
+        // Render below
+        this.tab_group_context_menu.position = "bottom"
+        this.tab_group_context_menu.style = {
+          top: `${ box.bottom + 5 }px`,
+          right: `${ document.body.clientWidth - box.right + 3 }px`,
+        }
+      } else {
+        // Render above
+        this.tab_group_context_menu.position = "top"
+        this.tab_group_context_menu.style = {
+          bottom: `${ document.body.clientHeight - box.top + 5 }px`,
+          right: `${ document.body.clientWidth - box.right + 3 }px`,
+        }
+      }
       this.tab_group_context_menu.tab_group_id = tab_group.id
       this.tab_group_context_menu.tab_group_copy_text = getTabGroupCopyText( tab_group )
     },
@@ -1072,7 +1094,7 @@ $tab-groups-list-item-header__themes: (
     @include slow-transition;
     transition-property: width;
     width: 0;
-    height: 4px;
+    height: 2px;
     background-color: $magenta-50;
     position: absolute;
     bottom: -1px;
@@ -1256,16 +1278,28 @@ $sidebar-tab-group-tabs-list__themes: (
 
     &::before {
       position: absolute;
-      top: -7px;
       right: 5px;
       width: 12px;
       height: 12px;
       transform: rotate(45deg);
-      clip-path: polygon(0% 0, 100% 0, 0 100%);
       box-shadow: 0 4px 16px rgba(12,12,13,.1);
       background-color: $white-100;
       border: solid 1px $grey-90-a20;
       content: "";
+    }
+
+    &--position-top {
+      &::before {
+        bottom: -7px;
+        clip-path: polygon(100% 100%, 100% 0, 0 100%);
+      }
+    }
+
+    &--position-bottom {
+      &::before {
+        top: -7px;
+        clip-path: polygon(0 0, 100% 0, 0 100%);
+      }
     }
   }
 

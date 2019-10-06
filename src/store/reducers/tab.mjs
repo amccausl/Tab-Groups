@@ -65,6 +65,7 @@ export function addTab( state, { browser_tab } ) {
               window1.active_tab_group_id = browser_tab.session.tab_group_id
             }
             window1.active_tab_id = browser_tab.id
+            window1.highlighted_tab_ids = [ browser_tab.id ]
           }
 
           return window1
@@ -489,9 +490,19 @@ export function removeTab( state, { tab_id, window_id } ) {
         return tab_group
       })
 
+      let { highlighted_tab_ids } = window
+      if( highlighted_tab_ids.includes( tab_id ) ) {
+        if( highlighted_tab_ids.length === 1 ) {
+          highlighted_tab_ids = [ active_tab_id ]
+        } else {
+          highlighted_tab_ids = highlighted_tab_ids.filter( ( highlighted_tab_id ) => highlighted_tab_id !== tab_id )
+        }
+      }
+
       window = {
         ...window,
         active_tab_id,
+        highlighted_tab_ids,
         tab_groups,
       }
     }

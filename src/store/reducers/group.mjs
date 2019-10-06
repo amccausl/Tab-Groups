@@ -125,6 +125,7 @@ export function moveGroup( state, { source_data, target_data } ) {
     }
     source_window1.active_tab_group_id = source_window_active_group1.id
     source_window1.active_tab_id = source_window_active_group1.active_tab_id
+    source_window1.highlighted_tab_ids = [ source_window_active_group1.active_tab_id ]
   }
 
   const target_tab_groups = [ ...windows[ target_window_index ].tab_groups ]
