@@ -24,7 +24,7 @@
 
       <div class="panel-section panel-section-footer">
         <div class="panel-section-footer-button" @click="openTabGroupsPage()">
-          <img class="icon" src="/icons/tabulate.svg"/>
+          <img class="icon" src="/icons/tabulate-32.svg"/>
           <span class="text" v-once>{{ __MSG_tab_group_manage__ }}</span>
         </div>
         <div class="panel-section-footer-separator"></div>
