@@ -142,7 +142,7 @@ export function getTransferData( data_transfer ) {
               const data = data_transfer.mozGetDataAt( types[ t ], i )
               event_data.urls.push( data )
             } catch( ex ) {
-              dump( ex )
+              console.error( ex )
             }
           }
         }

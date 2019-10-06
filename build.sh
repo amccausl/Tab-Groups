@@ -1,6 +1,10 @@
 #!/bin/sh
 
-rm -r dist/*
+if [ -d "dist" ]; then
+  rm -r dist/*
+else
+  mkdir dist
+fi
 cp -r src/assets/* dist/
 cp src/integrations/firefox/manifest.json dist/
 ./node_modules/.bin/ajv compile -s src/schemas/state.json -o src/schemas/validate_state.js
