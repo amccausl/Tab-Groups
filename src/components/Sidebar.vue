@@ -375,7 +375,7 @@ export default {
       })
     },
     openTabGroupMore( event, tab_group ) {
-      if( this.tab_group_context_menu.open ) {
+      if( this.tab_group_context_menu.open && this.tab_group_context_menu.tab_group_id === tab_group.id ) {
         this.closeTabGroupMore()
         return
       }
