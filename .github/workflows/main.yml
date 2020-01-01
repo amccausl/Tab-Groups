@@ -8,7 +8,7 @@ jobs:
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
-        node-version: 13.3.x
+        node-version: 13.5.x
     - name: npm install, build, and test
       run: |
         npm install
