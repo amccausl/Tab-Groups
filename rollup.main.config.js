@@ -4,7 +4,7 @@ import replace from 'rollup-plugin-replace'
 import vue from 'rollup-plugin-vue'
 
 const config = {
-  input: './src/main.mjs',
+  input: './src/app.mjs',
   output: {
     file: './dist/js/app.js',
     format: 'umd',
