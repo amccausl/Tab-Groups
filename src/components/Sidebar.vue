@@ -68,7 +68,7 @@
                   'search': getTabSearchState( tab )
                 } )"
                 v-for="tab in tab_group.tabs" :key="tab.id" :tab="tab"
-                :title="tab.title"
+                :title="getTabHoverText( tab )"
                 @click.ctrl="toggleTabSelection( tab )" @click.shift="toggleTabBatchSelection( tab )" @click.middle.exact="closeTab( tab )" @click.exact="openTab( tab.id )"
                 @dragenter="onTabDragEnter( $event, tab_group, tab )"
                 @dragover.prevent
@@ -200,6 +200,7 @@ import {
   debounce,
   getCountMessage,
   getFriendlyUrlText,
+  getTabHoverText,
   getTabGroupCopyText,
   onStateChange,
 } from './helpers.mjs'
@@ -366,6 +367,7 @@ export default {
   methods: {
     bem,
     getCountMessage,
+    getTabHoverText,
     async createTabGroup() {
       // Create new group with default properties in the store
       const tab_group = await window.background.createGroup( window.store, this.window_id )

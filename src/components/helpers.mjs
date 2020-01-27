@@ -96,6 +96,24 @@ export function getNewSelectedTabIds( old_selected_tab_ids, tab_groups ) {
   return getNewSelectedTabs( old_selected_tab_ids, tab_groups ).map( tab => tab.id )
 }
 
+function isLoadingIssueMessage( tab_title ) {
+  // @todo add localization
+  if( tab_title === "Problem loading page" ) {
+    return true
+  }
+  if( tab_title === "Server Not Found" ) {
+    return true
+  }
+  return false
+}
+
+export function getTabHoverText( tab ) {
+  if( isLoadingIssueMessage( tab.title ) ) {
+    return getFriendlyUrlText( tab.url )
+  }
+  return tab.title
+}
+
 /**
  * Get a markdown string rendering for a tab group
  */
