@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+- keyboard shortcut to toggle sidebar (Alt+Shift+G or Ctrl+Shift+G on linux)
+
 ### Changed
 - default to system theme on first launch
 - display URL instead of title on hover for tabs with loading issues

@@ -36,7 +36,8 @@ function onError( error ) {
 
 const debug = createDebug( "tabulate:background" )
 
-function handleInstalled( { reason } ) {
+// Need to add this handler syncronously to trigger on install
+browser.runtime.onInstalled.addListener( function handleInstalled( { reason } ) {
   debug( "runtime.onInstalled", reason )
   switch( reason ) {
     case "install":
@@ -52,10 +53,14 @@ function handleInstalled( { reason } ) {
     case "shared_module_update":
       break
   }
-}
+})
 
-// Need to add this handler syncronously to trigger on install
-browser.runtime.onInstalled.addListener( handleInstalled )
+browser.commands.onCommand.addListener( function handleCommand( command ) {
+  if( command === "toggle-feature-sidebar" ) {
+    console.log("Toggling the feature!")
+    browser.sidebarAction.toggle()
+  }
+})
 
 const store_promise = loadBrowserState()
   .then( browser_state => {

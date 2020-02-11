@@ -25,6 +25,15 @@
   "background": {
     "scripts": [ "background.js" ]
   },
+  "commands": {
+    "toggle-feature-sidebar": {
+      "suggested_key": {
+        "default": "Alt+Shift+G",
+        "linux": "Ctrl+Shift+G"
+      },
+      "description": "Send a 'toggle-feature-sidebar' event to the extension"
+    }
+  },
   "browser_action": {
     "browser_style": true,
     "default_icon": {
