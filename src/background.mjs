@@ -57,7 +57,6 @@ browser.runtime.onInstalled.addListener( function handleInstalled( { reason } ) 
 
 browser.commands.onCommand.addListener( function handleCommand( command ) {
   if( command === "toggle-feature-sidebar" ) {
-    console.log("Toggling the feature!")
     browser.sidebarAction.toggle()
   }
 })
