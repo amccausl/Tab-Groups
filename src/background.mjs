@@ -56,6 +56,7 @@ browser.runtime.onInstalled.addListener( function handleInstalled( { reason } ) 
 })
 
 browser.commands.onCommand.addListener( function handleCommand( command ) {
+  debug( "handleCommand", command )
   if( command === "toggle-feature-sidebar" ) {
     browser.sidebarAction.toggle()
   }
@@ -91,7 +92,8 @@ const store_promise = loadBrowserState()
 /**
  * Load the store and browser_state to dispatch init with fresh data
  */
-window.syncState = () => {
+window.reloadState = () => {
+  debug( "reloadState" )
   return Promise.all( [ window.getStore(), loadBrowserState() ] )
     .then( ( [ store, browser_state ] ) => {
       debug( "browser_state", JSON.stringify( browser_state ) )

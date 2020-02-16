@@ -85,7 +85,7 @@
           <form @submit.prevent>
             <!-- @todo localize -->
             <button @click="clearAllData()" class="browser-style">Clear All Data</button>
-            <button @click="syncState()" class="browser-style">Reload State</button>
+            <button @click="reloadState()" class="browser-style">Reload State</button>
           </form>
         </section>
         <section v-if="selected_section === 'debug'">
@@ -235,8 +235,8 @@ export default {
     openSidebarPage() {
       window.background.openSidebarPage()
     },
-    syncState() {
-      window.background.syncState()
+    reloadState() {
+      window.background.reloadState()
     },
     selectSection( section_id ) {
       this.selected_section = section_id
