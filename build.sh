@@ -9,13 +9,13 @@ cp -r src/assets/* dist/
 cp src/integrations/firefox/manifest.json dist/
 ./node_modules/.bin/ajv compile -s src/schemas/state.json -o src/schemas/validate_state.js
 ./node_modules/.bin/rollup -c rollup.config.js
-cp bower_components/fira/woff/FiraSans-Light.woff \
-   bower_components/fira/woff/FiraSans-LightItalic.woff \
-   bower_components/fira/woff/FiraSans-Regular.woff \
-   bower_components/fira/woff/FiraSans-Medium.woff \
-   bower_components/fira/woff/FiraSans-MediumItalic.woff \
-   bower_components/fira/woff/FiraSans-Bold.woff \
-   bower_components/fira/woff/FiraSans-BoldItalic.woff \
-   bower_components/fira/woff/FiraMono-Regular.woff \
-   bower_components/fira/woff/FiraMono-Bold.woff \
+cp node_modules/fira/woff/FiraSans-Light.woff \
+   node_modules/fira/woff/FiraSans-LightItalic.woff \
+   node_modules/fira/woff/FiraSans-Regular.woff \
+   node_modules/fira/woff/FiraSans-Medium.woff \
+   node_modules/fira/woff/FiraSans-MediumItalic.woff \
+   node_modules/fira/woff/FiraSans-Bold.woff \
+   node_modules/fira/woff/FiraSans-BoldItalic.woff \
+   node_modules/fira/woff/FiraMono-Regular.woff \
+   node_modules/fira/woff/FiraMono-Bold.woff \
    dist/fonts

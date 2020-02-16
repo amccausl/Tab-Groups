@@ -15,8 +15,7 @@
     "preversion": "$(npm bin)/kacl prerelease",
     "version": "$(npm bin)/kacl release && git add CHANGELOG.md",
     "ext:lint": "cd dist && $(npm bin)/web-ext lint",
-    "ext:pack": "$(npm bin)/web-ext build --source-dir dist",
-    "postinstall": "$(npm bin)/bower install"
+    "ext:pack": "$(npm bin)/web-ext build --source-dir dist"
   },
   "author": "Alex McCausland <alex.mccausland+tabulate@gmail.com>",
   "license": "MPL-2.0",
@@ -39,9 +38,9 @@
     "ajv": "6.11.0",
     "ajv-cli": "3.0.0",
     "babel-core": "6.26.3",
-    "bower": "1.8.8",
     "cross-env": "7.0.0",
     "eslint": "6.8.0",
+    "fira": "git://github.com/mozilla/Fira.git#fd8c8c0a3d353cd99e8ca1662942d165e6961407",
     "rollup": "1.31.1",
     "rollup-plugin-vue": "5.1.6",
     "sass": "1.25.0",
