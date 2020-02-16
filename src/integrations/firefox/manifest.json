@@ -28,8 +28,8 @@
   "commands": {
     "toggle-feature-sidebar": {
       "suggested_key": {
-        "default": "Alt+Shift+G",
-        "linux": "Ctrl+Shift+G"
+        "default": "Alt+Shift+U",
+        "linux": "Ctrl+Shift+U"
       },
       "description": "Send a 'toggle-feature-sidebar' event to the extension"
     }
