@@ -269,7 +269,9 @@ function resetTabState( tab ) {
 
 function moveBrowserTabs( tab_ids, move_properties ) {
   ignorePendingMove( tab_ids )
-  debug(`browser.tabs.move( ${ JSON.stringify( tab_ids ) }, ${ JSON.stringify( move_properties ) } )`)
+  if( debug.enabled ) {
+    debug(`browser.tabs.move( ${ JSON.stringify( tab_ids ) }, ${ JSON.stringify( move_properties ) } )`)
+  }
   return browser.tabs.move( tab_ids, move_properties )
 }
 
@@ -576,7 +578,9 @@ export function moveTabsToGroup( store, source_data, target_data ) {
         active
       }
       active = false
-      debug(`browser.tabs.create( ${ JSON.stringify( create_properties ) } )`)
+      if( debug.enabled ) {
+        debug(`browser.tabs.create( ${ JSON.stringify( create_properties ) } )`)
+      }
       return browser.tabs.create( create_properties )
     }))
   }

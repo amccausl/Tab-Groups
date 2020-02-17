@@ -96,7 +96,9 @@ window.reloadState = () => {
   debug( "reloadState" )
   return Promise.all( [ window.getStore(), loadBrowserState() ] )
     .then( ( [ store, browser_state ] ) => {
-      debug( "browser_state", JSON.stringify( browser_state ) )
+      if( debug.enabled ) {
+        debug( "browser_state", JSON.stringify( browser_state ) )
+      }
       store.dispatch( initAction( browser_state ) )
     })
 }
