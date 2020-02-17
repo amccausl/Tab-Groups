@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "__MSG_extension_name__",
   "description": "__MSG_extension_description__",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "browser_specific_settings": {
     "gecko": {
       "id": "{65afae73-8786-42d1-a6e7-95dc884dfb3a}",
@@ -24,6 +24,15 @@
   "default_locale": "en",
   "background": {
     "scripts": [ "background.js" ]
+  },
+  "commands": {
+    "toggle-feature-sidebar": {
+      "suggested_key": {
+        "default": "Alt+Shift+U",
+        "linux": "Ctrl+Shift+U"
+      },
+      "description": "Send a 'toggle-feature-sidebar' event to the extension"
+    }
   },
   "browser_action": {
     "browser_style": true,

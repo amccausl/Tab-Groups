@@ -30,12 +30,13 @@ import {
   WINDOW_SEARCH_RESET,
 } from "./action-types.mjs"
 
-export function initAction({ browser_tabs, config, contextual_identities, theme, window_tab_groups_map }) {
+export function initAction({ browser_tabs, config, contextual_identities, features, theme, window_tab_groups_map }) {
   return {
     type: INIT,
     browser_tabs,
     config,
     contextual_identities,
+    features,
     theme,
     window_tab_groups_map
   }

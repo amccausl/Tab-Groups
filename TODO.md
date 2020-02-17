@@ -8,7 +8,6 @@
 - open group should create new tab
 - set context for group to control open new tab
 - move to logical events instead of native
-- add missing locale keys
 - add hotkey for "move to new group"
 - support for tab sequence
 - svelte test
@@ -49,9 +48,6 @@
     - group toggle is odd if group moves above the fold, should scroll container so both headers visible
     - drag preview image issue
     - context display is broken
-    - icons
-      - better handling for broken icons
-- watch task with compile / tests
 - sidebar improvements
   - add process to suspend tabs
   - tab context menu
@@ -65,8 +61,6 @@
       - notifications?
     - ensure new tab is visible (scroll, open group)
       - sometimes not clear there are more items under sticky header
-    - text overflow gradient
-    - copy tab bar active style with blue bar
   - favicon scan for context styles
   - drag and drop
     - index based tab dragging
@@ -98,9 +92,7 @@
 - publish
   - clear out repo
   - review @todos
-  - determine min version
   - turn on vuejs production mode
-  - fix id
 - hotkeys
   - move to new group
   - next group
@@ -112,10 +104,8 @@
   - add library for web-extension browser mocking
   - add testing for vue components
   - investigate nodejs es6 dependency mocking
-  - investigate typescript for tests
   - VScode integration (running, linking errors & debugging)
   - file based execution
-  - watch
   - coverage
   - suspend and replace
   - url serialization
@@ -132,9 +122,6 @@
   - action
     - groups should be selectable
 - archived groups
-- test with typescript
-  - pull in types for redux, web-extensions
-  - refactor includes from components as methods on background window
 - revisit tab design
   - with mobile and new tab page layouts
 - action
@@ -146,7 +133,6 @@
 - sidebar
   - detect if favicons require background
   - bubbling audio indicator
-  - fade for overflow
 - open main tab groups page with hotkey
 - add interval to detect state drift
 
@@ -192,7 +178,6 @@
 - localization
   - https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Internationalization
   - investigate cleaner way to map localizations in components
-- light and dark themes for actions
 - filter for playing audio
 - recover with history
 - tour & upgrade features
