@@ -13,6 +13,8 @@ It currently includes:
 - support for multi-account containers
 - dark and light themes
 
+![Node CI](https://github.com/amccausl/Tabulate/workflows/Node%20CI/badge.svg)
+
 # Development
 ```
 npm run build && npm run debug
