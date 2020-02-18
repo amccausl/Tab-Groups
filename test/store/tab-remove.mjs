@@ -16,7 +16,7 @@ import {
   validateState,
 } from "../../src/store/validators.mjs"
 
-function testRemoveFirstTab( t ) {
+tap.test( function testRemoveFirstTab( t ) {
   const window_id = 1
   const tab_id = 3
   const state0 = {
@@ -47,9 +47,9 @@ function testRemoveFirstTab( t ) {
   t.equal( state1.windows[ 0 ].active_tab_id, 4 )
   t.same( state1.windows[ 0 ].highlighted_tab_ids, [ 4 ] )
   t.end()
-}
+})
 
-function testRemoveMiddleTab( t ) {
+tap.test( function testRemoveMiddleTab( t ) {
   const window_id = 1
   const state0 = {
     config: {},
@@ -79,9 +79,9 @@ function testRemoveMiddleTab( t ) {
   t.equal( state1.windows[ 0 ].tab_groups.length, 2 )
   t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
   t.end()
-}
+})
 
-function testRemoveLastTab( t ) {
+tap.test( function testRemoveLastTab( t ) {
   let window_id = 1
   let tab_id = 5
   const state0 = {
@@ -110,8 +110,36 @@ function testRemoveLastTab( t ) {
   t.equal( state1.windows[ 0 ].tab_groups.length, 2 )
   t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
   t.end()
-}
+})
 
-tap.test( testRemoveFirstTab )
-tap.test( testRemoveMiddleTab )
-tap.test( testRemoveLastTab )
+tap.test( function testRemoveLastTabInWindow( t ) {
+  let window_id = 2
+  let tab_id = 5
+  const state0 = {
+    config: {},
+    windows: [
+      createWindow( 1, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( 2, [
+          createTestTab({
+            id: 4
+          }),
+        ])
+      ]),
+      createWindow( window_id, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( 3, [
+          createTestTab({
+            id: tab_id
+          }),
+        ])
+      ])
+    ]
+  }
+
+  const state1 = removeTab( state0, { tab_id, window_id } )
+  t.ok( validateState( state1 ), "state validates", validateState.errors )
+
+  t.equal( state1.windows.length, 1 )
+  t.end()
+})
