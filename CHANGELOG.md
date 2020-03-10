@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [Unreleased]
 ### Fixed
 - validation error on close last tab in window
+- handling when active group is closed
 
 ## [0.0.16] - 2020-02-17
 
@@ -40,7 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - header overlap for drag target position ink
 - new group icon display edge case
 - active tab display in blue
-- drag styling on hilighted tabs while group is moving
+- drag styling on highlighted tabs while group is moving
 - flash of drag styling on active tab switch
 
 ## [0.0.13] - 2019-07-21
@@ -95,7 +96,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Added
 - use sync for config settings
 - incremental display search results
-- use native hilighted tabs for multi-drag
+- use native highlighted tabs for multi-drag
 
 ### Fixed
 - scrollbar display on windows

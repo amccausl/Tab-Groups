@@ -29,7 +29,7 @@ export function activateGroup( state, { window_id, tab_group_id } ) {
     ...state,
     windows: state.windows.map( window => {
       if( window.id === window_id ) {
-        const tab_group = window.tab_groups.find( tab_group => tab_group.id === tab_group_id )
+        const tab_group = window.tab_groups.find( _tab_group => _tab_group.id === tab_group_id )
         if( tab_group ) {
           return {
             ...window,
@@ -68,26 +68,44 @@ export function removeGroup( state, { tab_group_id, window_id } ) {
       if( window.id !== window_id ) {
         return window
       }
+
+      const removed_tab_group = window.tab_groups.find( tab_group => tab_group.id === tab_group_id )
+      const tab_groups = window.tab_groups.filter( tab_group => tab_group.id !== tab_group_id )
+      let { active_tab_group_id, active_tab_id, highlighted_tab_ids } = window
+      if( active_tab_group_id === tab_group_id ) {
+        // @todo scan for largest active instead of first
+        // @todo pull from highlighted tabs to get next group
+        const tab_group = tab_groups[ 1 ]
+        if( tab_group ) {
+          active_tab_group_id = tab_group.id
+          if( window.active_tab_id === removed_tab_group.active_tab_id ) {
+            active_tab_id = tab_group.active_tab_id
+            highlighted_tab_ids = [ active_tab_id ]
+          }
+        }
+      }
+
       return {
         ...window,
-        tab_groups: window.tab_groups.filter( tab_group => tab_group.id !== tab_group_id )
+        active_tab_group_id,
+        active_tab_id,
+        highlighted_tab_ids,
+        tab_groups,
       }
     })
   }
 }
 
 export function updateGroup( state, { tab_group_id, window_id, change_info } ) {
-  return mapTabGroup( state, window_id, tab_group_id,
-    tab_group => {
-      if( change_info.title && change_info.title !== tab_group.title ) {
-        // @todo validation
-      }
-      return {
-        ...tab_group,
-        ...change_info
-      }
+  return mapTabGroup( state, window_id, tab_group_id, tab_group => {
+    if( change_info.title && change_info.title !== tab_group.title ) {
+      // @todo validation
     }
-  )
+    return {
+      ...tab_group,
+      ...change_info
+    }
+  })
 }
 
 export function moveGroup( state, { source_data, target_data } ) {
@@ -147,13 +165,9 @@ export function moveGroup( state, { source_data, target_data } ) {
 // @todo consider merging these with updateGroup
 
 export function muteGroup( state, { tab_group_id, window_id } ) {
-  return mapTabGroup( state, window_id, tab_group_id,
-    tab_group => Object.assign( {}, tab_group, { muted: true } )
-  )
+  return mapTabGroup( state, window_id, tab_group_id, tab_group => ( { ...tab_group, muted: true } ) )
 }
 
 export function unmuteGroup( state, { tab_group_id, window_id } ) {
-  return mapTabGroup( state, window_id, tab_group_id,
-    tab_group => omit( tab_group, "muted")
-  )
+  return mapTabGroup( state, window_id, tab_group_id, tab_group => omit( tab_group, "muted" ) )
 }
