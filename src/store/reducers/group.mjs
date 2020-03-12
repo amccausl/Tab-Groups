@@ -138,12 +138,28 @@ export function moveGroup( state, { source_data, target_data } ) {
     let source_window_active_group1
     if( source_window1.tab_groups[ source_tab_group_index ] != null ) {
       source_window_active_group1 = source_window1.tab_groups[ source_tab_group_index ]
+    } else if( source_window_index !== target_window_index && source_window1.tab_groups.length === 1 ) {
+      if( source_window1.tab_groups[ 0 ].tabs_count > 0 ) {
+        // There are pinned tabs, make a new group to take the source groups place
+        const new_tab_group = createTabGroup( getNewTabGroupId( state ), [] )
+        source_window1.tab_groups.push( new_tab_group )
+        source_window1.active_tab_group_id = new_tab_group.id
+        const pinned_tabs = source_window1.tab_groups[ 0 ].tabs
+        source_window1.active_tab_id = pinned_tabs[ pinned_tabs.length - 1 ].id
+        // @todo this could be better than resetting the highlighted if the new active tab was already highlighted
+        source_window1.highlighted_tab_ids = [ source_window1.active_tab_id ]
+      } else {
+        // Window is empty, can be removed
+        source_window1.remove = true
+      }
     } else {
       source_window_active_group1 = source_window1.tab_groups[ source_tab_group_index - 1 ]
     }
-    source_window1.active_tab_group_id = source_window_active_group1.id
-    source_window1.active_tab_id = source_window_active_group1.active_tab_id
-    source_window1.highlighted_tab_ids = [ source_window_active_group1.active_tab_id ]
+    if( source_window_active_group1 ) {
+      source_window1.active_tab_group_id = source_window_active_group1.id
+      source_window1.active_tab_id = source_window_active_group1.active_tab_id
+      source_window1.highlighted_tab_ids = [ source_window_active_group1.active_tab_id ]
+    }
   }
 
   const target_tab_groups = [ ...windows[ target_window_index ].tab_groups ]
@@ -157,6 +173,10 @@ export function moveGroup( state, { source_data, target_data } ) {
   windows[ target_window_index ] = {
     ...windows[ target_window_index ],
     tab_groups: target_tab_groups
+  }
+
+  if( windows[ source_window_index ].remove ) {
+    windows.splice( source_window_index, 1 )
   }
 
   return { ...state, windows }
