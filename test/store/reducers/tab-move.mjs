@@ -9,7 +9,7 @@ import { moveTab } from "../../../src/store/reducers/tab.mjs"
 import { validateState } from "../../../src/store/validators.mjs"
 import { createTestTab } from "../helpers.mjs"
 
-function testSingleWindowMove( t ) {
+tap.test( function testSingleWindowMove( t ) {
   const tab = createTestTab({ id: 2 })
   const window = createWindow( 1, [
     createPinnedTabGroup( [] ),
@@ -32,9 +32,9 @@ function testSingleWindowMove( t ) {
   t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs_count, 3 )
   t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs[ 2 ], tab )
   t.end()
-}
+})
 
-function testMoveToPinnedBoundary( t ) {
+tap.test( function testMoveToPinnedBoundary( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -50,13 +50,13 @@ function testMoveToPinnedBoundary( t ) {
   }
 
   const state1 = moveTab( state0, { tab_id: 3, window_id: 1, index: 0 } )
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs[ 0 ].id, 3 )
 
   t.end()
-}
+})
 
-function testMoveToNewGroup( t ) {
+tap.test( function testMoveToNewGroup( t ) {
   const state0 = {
     windows: [
       createWindow( 1, [
@@ -74,8 +74,4 @@ function testMoveToNewGroup( t ) {
   const state1 = moveTab( state0, { tab_id: 4, window_id: 1, index: 2 } )
   t.equal( state0, state1 )
   t.end()
-}
-
-tap.test( testSingleWindowMove )
-tap.test( testMoveToPinnedBoundary )
-tap.test( testMoveToNewGroup )
+})

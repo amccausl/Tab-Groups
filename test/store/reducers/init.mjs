@@ -5,7 +5,9 @@ import { validateState } from "../../../src/store/validators.mjs"
 
 import { createBrowserTab } from "../helpers.mjs"
 
-function freshInitWithSingleWindow( t ) {
+// @todo if one window not included in saved state, ensure IDs not duplicated
+
+tap.test( function freshInitWithSingleWindow( t ) {
   const browser_tabs = [
     createBrowserTab({
       id: 1,
@@ -29,7 +31,7 @@ function freshInitWithSingleWindow( t ) {
 
   let initial_state = init( null, { browser_tabs, config: {}, window_tab_groups_map })
 
-  t.ok( validateState( initial_state ), "initial state validates", validateState.errors )
+  t.ok( validateState( initial_state ), "initial should pass validation", validateState.errors )
 
   t.equal( initial_state.windows[ 0 ].tab_groups.length, 2 )
   t.equal( initial_state.windows[ 0 ].tab_groups[ 1 ].id, 1 )
@@ -38,9 +40,9 @@ function freshInitWithSingleWindow( t ) {
   t.equal( initial_state.windows.length, 1 )
   t.equal( initial_state.windows[ 0 ].active_tab_group_id, initial_state.windows[ 0 ].tab_groups[ 1 ].id )
   t.end()
-}
+})
 
-function freshInitWithMultipleWindows( t ) {
+tap.test( function freshInitWithMultipleWindows( t ) {
   const browser_state = {
     browser_tabs: [
       createBrowserTab({
@@ -70,7 +72,7 @@ function freshInitWithMultipleWindows( t ) {
 
   let state0 = init( null, browser_state )
 
-  t.ok( validateState( state0 ), "initial state validates", validateState.errors )
+  t.ok( validateState( state0 ), "initial should pass validation", validateState.errors )
 
   t.equal( state0.windows.length, 2 )
 
@@ -85,9 +87,9 @@ function freshInitWithMultipleWindows( t ) {
   t.equal( state0.windows[ 1 ].tab_groups[ 1 ].tabs.length, 2 )
   t.equal( state0.windows[ 1 ].active_tab_group_id, state0.windows[ 1 ].tab_groups[ 1 ].id )
   t.end()
-}
+})
 
-function testSingleWindowMultiGroupDetectActive( t ) {
+tap.test( function testSingleWindowMultiGroupDetectActive( t ) {
   const browser_state = {
     browser_tabs: [
       createBrowserTab({
@@ -135,13 +137,13 @@ function testSingleWindowMultiGroupDetectActive( t ) {
 
   const state0 = init( null, browser_state )
 
-  t.ok( validateState( state0 ), "initial state validates", validateState.errors )
+  t.ok( validateState( state0 ), "initial should pass validation", validateState.errors )
   t.equal( state0.windows[ 0 ].active_tab_group_id, 2 )
 
   t.end()
-}
+})
 
-function testSingleWindowSessionLoad( t ) {
+tap.test( function testSingleWindowSessionLoad( t ) {
   const browser_state = {
     browser_tabs: [
       createBrowserTab({
@@ -200,15 +202,15 @@ function testSingleWindowSessionLoad( t ) {
 
   const state0 = init( null, browser_state )
 
-  t.ok( validateState( state0 ), "initial state validates", validateState.errors )
+  t.ok( validateState( state0 ), "initial should pass validation", validateState.errors )
 
   t.equal( state0.windows[ 0 ].tab_groups[ 1 ].tabs_count, 3 )
   t.equal( state0.windows[ 0 ].tab_groups[ 2 ].tabs_count, 1 )
 
   t.end()
-}
+})
 
-function testUnsetActiveTab( t ) {
+tap.test( function testUnsetActiveTab( t ) {
   const browser_tabs = [
     createBrowserTab({
       id: 1,
@@ -241,16 +243,8 @@ function testUnsetActiveTab( t ) {
 
   let initial_state = init( null, { browser_tabs, config: {}, window_tab_groups_map })
 
-  t.ok( validateState( initial_state ), "initial state validates", validateState.errors )
+  t.ok( validateState( initial_state ), "initial should pass validation", validateState.errors )
   // console.info( initial_state.windows[ 0 ] )
 
   t.end()
-}
-
-// @todo if one window not included in saved state, ensure IDs not duplicated
-
-tap.test( freshInitWithSingleWindow )
-tap.test( freshInitWithMultipleWindows )
-tap.test( testSingleWindowMultiGroupDetectActive )
-tap.test( testSingleWindowSessionLoad )
-tap.test( testUnsetActiveTab )
+})

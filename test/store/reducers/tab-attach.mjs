@@ -38,7 +38,7 @@ tap.test( "shouldValidateNativeTabDragToNativeTabBar", ( t ) => {
 
   const state1 = attachTab( state0, { tab_id: 7, window_id, index: 2 } )
 
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
 
   t.equal( state1.windows.length, 1, "should remove empty window" )
 
@@ -62,7 +62,7 @@ tap.test( "shouldValidateDragToNewWindow", ( t ) => {
 
   const state1 = attachTab( state0, { tab_id: 5, window_id: 2, index: 0 } )
 
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
 
   t.same( state1, {
     config: {},

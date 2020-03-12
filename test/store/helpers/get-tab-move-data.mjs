@@ -178,7 +178,12 @@ function testGetTabMoveDataNewGroup( t ) {
   t.end()
 }
 
-function testMoveFromUrl( t ) {
+// tap.test( testGetTabMoveData )
+// tap.test( testGetTabMoveDataMiddle )
+// tap.test( testGetTabMoveDataNewGroup )
+// tap.test( testGetTabMoveDataReopenPinned )
+
+tap.test( function testMoveFromUrl( t ) {
   const state0 = {
     windows: [
       createWindow( 1, [
@@ -220,9 +225,9 @@ function testMoveFromUrl( t ) {
   // })
 
   t.end()
-}
+})
 
-function testNativeDragToStartOfSecondGroup( t ) {
+tap.test( function testNativeDragToStartOfSecondGroup( t ) {
   const state0 = {
     windows: [
       createWindow( 1, [
@@ -268,9 +273,9 @@ function testNativeDragToStartOfSecondGroup( t ) {
   })
 
   t.end()
-}
+})
 
-function testNativeDragPinned( t ) {
+tap.test( function testNativeDragPinned( t ) {
   const state0 = {
     windows: [
       createWindow(
@@ -327,9 +332,9 @@ function testNativeDragPinned( t ) {
   })
 
   t.end()
-}
+})
 
-function testNativeDragMultiple( t ) {
+tap.test( function testNativeDragMultiple( t ) {
   const state0 = {
     windows: [
       createWindow(
@@ -384,13 +389,4 @@ function testNativeDragMultiple( t ) {
   })
 
   t.end()
-}
-
-// tap.test( testGetTabMoveData )
-// tap.test( testGetTabMoveDataMiddle )
-// tap.test( testGetTabMoveDataNewGroup )
-// tap.test( testGetTabMoveDataReopenPinned )
-tap.test( testMoveFromUrl )
-tap.test( testNativeDragToStartOfSecondGroup )
-tap.test( testNativeDragPinned )
-tap.test( testNativeDragMultiple )
+})

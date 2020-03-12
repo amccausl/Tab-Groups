@@ -15,7 +15,7 @@ import {
 import { addTab } from "../../../src/store/reducers/tab.mjs"
 import { validateState } from "../../../src/store/validators.mjs"
 
-function testSingleWindowAdd( t ) {
+tap.test( function testSingleWindowAdd( t ) {
   let state = getInitialState()
 
   let tab_group_id = state.windows[ 0 ].tab_groups[ 0 ].id
@@ -26,14 +26,14 @@ function testSingleWindowAdd( t ) {
   })
 
   state = addTab( state, { tab_group_id, browser_tab } )
-  t.ok( validateState( state ), "state validates", validateState.errors )
+  t.ok( validateState( state ), "should pass validation", validateState.errors )
 
   t.equal( state.windows[ 0 ].tab_groups.length, 2 )
   t.equal( state.windows[ 0 ].tab_groups[ 1 ].tabs.length, 3 )
   t.end()
-}
+})
 
-function testMultiWindowAdd( t ) {
+tap.test( function testMultiWindowAdd( t ) {
   let state = getMultiWindowInitialState()
 
   // let tab_group_id = state.tab_groups[ 1 ].id
@@ -44,16 +44,16 @@ function testMultiWindowAdd( t ) {
   })
 
   state = addTab( state, { browser_tab } )
-  t.ok( validateState( state ), "state validates", validateState.errors )
+  t.ok( validateState( state ), "should pass validation", validateState.errors )
 
   t.equal( state.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
   t.equal( state.windows[ 0 ].tab_groups[ 1 ].tabs_count, state.windows[ 0 ].tab_groups[ 1 ].tabs.length )
   t.equal( state.windows[ 1 ].tab_groups[ 1 ].tabs.length, 3 )
   t.equal( state.windows[ 1 ].tab_groups[ 1 ].tabs_count, state.windows[ 1 ].tab_groups[ 1 ].tabs.length )
   t.end()
-}
+})
 
-function testAddToNewWindow( t ) {
+tap.test( function testAddToNewWindow( t ) {
   let state = getInitialState()
 
   let browser_tab = createBrowserTab({
@@ -63,14 +63,14 @@ function testAddToNewWindow( t ) {
   })
 
   state = addTab( state, { browser_tab } )
-  t.ok( validateState( state ), "state validates", validateState.errors )
+  t.ok( validateState( state ), "should pass validation", validateState.errors )
 
   t.equal( state.windows.length, 2 )
   t.equal( state.windows[ 1 ].tab_groups[ 1 ].tabs[ 0 ].id, 5 )
   t.end()
-}
+})
 
-function testReopenClosedPinnedTab( t ) {
+tap.test( function testReopenClosedPinnedTab( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -97,15 +97,15 @@ function testReopenClosedPinnedTab( t ) {
   })
 
   const state1 = addTab( state0, { browser_tab } )
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
 
   t.equal( state1.windows[ 0 ].tab_groups[ 0 ].tabs.length, 2 )
   t.equal( state1.windows[ 0 ].tab_groups[ 0 ].tabs[ 1 ].id, 5 )
 
   t.end()
-}
+})
 
-function testOpenNewTabWithOpenerId( t ) {
+tap.test( function testOpenNewTabWithOpenerId( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -137,13 +137,13 @@ function testOpenNewTabWithOpenerId( t ) {
   })
 
   const state1 = addTab( state0, { browser_tab } )
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs_count, 3 )
 
   t.end()
-}
+})
 
-function testOpenNewTabInOtherGroup( t ) {
+tap.test( function testOpenNewTabInOtherGroup( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -175,15 +175,15 @@ function testOpenNewTabInOtherGroup( t ) {
 
   const state1 = addTab( state0, { browser_tab } )
   const window1 = state1.windows[ 0 ]
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( window1.tab_groups[ 1 ].tabs_count, 2 )
   t.equal( window1.tab_groups[ 2 ].active_tab_id, 9 )
   t.equal( window1.active_tab_id, 9 )
   t.equal( window1.active_tab_group_id, 3 )
   t.end()
-}
+})
 
-function testOpenActiveTabUndefinedGroup( t ) {
+tap.test( function testOpenActiveTabUndefinedGroup( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -207,15 +207,7 @@ function testOpenActiveTabUndefinedGroup( t ) {
 
   const state1 = addTab( state0, { browser_tab, tab_group_id: undefined } )
   const window1 = state1.windows[ 0 ]
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( window1.active_tab_id, browser_tab.id )
   t.end()
-}
-
-tap.test( testSingleWindowAdd )
-tap.test( testMultiWindowAdd )
-tap.test( testAddToNewWindow )
-tap.test( testReopenClosedPinnedTab )
-tap.test( testOpenNewTabWithOpenerId )
-tap.test( testOpenNewTabInOtherGroup )
-tap.test( testOpenActiveTabUndefinedGroup )
+})

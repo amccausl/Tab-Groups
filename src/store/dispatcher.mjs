@@ -8,11 +8,10 @@ const debug = createDebug( "tabulate:store:dispatcher" )
 export function createStore( reducer, initial_state ) {
   const listeners = []
   let current_state = initial_state
-  let is_dispatching = false
   let dispatch_id = 0
 
   const store = {
-    is_dispatching,
+    is_dispatching: false,
     dispatch,
     subscribe,
     getState,

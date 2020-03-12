@@ -40,7 +40,7 @@ tap.test( function testRemoveFirstTab( t ) {
   }
 
   const state1 = removeTab( state0, { tab_id, window_id } )
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
 
   t.equal( state1.windows[ 0 ].tab_groups.length, 2 )
   t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
@@ -74,7 +74,7 @@ tap.test( function testRemoveMiddleTab( t ) {
   let tab_id = state0.windows[ 0 ].tab_groups[ 1 ].tabs[ 1 ].id
 
   const state1 = removeTab( state0, { tab_id, window_id } )
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
 
   t.equal( state1.windows[ 0 ].tab_groups.length, 2 )
   t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
@@ -105,7 +105,7 @@ tap.test( function testRemoveLastTab( t ) {
   }
 
   const state1 = removeTab( state0, { tab_id, window_id } )
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
 
   t.equal( state1.windows[ 0 ].tab_groups.length, 2 )
   t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs.length, 2 )
@@ -138,7 +138,7 @@ tap.test( function testRemoveLastTabInWindow( t ) {
   }
 
   const state1 = removeTab( state0, { tab_id, window_id } )
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
 
   t.equal( state1.windows.length, 1 )
   t.end()

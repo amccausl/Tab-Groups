@@ -34,7 +34,7 @@ tap.test( function removeActiveGroup( t ) {
   }
 
   const state1 = removeGroup( state0, { tab_group_id, window_id } )
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
 
   t.end()
 })

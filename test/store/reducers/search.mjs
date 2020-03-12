@@ -15,7 +15,7 @@ import {
   createTestTab,
 } from "../helpers.mjs"
 
-function testSingleWindowSearch( t ) {
+tap.test( function testSingleWindowSearch( t ) {
   const window_id = 1
   const state0 = {
     config: {},
@@ -47,9 +47,9 @@ function testSingleWindowSearch( t ) {
   t.same( state2.windows[ 0 ].search, { text: search_text, resolved: true, total_tabs_count, matched_tab_ids: [ 4, 6, 7, 8 ], queued_tab_ids: [] } )
 
   t.end()
-}
+})
 
-function testSingleWindowSearchUpdate( t ) {
+tap.test( function testSingleWindowSearchUpdate( t ) {
   const window_id = 1
   const state0 = {
     config: {},
@@ -80,7 +80,4 @@ function testSingleWindowSearchUpdate( t ) {
   t.same( state2.windows[ 0 ].search, { text: search_text, resolved: false, total_tabs_count, matched_tab_ids: [ 5 ], queued_tab_ids: [ 7, 8 ] } )
 
   t.end()
-}
-
-tap.test( testSingleWindowSearch )
-tap.test( testSingleWindowSearchUpdate )
+})

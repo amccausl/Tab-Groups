@@ -13,19 +13,19 @@ import {
   getInitialState,
 } from "./helpers.mjs"
 
-function testStateValidation( t ) {
+tap.test( function testStateValidation( t ) {
   const state = getInitialState()
 
-  t.ok( validateState( state ), "state validates", validateState.errors )
+  t.ok( validateState( state ), "should pass validation", validateState.errors )
 
   state.windows[ 0 ].tab_groups[ 1 ].tabs.push( state.windows[ 0 ].tab_groups[ 1 ].tabs[ 0 ] )
 
   t.equal( validateState( state ), false )
 
   t.end()
-}
+})
 
-function shouldFailWhenActiveTabNotInActiveGroup( t ) {
+tap.test( function shouldFailWhenActiveTabNotInActiveGroup( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -58,7 +58,4 @@ function shouldFailWhenActiveTabNotInActiveGroup( t ) {
   ])
 
   t.end()
-}
-
-tap.test( testStateValidation )
-tap.test( shouldFailWhenActiveTabNotInActiveGroup )
+})
