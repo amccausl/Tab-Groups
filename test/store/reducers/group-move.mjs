@@ -241,3 +241,42 @@ tap.test( function lastGroupToDifferentWindowWithPinned( t ) {
 
   t.end()
 })
+
+tap.test( function lastNonEmptyGroupToDifferentWindow( t ) {
+  // Latest firefox doesn't trigger window create first :(
+  const tab_group_index = 1
+  const source_data = {
+    window_id: 1,
+    tab_group_id: 3
+  }
+  const target_data = {
+    window_id: 2,
+    tab_group_index
+  }
+
+  const state0 = {
+    config: {},
+    windows: [
+      createWindow( source_data.window_id, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( source_data.tab_group_id, [
+          createTestTab({ id: 6 })
+        ]),
+        createTabGroup( 5, [] ),
+      ]),
+      createWindow( target_data.window_id, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( 4, [
+          createTestTab({ id: 8 })
+        ]),
+      ])
+    ]
+  }
+
+  const state1 = moveGroup( state0, { source_data, target_data } )
+
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
+  t.equal( state1.windows.length, 1, "should remove empty window" )
+
+  t.end()
+})
