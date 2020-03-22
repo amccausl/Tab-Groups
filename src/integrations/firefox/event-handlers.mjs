@@ -151,6 +151,17 @@ export function bindBrowserEvents( browser, browser_state, store ) {
         return
       }
       debug( `onTabUpdated( tab_id=${ tab_id }, change_info=${ change_info_json } )`, browser_tab )
+
+      if( browser_tab.hidden ) {
+        if( show_tab_ids.has( browser_tab.id ) ) {
+          console.info( "tab is out of sync, hidden but in shown list" )
+        }
+      } else {
+        if( hide_tab_ids.has( browser_tab.id ) ) {
+          console.info( "tab is out of sync, shown but in hidden list" )
+        }
+      }
+
       store.dispatch( updateTabAction( browser_tab, change_info ) )
     }],
     [ "tabs.onRemoved", function onTabRemoved( store, tab_id, { windowId, isWindowClosing } ) {

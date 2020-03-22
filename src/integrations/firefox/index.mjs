@@ -673,6 +673,7 @@ export async function moveTabGroup( store, source_data, target_data ) {
 
     window.event_handler.pause()
     const active_tab_index = source_tab_ids.indexOf( source_tab_group.active_tab_id || source_tab_ids[ 0 ] )
+    // Seed the window with the active tab to prevent a new tab or activate event
     const new_window = await browser.windows.create( { tabId: source_tab_ids[ active_tab_index ] } )
     if( source_tab_ids.length > 1 ) {
       if( active_tab_index < source_tab_ids.length - 1 ) {

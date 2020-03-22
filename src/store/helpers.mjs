@@ -1,6 +1,6 @@
 
 export const default_config = {
-  theme: 'system',
+  theme: "system",
   show_header: true,
   show_tabs_count: true,
   show_tabs: true,
@@ -15,7 +15,7 @@ export function createWindow( window_id, tab_groups, properties = {} ) {
     active_tab_group_id: tab_groups[ 1 ].id,
     active_tab_id: tab_groups[ 1 ].active_tab_id,
     highlighted_tab_ids: [ tab_groups[ 1 ].active_tab_id ].filter( id => id != null ),
-    tab_groups: tab_groups,
+    tab_groups,
     ...properties
   }
 }
@@ -23,7 +23,7 @@ export function createWindow( window_id, tab_groups, properties = {} ) {
 export function createTabGroup( tab_group_id, tabs, active_tab_id ) {
   return {
     id: tab_group_id,
-    title: typeof browser != 'undefined' ? browser.i18n.getMessage( "tab_group_name_placeholder", [ tab_group_id ] ) : `Group ${ tab_group_id }`,
+    title: typeof( browser ) !== "undefined" ? browser.i18n.getMessage( "tab_group_name_placeholder", [ tab_group_id ] ) : `Group ${ tab_group_id }`,
     active_tab_id: active_tab_id || ( tabs.length ? tabs[ 0 ].id : null ),
     tabs,
     tabs_count: tabs.length,
@@ -90,11 +90,11 @@ export function findTab( state, window_id, tab_id ) {
 }
 
 export function findTabGroup( state, window_id, tab_group_id ) {
-  for( let window of state.windows ) {
+  for( const window of state.windows ) {
     if( window.id !== window_id ) {
       continue
     }
-    for( let tab_group of window.tab_groups ) {
+    for( const tab_group of window.tab_groups ) {
       if( tab_group.id === tab_group_id ) {
         return tab_group
       }
@@ -129,7 +129,7 @@ export function getCreateTabTarget( state, browser_tab ) {
       // Tab was opened by a pinned tab, move to start of active group instead
       if( window.tab_groups[ 0 ].tabs.some( tab => tab.id === browser_tab.openerTabId ) ) {
         let index_offset = 0
-        for( let tab_group of window.tab_groups ) {
+        for( const tab_group of window.tab_groups ) {
           if( tab_group.id === window.active_tab_group_id ) {
             return {
               index: index_offset,
@@ -147,7 +147,7 @@ export function getCreateTabTarget( state, browser_tab ) {
     } else if( browser_tab.index === total_tabs_count ) {
       // This was probably created by native "New Tab" functionality
       let index_offset = 0
-      for( let tab_group of window.tab_groups ) {
+      for( const tab_group of window.tab_groups ) {
         if( tab_group.id === window.active_tab_group_id ) {
           return {
             index: index_offset + tab_group.tabs_count,
@@ -196,10 +196,10 @@ export function getTargetIndex( target_window, target_data, ignored_tabs ) {
   }
   let target_tab_group_index = target_data.tab_group_index
   let index_offset = 0
-  for( let tab_group of target_window.tab_groups ) {
+  for( const tab_group of target_window.tab_groups ) {
     if( target_data.tab_group_id === tab_group.id ) {
       let tab_group_index = 0
-      for( let tab of tab_group.tabs ) {
+      for( const tab of tab_group.tabs ) {
         if( target_tab_group_index === tab_group_index ) {
           return {
             index: index_offset + target_tab_group_index,
@@ -225,8 +225,8 @@ export function getTargetIndex( target_window, target_data, ignored_tabs ) {
 
 export function getSourceTabGroupData( source_window, source_data ) {
   let index_offset = 0
-  for( let tab_group of source_window.tab_groups ) {
-    let tab_group_index = tab_group.tabs.findIndex( tab => tab.id === source_data.tab_id )
+  for( const tab_group of source_window.tab_groups ) {
+    const tab_group_index = tab_group.tabs.findIndex( tab => tab.id === source_data.tab_id )
     if( tab_group_index > -1 ) {
       return {
         index: index_offset + tab_group_index,
@@ -242,12 +242,12 @@ export function getSourceTabGroupData( source_window, source_data ) {
 
 export function getTargetTabGroupData( target_window, target_data, ignored_tabs = [] ) {
   let index_offset = 0
-  for( let tab_group of target_window.tab_groups ) {
+  for( const tab_group of target_window.tab_groups ) {
     let { tabs_count } = tab_group
     if( ignored_tabs.length ) {
       tabs_count = tab_group.tabs.filter( tab => ! ignored_tabs.includes( tab ) ).length
     }
-    if( ! target_data.hasOwnProperty( 'pinned' ) || ( target_data.pinned && tab_group.pinned || ! tab_group.hasOwnProperty( 'pinned' ) ) ) {
+    if( ! target_data.hasOwnProperty( "pinned" ) || ( target_data.pinned && tab_group.pinned || ! tab_group.hasOwnProperty( "pinned" ) ) ) {
       // @todo can be more efficient
       const next_tab_group = target_window.tab_groups[ target_window.tab_groups.indexOf( tab_group ) + 1 ]
       if( target_data.index - index_offset === tabs_count && next_tab_group != null && next_tab_group.id === target_window.active_tab_group_id ) {
@@ -296,7 +296,7 @@ export function getTabMoveData( state, source_data, target_data ) {
         })
       }
 
-      for( let window of windows ) {
+      for( const window of windows ) {
         if( window.id !== source_data.window_id ) {
           continue
         }
@@ -312,17 +312,17 @@ export function getTabMoveData( state, source_data, target_data ) {
         }
         break
       }
-    } else if( source_data.type === 'moz-tab' ) {
+    } else if( source_data.type === "moz-tab" ) {
       // @todo scan target_data group, then window first
       const urls = ( source_data.url ? [ source_data.url ] : source_data.urls )
       source_data.tab_ids = Array( urls.length ).fill( null )
       source_data.tabs = Array( urls.length ).fill( null )
-      for( let window of windows ) {
+      for( const window of windows ) {
         if( window.highlighted_tab_ids.length !== urls.length ) {
           continue
         }
-        for( let tab_group of window.tab_groups ) {
-          for( let tab of tab_group.tabs ) {
+        for( const tab_group of window.tab_groups ) {
+          for( const tab of tab_group.tabs ) {
             if( ! window.highlighted_tab_ids.includes( tab.id ) ) {
               continue
             }
@@ -439,7 +439,7 @@ export function getTabGroupsPersistState( window ) {
 export function omit( obj, ...properties ) {
   const new_obj = {}
 
-  for( let key in obj ) {
+  for( const key in obj ) {
     if( ! properties.includes( key ) ) {
       new_obj[ key ] = obj[ key ]
     }

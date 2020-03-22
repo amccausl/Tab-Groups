@@ -25,13 +25,12 @@ export function createStore( reducer, initial_state ) {
     listeners.push( listener )
 
     return function unsubscribe() {
-      var index = listeners.indexOf( listener )
-      listeners.splice( index, 1 )
+      listeners.splice( listeners.indexOf( listener ), 1 )
     }
   }
 
   function dispatch( action ) {
-    let local_dispatch_id = ++dispatch_id
+    const local_dispatch_id = ++dispatch_id
     let is_unchanged = false
 
     try {
