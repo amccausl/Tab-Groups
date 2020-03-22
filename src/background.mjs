@@ -58,7 +58,18 @@ browser.runtime.onInstalled.addListener( function handleInstalled( { reason } ) 
 browser.commands.onCommand.addListener( function handleCommand( command ) {
   debug( "handleCommand", command )
   if( command === "toggle-feature-sidebar" ) {
-    browser.sidebarAction.toggle()
+    if( browser.sidebarAction.toggle ) {
+      browser.sidebarAction.toggle()
+    } else {
+      browser.sidebarAction.isOpen()
+        .then( is_open => {
+          if( is_open ) {
+            browser.sidebarAction.close()
+          } else {
+            browser.sidebarAction.open()
+          }
+        })
+    }
   }
 })
 

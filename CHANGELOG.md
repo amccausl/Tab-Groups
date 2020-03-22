@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - validation error on moving the last tabs from a window
 - move active group between windows
 - handling when active group is closed
+- feature toggle hotkey in older browsers
 
 ## [0.0.16] - 2020-02-17
 
