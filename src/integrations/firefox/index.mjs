@@ -18,7 +18,9 @@ import {
   getTabMoveData,
   getWindow,
 } from "../../store/helpers.mjs"
-
+import {
+  moveGroup,
+} from "../../store/reducers/group.mjs"
 import {
   ignorePendingMove,
 } from "./event-handlers.mjs"
@@ -267,6 +269,7 @@ function resetTabState( tab ) {
   ])
 }
 
+/** @type { ( tab_ids: string[], move_properties: { index: number, windowId?: number } ) => Promise<any | any[]> } */
 function moveBrowserTabs( tab_ids, move_properties ) {
   ignorePendingMove( tab_ids )
   if( debug.enabled ) {
@@ -637,14 +640,7 @@ export function moveTabsToGroup( store, source_data, target_data ) {
 
 /**
  * Move a tab group to a another window or index
- * @param store
- * @param source_data
- *   window_id
- *   tab_group_id
- * @param target_data
- *   window_id
- *   tab_group_index
- *   window_new
+ * @type { ( store, source_data: { window_id: number, tab_group_id: number }, target_data: { window_id: number, tab_group_index: number, window_new?: boolean } ) => Promise<any> }
  */
 export async function moveTabGroup( store, source_data, target_data ) {
   debug( "moveTabGroup", source_data, target_data )
@@ -659,6 +655,8 @@ export async function moveTabGroup( store, source_data, target_data ) {
   const source_tab_group = source_window.tab_groups[ source_tab_group_index ]
   const source_tab_ids = source_tab_group.tabs.map( tab => tab.id )
 
+  const source_tab_group_active = ( source_tab_group.id === source_window.active_tab_group_id )
+
   if( target_data.window_new ) {
     // @todo can optimize this branch
     if( source_tab_ids.length === 0 ) {
@@ -666,35 +664,69 @@ export async function moveTabGroup( store, source_data, target_data ) {
       return Promise.reject()
     }
 
-    // @todo prevent temp state by seeding with tab from the source_tab_ids
-    const new_window = await browser.windows.create( {} )
-    await moveTabGroup( store, source_data, { window_id: new_window.id, tab_group_index: 1 } )
+    // If active group is moved, select new active tab manually to prevent issues
+    if( source_tab_group_active ) {
+      debug( "updating active tab in source group" )
+      const successor_tab_group = source_window.tab_groups[ source_tab_group_index + 1 ] || source_window.tab_groups[ source_tab_group_index - 1 ]
+      await setTabActive( store, source_window.id, successor_tab_group.active_tab_id )
+    }
+
+    window.event_handler.pause()
+    const active_tab_index = source_tab_ids.indexOf( source_tab_group.active_tab_id || source_tab_ids[ 0 ] )
+    const new_window = await browser.windows.create( { tabId: source_tab_ids[ active_tab_index ] } )
+    if( source_tab_ids.length > 1 ) {
+      if( active_tab_index < source_tab_ids.length - 1 ) {
+        const after_tab_ids = source_tab_ids.slice( active_tab_index + 1 )
+        await moveBrowserTabs( after_tab_ids, { index: 1, windowId: new_window.id } )
+      }
+      if( active_tab_index > 0 ) {
+        const before_tab_ids = source_tab_ids.slice( 0, active_tab_index )
+        await moveBrowserTabs( before_tab_ids, { index: 0, windowId: new_window.id } )
+      }
+    }
+    store.dispatch( moveGroupAction( source_data, { window_id: new_window.id, tab_group_index: 1 } ) )
+    window.event_handler.clearQueuedEvents()
+    window.event_handler.resume()
 
     const state1 = store.getState()
 
     const target_window = state1.windows.find( window => window.id === new_window.id )
     if( ! target_window ) {
       // @todo error
+      console.error( "no target window" )
       return Promise.reject()
     }
-
-    // Remove the temporary group created by the window create process
-    await closeTabGroup( store, new_window.id, target_window.tab_groups[ 2 ].id )
   } else {
-    // Dispatch the update first to prevent move event handlers from getting confused
-    store.dispatch( moveGroupAction( source_data, target_data ) )
-
     if( source_tab_ids.length === 0 ) {
+      store.dispatch( moveGroupAction( source_data, target_data ) )
       return Promise.resolve()
     }
 
-    const state1 = store.getState()
-
+    const state1 = moveGroup( store.getState(), { source_data, target_data } )
     const target_window = state1.windows.find( window => window.id === target_data.window_id )
     if( ! target_window ) {
       // @todo error
       return Promise.reject()
     }
+
+    if( source_data.window_id === target_data.window_id ) {
+      const target_tab_group_index = target_window.tab_groups.findIndex( tab_group => tab_group.id === source_data.tab_group_id )
+      if( source_tab_group_index === target_tab_group_index ) {
+        debug( "moveTabGroup move is a noop, skipping" )
+        return Promise.resolve()
+      }
+    }
+
+    // If active group is moved, select new active tab manually to prevent issues
+    if( source_tab_group_active && source_data.window_id !== target_data.window_id ) {
+      debug( "updating active tab in source group" )
+      const source_window1 = state1.windows.find( window => window.id === source_data.window_id )
+      if( source_window1 ) {
+        await setTabActive( store, source_window1.id, source_window1.active_tab_id )
+      }
+    }
+
+    window.event_handler.pause()
 
     let index_offset = 0
     const tab_groups_length = target_window.tab_groups.length
@@ -708,8 +740,14 @@ export async function moveTabGroup( store, source_data, target_data ) {
         }
         if( source_data.window_id !== target_data.window_id ) {
           move_properties.windowId = target_data.window_id
+          await moveBrowserTabs( source_tab_ids.reverse(), move_properties )
+        } else {
+          await moveBrowserTabs( source_tab_ids, move_properties )
         }
-        return moveBrowserTabs( source_tab_ids, move_properties )
+        store.dispatch( moveGroupAction( source_data, target_data ) )
+        window.event_handler.clearQueuedEvents()
+        window.event_handler.resume()
+        return
       }
       // If move is local to window, and new index is after old index, move other tabs forward to prevent browser issue
       if( source_data.window_id === target_data.window_id && tab_group_index === source_tab_group_index ) {
@@ -718,12 +756,20 @@ export async function moveTabGroup( store, source_data, target_data ) {
           tab_ids.push( ...target_window.tab_groups[ tab_group_index ].tabs.map( tab => tab.id ) )
         }
         if( tab_ids.length === 0 ) {
+          window.event_handler.clearQueuedEvents()
+          window.event_handler.resume()
           return Promise.resolve()
         }
-        return moveBrowserTabs( tab_ids, { index: index_offset } )
+        await moveBrowserTabs( tab_ids, { index: index_offset } )
+        store.dispatch( moveGroupAction( source_data, target_data ) )
+        window.event_handler.clearQueuedEvents()
+        window.event_handler.resume()
+        return
       }
       index_offset += tab_group.tabs_count
     }
+    window.event_handler.clearQueuedEvents()
+    window.event_handler.resume()
     return Promise.reject()
   }
 }

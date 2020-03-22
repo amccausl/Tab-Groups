@@ -22,15 +22,19 @@ tap.test( function toSameWindow( t ) {
   const state0 = {
     config: {},
     windows: [
-      createWindow( window_id, [
-        createPinnedTabGroup( [] ),
-        createTabGroup( 2, [
-          createTestTab({ id: 4 })
-        ]),
-        createTabGroup( tab_group_id, [
-          createTestTab({ id: 5 })
-        ])
-      ])
+      createWindow(
+        window_id,
+        [
+          createPinnedTabGroup( [] ),
+          createTabGroup( 2, [
+            createTestTab({ id: 4 })
+          ]),
+          createTabGroup( tab_group_id, [
+            createTestTab({ id: 5 })
+          ]),
+        ],
+        { active_tab_group_id: tab_group_id, active_tab_id: 5, highlighted_tab_ids: [ 5 ] },
+      )
     ]
   }
 
@@ -40,6 +44,8 @@ tap.test( function toSameWindow( t ) {
   const state1 = moveGroup( state0, { source_data, target_data } )
   t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows[ 0 ].tab_groups[ tab_group_index ].id, tab_group_id )
+  t.equal( state1.windows[ 0 ].active_tab_group_id, tab_group_id, "should not update the active group during move" )
+  t.equal( state1.windows[ 0 ].active_tab_id, 5, "should not update the active tab during move" )
 
   t.end()
 })
@@ -277,6 +283,40 @@ tap.test( function lastNonEmptyGroupToDifferentWindow( t ) {
 
   t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows.length, 1, "should remove empty window" )
+
+  t.end()
+})
+
+tap.test( function toNewWindow( t ) {
+  const tab_group_index = 1
+  const source_data = {
+    window_id: 1,
+    tab_group_id: 3
+  }
+  const target_data = {
+    window_id: 2, // This window doesn't exist yet
+    tab_group_index: 1,
+  }
+
+  const state0 = {
+    config: {},
+    windows: [
+      createWindow( source_data.window_id, [
+        createPinnedTabGroup( [] ),
+        createTabGroup( source_data.tab_group_id, [
+          createTestTab({ id: 6 })
+        ]),
+        createTabGroup( 5, [
+          createTestTab({ id: 7 })
+        ]),
+      ]),
+    ]
+  }
+
+  const state1 = moveGroup( state0, { source_data, target_data } )
+
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
+  t.equal( state1.windows.length, 2, "should add a new window" )
 
   t.end()
 })

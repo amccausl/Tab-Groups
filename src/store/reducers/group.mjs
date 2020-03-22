@@ -1,5 +1,7 @@
 import {
+  createPinnedTabGroup,
   createTabGroup,
+  createWindow,
   getNewTabGroupId,
   omit,
 } from "../helpers.mjs"
@@ -132,8 +134,8 @@ export function moveGroup( state, { source_data, target_data } ) {
     return state
   }
 
-  // Replace active group info if active group was moved
-  if( windows[ source_window_index ].active_tab_group_id === source_data.tab_group_id ) {
+  // Replace active group info if active group was moved to a different window
+  if( windows[ source_window_index ].active_tab_group_id === source_data.tab_group_id && source_data.window_id !== target_data.window_id ) {
     const source_window1 = windows[ source_window_index ]
     let source_window_active_group1
     if( source_window1.tab_groups[ source_tab_group_index ] != null ) {
@@ -165,17 +167,22 @@ export function moveGroup( state, { source_data, target_data } ) {
     }
   }
 
-  const target_tab_groups = [ ...windows[ target_window_index ].tab_groups ]
-  let target_tab_group_index = target_data.tab_group_index
-  if( target_tab_group_index == null ) {
-    target_tab_group_index = target_tab_groups.length
-  } else if( source_window_index === target_window_index && source_tab_group_index < target_tab_group_index ) {
-    target_tab_group_index--
-  }
-  target_tab_groups.splice( target_tab_group_index, 0, source_tab_group )
-  windows[ target_window_index ] = {
-    ...windows[ target_window_index ],
-    tab_groups: target_tab_groups
+  if( target_window_index === -1 ) {
+    // If the target is new, we can create here
+    windows.push( createWindow( target_data.window_id, [ createPinnedTabGroup( [] ), source_tab_group ] ) )
+  } else {
+    const target_tab_groups = [ ...windows[ target_window_index ].tab_groups ]
+    let target_tab_group_index = target_data.tab_group_index
+    if( target_tab_group_index == null ) {
+      target_tab_group_index = target_tab_groups.length
+    } else if( source_window_index === target_window_index && source_tab_group_index < target_tab_group_index ) {
+      target_tab_group_index--
+    }
+    target_tab_groups.splice( target_tab_group_index, 0, source_tab_group )
+    windows[ target_window_index ] = {
+      ...windows[ target_window_index ],
+      tab_groups: target_tab_groups
+    }
   }
 
   if( windows[ source_window_index ].remove ) {
