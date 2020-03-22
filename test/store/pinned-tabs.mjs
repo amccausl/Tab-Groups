@@ -15,7 +15,27 @@ import init from "../../src/store/reducers/init.mjs"
 import { addTab, updateTab } from "../../src/store/reducers/tab.mjs"
 import { validateState } from "../../src/store/validators.mjs"
 
-function testSingleWindowFreshInit( t ) {
+function testSingleWindowFreshPinnedInit( t ) {
+  const browser_tabs = [
+    createBrowserTab({
+      id: 1,
+      index: 0,
+      windowId: 1
+    }),
+    createBrowserTab({
+      id: 2,
+      index: 1,
+      windowId: 1
+    })
+  ]
+  const window_tab_groups_map = new Map()
+
+  // @todo toggle based on config
+  t.end()
+}
+
+// @todo move pinned tabs
+tap.test( function testSingleWindowFreshInit( t ) {
   const browser_tabs = [
     createBrowserTab({
       id: 1,
@@ -39,28 +59,9 @@ function testSingleWindowFreshInit( t ) {
   t.equal( initial_state.windows[ 0 ].tab_groups[ 1 ].pinned, undefined )
   t.equal( initial_state.windows[ 0 ].active_tab_group_id, 1 )
   t.end()
-}
+})
 
-function testSingleWindowFreshPinnedInit( t ) {
-  const browser_tabs = [
-    createBrowserTab({
-      id: 1,
-      index: 0,
-      windowId: 1
-    }),
-    createBrowserTab({
-      id: 2,
-      index: 1,
-      windowId: 1
-    })
-  ]
-  const window_tab_groups_map = new Map()
-
-  // @todo toggle based on config
-  t.end()
-}
-
-function testPinnedTabs( t ) {
+tap.test( function testPinnedTabs( t ) {
   const browser_tabs = [
     createBrowserTab({
       id: 1,
@@ -115,9 +116,9 @@ function testPinnedTabs( t ) {
   t.equal( state.windows[ 0 ].tab_groups[ 0 ].tabs.length, 1 )
 
   t.end()
-}
+})
 
-function testOpenerPinnedTab( t ) {
+tap.test( function testOpenerPinnedTab( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -141,13 +142,13 @@ function testOpenerPinnedTab( t ) {
 
   const state1 = addTab( state0, { browser_tab } )
 
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows[ 0 ].tab_groups[ 0 ].tabs_count, 1 )
   t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs[ 0 ].id, 3 )
   t.end()
-}
+})
 
-function testReopenPinnedTab( t ) {
+tap.test( function testReopenPinnedTab( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -171,13 +172,13 @@ function testReopenPinnedTab( t ) {
 
   const state1 = addTab( state0, { browser_tab } )
 
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows[ 0 ].tab_groups[ 0 ].tabs_count, 2 )
   t.equal( state1.windows[ 0 ].tab_groups[ 0 ].tabs[ 1 ].id, 3 )
   t.end()
-}
+})
 
-function testPinActiveTab( t ) {
+tap.test( function testPinActiveTab( t ) {
   const state0 = getInitialState()
 
   let browser_tab = createBrowserTab({
@@ -187,14 +188,7 @@ function testPinActiveTab( t ) {
   })
   const state1 = updateTab( state0, { browser_tab, change_info: { pinned: true } } )
 
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
 
   t.end()
-}
-
-// @todo move pinned tabs
-tap.test( testSingleWindowFreshInit )
-tap.test( testPinnedTabs )
-tap.test( testOpenerPinnedTab )
-tap.test( testReopenPinnedTab )
-tap.test( testPinActiveTab )
+})

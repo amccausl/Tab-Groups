@@ -464,57 +464,60 @@ export function moveTabs( state0, { source_data, target_data } ) {
 }
 
 export function removeTab( state, { tab_id, window_id } ) {
-  const windows = state.windows.map( window => {
-    if( window.id === window_id ) {
-      let active_tab_id = window.active_tab_id
-      let tab_groups = window.tab_groups.map( tab_group => {
-        const tab_index = tab_group.tabs.findIndex( tab => tab.id === tab_id )
-        if( tab_index > -1 ) {
-          tab_group = {
-            ...tab_group,
-            tabs: [ ...tab_group.tabs ],
-            tabs_count: tab_group.tabs_count - 1
-          }
-          tab_group.tabs.splice( tab_index, 1 )[ 0 ]
-          if( tab_group.active_tab_id === tab_id ) {
-            if( tab_group.tabs_count > 0 ) {
-              tab_group.active_tab_id = tab_group.tabs[ Math.min( tab_index, tab_group.tabs_count - 1 ) ].id
-            } else {
-              tab_group.active_tab_id = null
-            }
-            if( active_tab_id === tab_id ) {
-              active_tab_id = tab_group.active_tab_id
-            }
-          }
+  const windows = state.windows.reduce( ( acc, window ) => {
+    if( window.id !== window_id ) {
+      acc.push( window )
+      return acc
+    }
+    let active_tab_id = window.active_tab_id
+    let tab_groups = window.tab_groups.map( tab_group => {
+      const tab_index = tab_group.tabs.findIndex( tab => tab.id === tab_id )
+      if( tab_index > -1 ) {
+        tab_group = {
+          ...tab_group,
+          tabs: [ ...tab_group.tabs ],
+          tabs_count: tab_group.tabs_count - 1
         }
-        return tab_group
-      })
-
-      let { highlighted_tab_ids } = window
-      if( highlighted_tab_ids.includes( tab_id ) ) {
-        if( highlighted_tab_ids.length === 1 ) {
-          highlighted_tab_ids = [ active_tab_id ]
-        } else {
-          highlighted_tab_ids = highlighted_tab_ids.filter( ( highlighted_tab_id ) => highlighted_tab_id !== tab_id )
+        tab_group.tabs.splice( tab_index, 1 )[ 0 ]
+        if( tab_group.active_tab_id === tab_id ) {
+          if( tab_group.tabs_count > 0 ) {
+            tab_group.active_tab_id = tab_group.tabs[ Math.min( tab_index, tab_group.tabs_count - 1 ) ].id
+          } else {
+            tab_group.active_tab_id = null
+          }
+          if( active_tab_id === tab_id ) {
+            active_tab_id = tab_group.active_tab_id
+          }
         }
       }
+      return tab_group
+    })
 
-      window = {
-        ...window,
-        active_tab_id,
-        highlighted_tab_ids,
-        tab_groups,
+    let { highlighted_tab_ids } = window
+    if( highlighted_tab_ids.includes( tab_id ) ) {
+      if( highlighted_tab_ids.length === 1 ) {
+        if( active_tab_id == null ) {
+          return acc
+        }
+        highlighted_tab_ids = [ active_tab_id ]
+      } else {
+        highlighted_tab_ids = highlighted_tab_ids.filter( ( highlighted_tab_id ) => highlighted_tab_id !== tab_id )
       }
     }
-    return window
-  })
 
-  const new_state = {
+    acc.push({
+      ...window,
+      active_tab_id,
+      highlighted_tab_ids,
+      tab_groups,
+    })
+    return acc
+  }, [] )
+
+  return {
     ...state,
     windows
   }
-
-  return new_state
 }
 
 function isArrayEqual( arr1, arr2 ) {

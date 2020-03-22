@@ -151,6 +151,17 @@ export function bindBrowserEvents( browser, browser_state, store ) {
         return
       }
       debug( `onTabUpdated( tab_id=${ tab_id }, change_info=${ change_info_json } )`, browser_tab )
+
+      if( browser_tab.hidden ) {
+        if( show_tab_ids.has( browser_tab.id ) ) {
+          console.info( "tab is out of sync, hidden but in shown list" )
+        }
+      } else {
+        if( hide_tab_ids.has( browser_tab.id ) ) {
+          console.info( "tab is out of sync, shown but in hidden list" )
+        }
+      }
+
       store.dispatch( updateTabAction( browser_tab, change_info ) )
     }],
     [ "tabs.onRemoved", function onTabRemoved( store, tab_id, { windowId, isWindowClosing } ) {
@@ -163,15 +174,21 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       const ignore_index = ignore_moves.indexOf( tab_id )
       if( ignore_index > -1 ) {
         ignore_moves.splice( ignore_index, 1 )
-        debug( "onTabMoved: ignoring event" )
+        debug( "tabs.onMoved: ignoring event" )
       } else {
         store.dispatch( moveTabAction( tab_id, windowId, toIndex ) )
         // @todo update succession if required
       }
     }],
     [ "tabs.onAttached", function onTabAttached( store, tab_id, { newWindowId, newPosition } ) {
-      store.dispatch( attachTabAction( tab_id, newWindowId, newPosition ) )
-      // @todo update succession if required
+      const ignore_index = ignore_moves.indexOf( tab_id )
+      if( ignore_index > -1 ) {
+        ignore_moves.splice( ignore_index, 1 )
+        debug( "tabs.onAttached: ignoring event" )
+      } else {
+        // @todo update succession if required
+        store.dispatch( attachTabAction( tab_id, newWindowId, newPosition ) )
+      }
     }],
     [ "tabs.onActivated", function onTabActivated( store, { tabId, windowId } ) {
       // @todo if previous tab.url == about:config, check features
@@ -207,6 +224,7 @@ export function bindBrowserEvents( browser, browser_state, store ) {
 
   async function runQueuedEvents() {
     if( is_processing || is_paused ) {
+      debug( "handleEvent skipping" )
       return
     }
     is_processing = true
@@ -276,9 +294,9 @@ export function bindBrowserEvents( browser, browser_state, store ) {
       const hide_ids = []
       const updates = []
 
-      for( let window of state.windows ) {
+      for( const window of state.windows ) {
         // @todo check for noop
-        for( let tab_group of window.tab_groups ) {
+        for( const tab_group of window.tab_groups ) {
           if( tab_group.hasOwnProperty( "pinned" ) ) {
             continue
           }
@@ -306,16 +324,23 @@ export function bindBrowserEvents( browser, browser_state, store ) {
 
   return {
     pause() {
+      debug( "pause" )
       is_paused = true
     },
     resume() {
+      debug( "resume" )
       is_paused = false
       return runQueuedEvents()
+    },
+    clearQueuedEvents() {
+      debug( "clearQueuedEvents", JSON.stringify( queued_events ) )
+      queued_events.splice( 0, queued_events.length )
     },
     getQueuedEvents() {
       return queued_events
     },
     removeQueuedEvent( index, count = 1 ) {
+      debug( "removeQueuedEvent", index, count, JSON.stringify( queued_events ) )
       queued_events.splice( index, count )
     },
   }

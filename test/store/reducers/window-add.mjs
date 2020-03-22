@@ -1,13 +1,8 @@
 import tap from 'tap'
 
-import {
-  getInitialState,
-  getMultiWindowInitialState,
-} from "../helpers.mjs"
-
 import { addWindow } from "../../../src/store/reducers/window.mjs"
 
-function testSingleWindowAdd( t ) {
+tap.test( function testSingleWindowAdd( t ) {
   let state = {
     windows: []
   }
@@ -22,6 +17,4 @@ function testSingleWindowAdd( t ) {
   t.equal( state.windows.length, 2 )
   t.equal( state.windows[ 1 ].id, 2 )
   t.end()
-}
-
-tap.test( testSingleWindowAdd )
+})

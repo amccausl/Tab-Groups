@@ -15,7 +15,7 @@ const required_props = [
   "sidebar_name",
 ]
 
-async function validateLocales( t ) {
+tap.test( async function validateLocales( t ) {
   const locales_path = "./src/assets/_locales"
   const locales_keys = await readDir( locales_path )
 
@@ -39,6 +39,4 @@ async function validateLocales( t ) {
   }
 
   t.end()
-}
-
-tap.test( validateLocales )
+})

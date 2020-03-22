@@ -11,7 +11,7 @@ import { validateState } from "../../../src/store/validators.mjs"
 
 import { moveTabs } from "../../../src/store/reducers/tab.mjs"
 
-function testSingleWindowMoveOne( t ) {
+tap.test( function testSingleWindowMoveOne( t ) {
   const initial_state = {
     config: {},
     windows: [
@@ -30,7 +30,7 @@ function testSingleWindowMoveOne( t ) {
     ]
   }
 
-  t.ok( validateState( initial_state ), "state validates", validateState.errors )
+  t.ok( validateState( initial_state ), "should pass validation", validateState.errors )
 
   let source_data = {
     window_id: 1,
@@ -43,11 +43,11 @@ function testSingleWindowMoveOne( t ) {
   let tab_move_data = getTabMoveData( initial_state, source_data, target_data )
 
   const state1 = moveTabs( initial_state, tab_move_data )
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.end()
-}
+})
 
-function testMoveActiveTab( t ) {
+tap.test( function testMoveActiveTab( t ) {
   const last_active = ( new Date() ).getTime() - 10
   const initial_state = {
     config: {},
@@ -70,7 +70,7 @@ function testMoveActiveTab( t ) {
     ]
   }
 
-  t.ok( validateState( initial_state ), "state validates", validateState.errors )
+  t.ok( validateState( initial_state ), "should pass validation", validateState.errors )
 
   let active_tab_group = initial_state.windows[ 0 ].tab_groups.find( tab_group => tab_group.id === initial_state.windows[ 0 ].active_tab_group_id )
   let inactive_tab_group = initial_state.windows[ 0 ].tab_groups.find( tab_group => tab_group.id && tab_group.id !== initial_state.windows[ 0 ].active_tab_group_id )
@@ -88,14 +88,14 @@ function testMoveActiveTab( t ) {
   let tab_move_data = getTabMoveData( initial_state, source_data, target_data )
 
   const state1 = moveTabs( initial_state, tab_move_data )
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows[ 0 ].active_tab_group_id, inactive_tab_group.id, "activate new group on move of active tab" )
   t.type( state1.windows[ 0 ].tab_groups[ 2 ].last_active, "number" )
   t.ok( state1.windows[ 0 ].tab_groups[ 2 ].last_active > last_active, `${ state1.windows[ 0 ].tab_groups[ 2 ].last_active } > ${ last_active }` )
   t.end()
-}
+})
 
-function testMoveTabsToNewGroup( t ) {
+tap.test( function testMoveTabsToNewGroup( t ) {
   const last_active = ( new Date() ).getTime() - 10
   const state0 = {
     config: {},
@@ -133,7 +133,7 @@ function testMoveTabsToNewGroup( t ) {
 
   const state1 = moveTabs( state0, tab_move_data )
 
-  t.ok( validateState( state1 ), "state validates", validateState.errors )
+  t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   const target_tab_group = state1.windows[ 0 ].tab_groups[ 2 ]
   t.equal( state1.windows[ 0 ].tab_groups.length, 3 )
   t.same( target_tab_group.tabs.map( tab => tab.id ), source_data.tab_ids )
@@ -142,8 +142,4 @@ function testMoveTabsToNewGroup( t ) {
   t.equal( state1.windows[ 0 ].active_tab_id, 7 )
   t.equal( state1.windows[ 0 ].active_tab_group_id, tab_move_data.target_data.tab_group_id )
   t.end()
-}
-
-tap.test( testSingleWindowMoveOne )
-tap.test( testMoveActiveTab )
-tap.test( testMoveTabsToNewGroup )
+})
