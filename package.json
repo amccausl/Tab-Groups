@@ -30,19 +30,19 @@
   "devDependencies": {
     "@brightcove/kacl": "0.1.8",
     "@rollup/plugin-commonjs": "13.0.0",
-    "@rollup/plugin-node-resolve": "8.0.1",
+    "@rollup/plugin-node-resolve": "8.1.0",
     "@rollup/plugin-replace": "2.3.3",
     "ajv": "6.12.2",
     "ajv-cli": "3.2.1",
     "debug": "4.1.1",
-    "eslint": "7.3.0",
+    "eslint": "7.3.1",
     "fira": "git://github.com/mozilla/Fira.git#fd8c8c0a3d353cd99e8ca1662942d165e6961407",
-    "rollup": "2.17.1",
+    "rollup": "2.18.1",
     "rollup-plugin-vue": "5.1.6",
-    "sass": "1.26.8",
+    "sass": "1.26.9",
     "tap": "14.10.7",
     "vue": "2.6.11",
     "vue-template-compiler": "2.6.11",
-    "web-ext": "4.2.0"
+    "web-ext": "4.3.0"
   }
 }
