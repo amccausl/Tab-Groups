@@ -37,12 +37,12 @@
     "debug": "4.1.1",
     "eslint": "7.7.0",
     "fira": "git://github.com/mozilla/Fira.git#fd8c8c0a3d353cd99e8ca1662942d165e6961407",
-    "rollup": "2.26.2",
+    "rollup": "2.26.8",
     "rollup-plugin-vue": "5.1.9",
     "sass": "1.26.10",
     "tap": "14.10.8",
-    "vue": "2.6.11",
-    "vue-template-compiler": "2.6.11",
+    "vue": "2.6.12",
+    "vue-template-compiler": "2.6.12",
     "web-ext": "5.0.0"
   }
 }
