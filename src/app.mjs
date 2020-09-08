@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 import Action from './components/Action.vue'
 import Options from './components/Options.vue'
@@ -31,23 +31,14 @@ Promise.all([
   window.store = store
 
   if( window.document.getElementById( 'action' ) ) {
-    new Vue({
-      el: '#action',
-      render: ( h ) => h( Action )
-    })
+    createApp( Action ).mount( '#action' )
   }
 
   if( window.document.getElementById( 'options' ) ) {
-    new Vue({
-      el: '#options',
-      render: ( h ) => h( Options )
-    })
+    createApp( Options ).mount( '#options' )
   }
 
   if( window.document.getElementById( 'sidebar' ) ) {
-    new Vue({
-      el: '#sidebar',
-      render: ( h ) => h( Sidebar )
-    })
+    createApp( Sidebar ).mount( '#sidebar' )
   }
 })

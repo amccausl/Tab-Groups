@@ -341,7 +341,7 @@ export function onTabGroupDrop( event, tab_group, tab_group_index, type ) {
       case "tab": {
         if( tab_group == null ) {
           return window.background.createGroup( window.store, this.window_id, event_data )
-          .then( tab_group => this.renameTabGroup( tab_group.id ) )
+            .then( tab_group => this.renameTabGroup( tab_group.id ) )
         }
         const target_data = {
           window_id: this.window_id,

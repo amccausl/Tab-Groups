@@ -1,9 +1,9 @@
+import app_config from "./rollup.app.config"
 import background_config from "./rollup.background.config"
-import main_config from "./rollup.main.config"
 
 const config = [
   background_config,
-  main_config,
+  app_config,
 ]
 
 export default config

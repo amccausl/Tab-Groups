@@ -312,7 +312,6 @@ export default {
   }
 
   &__input {
-    // @todo need to determine how this is still selectable
     display: none;
   }
 

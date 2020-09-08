@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Changed
+- performance improvements for large tab lists
+
 ## [0.0.17] - 2020-03-22
 
 ### Fixed
