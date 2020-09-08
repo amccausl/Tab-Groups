@@ -251,13 +251,13 @@
       onTabGroupDragLeave,
       onTabGroupDragEnd,
       onTabGroupDrop,
-      onTabGroupTitleInput( title, tab_group ) {
-        console.info('onTabGroupTitleInput', title, tab_group)
-        // Update interferes with the editable div if it happens too quickly
-        this.rename_tab_group_id = null
+      onTabGroupTitleInput( title ) {
+        console.info('onTabGroupTitleInput', title )
         // @todo skip if empty, reset
         // @todo should be moved to background
-        window.store.dispatch( updateGroupAction( tab_group.id, this.window_id, { title } ) )
+        window.store.dispatch( updateGroupAction( this.rename_tab_group_id, this.window_id, { title } ) )
+        // Update interferes with the editable div if it happens too quickly
+        this.rename_tab_group_id = null
       },
       getTabSearchState( tab ) {
         if( ! this.is_searching ) {
@@ -304,16 +304,21 @@
           v-for="(tab_group, tab_group_index) in tab_groups" :key="tab_group.id"
       >
         <div class="sidebar-tab_groups-list__item">
-          <div :class="bem( 'tab-groups-list-item-header', { 'active': active_tab_group_id === tab_group.id, 'open': show_tabs && tab_group.open, 'drag-source': isTabGroupDragSource( tab_group ), [`drag-${ drag_state.source.type }-target`]: ! isTabGroupDragSource( tab_group ) && isTabGroupDragTarget( tab_group ) } )"
-              :title="tab_group.title"
-              @dragenter="onTabGroupDragEnter( $event, tab_group, tab_group_index + 1 )"
-              @dragover.prevent
-              @dragleave="onTabGroupDragLeave( $event, tab_group, tab_group_index + 1 )"
-              @drop="onTabGroupDrop( $event, tab_group, tab_group_index + 1 )"
-              @click="onTabGroupClick( tab_group )"
-              draggable="true"
-              @dragstart="onTabGroupDragStart( $event, tab_group )"
-              @dragend="onTabGroupDragEnd( $event, tab_group )"
+          <div :class="bem( 'tab-groups-list-item-header', {
+              'active': active_tab_group_id === tab_group.id,
+              'open': show_tabs && tab_group.open,
+              'drag-source': isTabGroupDragSource( tab_group ),
+              [`drag-${ drag_state.source.type }-target`]: ! isTabGroupDragSource( tab_group ) && isTabGroupDragTarget( tab_group )
+            } )"
+            :title="tab_group.title"
+            @dragenter="onTabGroupDragEnter( $event, tab_group, tab_group_index + 1 )"
+            @dragover.prevent
+            @dragleave="onTabGroupDragLeave( $event, tab_group, tab_group_index + 1 )"
+            @drop="onTabGroupDrop( $event, tab_group, tab_group_index + 1 )"
+            @click="onTabGroupClick( tab_group )"
+            draggable="true"
+            @dragstart="onTabGroupDragStart( $event, tab_group )"
+            @dragend="onTabGroupDragEnd( $event, tab_group )"
           >
             <div class="tab-groups-list-item-header__container">
               <div class="tab-groups-list-item-header__drag-target-ink"></div>
@@ -322,7 +327,7 @@
                   <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
                 </svg>
                 <div :class="bem( `tab-groups-list-item-header__title`, { 'editing': rename_tab_group_id === tab_group.id } )">
-                  <editable class="tab-groups-list-item-header__title-editable" v-model="tab_group.title" @input="onTabGroupTitleInput( $event, tab_group )" :active="rename_tab_group_id === tab_group.id"></editable>
+                  <editable class="tab-groups-list-item-header__title-editable" :model-value="tab_group.title" @update:model-value="onTabGroupTitleInput( $event )" :active="rename_tab_group_id === tab_group.id"></editable>
                 </div>
 
                 <svg v-if="tab_group.muted" :class="bem( `tab-groups-list-item-header__icon`, { 'audio-mute': true } )" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -564,11 +569,37 @@
     &--theme-dark {
       --sidebar--color: #fff;
       --sidebar--background-color: #000;
+      --sidebar__action-strip--background-color: #323234;
+      --sidebar__action-strip--button-background-color: #323234;
+      --sidebar__action-strip--button-hover-background-color: #5b5b5d;
+      --sidebar__action-strip--text-color: #d0d0d0;
+      --sidebar__dropzone--background-color: black;
+      --sidebar__scrollbar--background-color: black;
+      --sidebar__scrollbar--color: #5b5b5d;
+      --sidebar__separator--color: #545455;
+      --sidebar__tab-groups-list--active-background-color: #323234;
+      --sidebar__tab-groups-list--background-color: #0c0c0d;
+      --sidebar__tab-groups-list-item-header--hover-background-color: #5b5b5d;
+      --sidebar__text--primary-color: #fff;
+      --sidebar__text--secondary-color: #f9f9fa;
     }
 
     &--theme-light {
       --sidebar--color: #0c0c0d;
       --sidebar--background-color: #fff;
+      --sidebar__action-strip--background-color: #f5f6f7;
+      --sidebar__action-strip--button-background-color: #f5f6f7;
+      --sidebar__action-strip--button-hover-background-color: #d0d0d0;
+      --sidebar__action-strip--text-color: rgba(12, 12, 13, 0.8);
+      --sidebar__dropzone--background-color: #fff;
+      --sidebar__scrollbar--background-color: #fff;
+      --sidebar__scrollbar--color: #cccdcf;
+      --sidebar__separator--color: #e0e0e1;
+      --sidebar__tab-groups-list--active-background-color: #f5f6f7;
+      --sidebar__tab-groups-list--background-color: #fff;
+      --sidebar__tab-groups-list-item-header--hover-background-color: #cccdcf;
+      --sidebar__text--primary-color: #0c0c0d;
+      --sidebar__text--secondary-color: #737373;
     }
 
     width: 100%;

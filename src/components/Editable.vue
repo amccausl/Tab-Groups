@@ -6,7 +6,7 @@
   export default {
     name: "editable",
     props: {
-      "value": {
+      "modelValue": {
         type: String,
         required: true
       },
@@ -16,14 +16,12 @@
       }
     },
     mounted() {
-      this.$el.innerText = this.value
+      this.$el.innerText = this.modelValue
       if( this.active ) {
         nextTick( () => {
           this.$el.focus()
         })
       }
-
-      this.$on( "input", this.onInput )
     },
     methods: {
       onClick( event ) {
@@ -41,15 +39,14 @@
         sel.addRange( range )
       },
       onBlur() {
-        this.$emit( "input", this.$el.innerText.replace( /\n/g, "" ) )
+        const value = this.$el.innerText.replace( /\n/g, "" )
+        this.$emit( "update:modelValue", value )
+        this.$el.innerHTML = value
         this.$el.parentElement.scrollLeft = 0
       },
       onPressEnter() {
         this.$el.blur()
       },
-      onInput( value ) {
-        this.$el.innerHTML = value
-      }
     },
     watch: {
       active( active ) {
