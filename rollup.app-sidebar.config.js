@@ -8,7 +8,7 @@ const config = {
   input: './src/app-sidebar.mjs',
   output: {
     file: './dist/js/app-sidebar.js',
-    format: 'umd',
+    format: 'iife',
     sourcemap: false,
   },
   plugins: [

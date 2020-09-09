@@ -8,7 +8,7 @@ const config = {
   input: './src/app-options.mjs',
   output: {
     file: './dist/js/app-options.js',
-    format: 'umd',
+    format: 'iife',
     sourcemap: false,
   },
   plugins: [

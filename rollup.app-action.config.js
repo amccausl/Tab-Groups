@@ -8,7 +8,7 @@ const config = {
   input: './src/app-action.mjs',
   output: {
     file: './dist/js/app-action.js',
-    format: 'umd',
+    format: 'iife',
     sourcemap: false,
   },
   plugins: [
