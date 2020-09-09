@@ -17,6 +17,30 @@ export function bem( base, modifiers ) {
   return classes
 }
 
+export function bootstrap() {
+  return Promise.all([
+    browser.windows.getCurrent(),
+    browser.runtime.getBackgroundPage()
+      .then( background => {
+        // Save a reference to the background script so it can be accessed syncronously
+        window.background = background
+
+        // Sometimes this is reached before the background script has run it's initializer, check for that
+        if( background.getStore ) {
+          return background.getStore()
+        }
+
+        console.info('deferring load')
+        return new Promise( ( resolve ) => {
+          background.addEventListener( "load", () => {
+            console.info('load event', background.getStore)
+            resolve( background.getStore() )
+          })
+        })
+      })
+  ])
+}
+
 /**
  * Delay execution of function, use only most recent args.  Works to wrap method on component
  * @param fn Function to delay

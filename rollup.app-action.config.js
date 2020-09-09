@@ -5,17 +5,17 @@ import scss from 'rollup-plugin-scss'
 import vue from 'rollup-plugin-vue'
 
 const config = {
-  input: './src/app.mjs',
+  input: './src/app-action.mjs',
   output: {
-    file: './dist/js/app.js',
+    file: './dist/js/app-action.js',
     format: 'umd',
-    sourcemap: true
+    sourcemap: false,
   },
   plugins: [
     vue({
     }),
     scss({
-      output: './dist/css/app.css',
+      output: './dist/css/app-action.css',
     }),
     replace({
       'process.env.NODE_ENV': JSON.stringify( 'production' ),
