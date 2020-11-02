@@ -1,3 +1,74 @@
+<script>
+  import {
+    bem,
+  } from "./helpers.mjs"
+
+  export default {
+    name: "tab-icon",
+    props: [ "theme", "tab", "size" ],
+    data() {
+      return {
+        error_url: null,
+      }
+    },
+    computed: {
+      icon() {
+        // Handle icons blocked by app security
+        switch( this.tab.icon_url ) {
+          case "chrome://mozapps/skin/extensions/extensionGeneric-16.svg":
+            return { is_svg: true, url: "/favicons/firefox-addon.svg" }
+          case "chrome://branding/content/icon32.png":
+            return { is_svg: true, url: "/favicons/firefox-logo.svg" }
+        }
+
+        if( this.tab.url.startsWith( "about:" ) ) {
+          if( this.tab.url === 'about:debugging' || this.tab.url === 'about:config' || this.tab.url === 'about:newtab' ) {
+            return { is_svg: true, url: "/favicons/firefox-logo.svg" }
+          }
+        }
+
+        // Handle icons blocked by tracking protection
+        // Twitter
+        if( this.tab.url.startsWith( "https://twitter.com" ) ) {
+          return { is_svg: false, url: "/favicons/twitter.svg" }
+        }
+        // Google
+        if( this.tab.url.startsWith( "https://mail.google.com" ) ) {
+          return { is_svg: false, url: "/favicons/google/mail.ico" }
+        }
+        if( this.tab.url.startsWith( "https://docs.google.com/document" ) ) {
+          return { is_svg: false, url: "/favicons/google/document.ico" }
+        }
+        if( this.tab.url.startsWith( "https://docs.google.com/presentation" ) ) {
+          return { is_svg: false, url: "/favicons/google/presentation.ico" }
+        }
+
+        // Remaining icons
+        return { is_svg: false, url: this.tab.icon_url }
+      },
+    },
+    created() {
+    },
+    methods: {
+      bem,
+      muteTab( event ) {
+        console.info('muteTab', this.tab.id)
+        event.stopPropagation()
+        window.background.muteTab( window.store, window.current_window_id, this.tab.id )
+      },
+      unmuteTab( event ) {
+        console.info('unmuteTab', this.tab.id)
+        event.stopPropagation()
+        window.background.unmuteTab( window.store, window.current_window_id, this.tab.id )
+      },
+      onIconLoadError( event ) {
+        console.info('onIconLoadError', event, this.tab.id, this.tab.icon_url)
+        this.error_url = this.tab.icon_url
+      }
+    }
+  }
+</script>
+
 <template>
   <div :class="bem( 'tab-icon', { 'is-loading': tab.status === 'loading' } )">
     <img v-if="icon.url && ! icon.is_svg && error_url !== icon.url" class="tab-icon__img" :src="icon.url" :style="{ height: `${ size }px`, width: `${ size }px` }" @error="onIconLoadError"/>
@@ -37,178 +108,160 @@
   </div>
 </template>
 
-<script>
-import {
-  bem,
-} from "./helpers.mjs"
+<style lang="scss">
+  @import "../styles/photon-colors";
 
-export default {
-  name: "tab-icon",
-  props: [ "theme", "tab", "size" ],
-  data() {
-    return {
-      error_url: null,
-    }
-  },
-  computed: {
-    icon() {
-      // Handle icons blocked by app security
-      switch( this.tab.icon_url ) {
-        case "chrome://mozapps/skin/extensions/extensionGeneric-16.svg":
-          return { is_svg: true, url: "/favicons/firefox-addon.svg" }
-        case "chrome://branding/content/icon32.png":
-          return { is_svg: true, url: "/favicons/firefox-logo.svg" }
+  $tab-icon--size: 16px !default;
+  $tab-icon__state--size: 12px !default;
+
+  %slow-transition {
+    transition-duration: 250ms;
+    transition-timing-function: cubic-bezier(.07,.95,0,1);
+  }
+
+  @keyframes spinner {
+    0% { opacity: 1; }
+    50% { opacity: 0.25; }
+    100% { opacity: 1; }
+  }
+
+  .tab-icon {
+    position: relative;
+
+    &__img {
+      width: $tab-icon--size;
+      height: $tab-icon--size;
+
+      &--is-svg {
+        fill: var( --tab-icon__color );
       }
 
-      if( this.tab.url.startsWith( "about:" ) ) {
-        if( this.tab.url === 'about:debugging' || this.tab.url === 'about:config' || this.tab.url === 'about:newtab' ) {
-          return { is_svg: true, url: "/favicons/firefox-logo.svg" }
+      &--is-svg.tab-icon__img--theme-dark {
+        --tab-icon__color: $grey-30;
+      }
+
+      &--is-svg.tab-icon__img--theme-light {
+        --tab-icon__color: $ink-90;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        --tab-icon__color: $grey-30;
+      }
+
+      @media (prefers-color-scheme: light) {
+        --tab-icon__color: $ink-90;
+      }
+    }
+
+    &__state {
+      position: absolute;
+      top: -2px;
+      right: -8px;
+      height: $tab-icon__state--size;
+      width: $tab-icon__state--size;
+
+      &--theme-dark {
+        fill: rgb(255, 255, 255);
+      }
+
+      &--theme-light {
+        fill: $ink-90;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        &--theme-system {
+          fill: rgb(255, 255, 255);
         }
       }
 
-      // Handle icons blocked by tracking protection
-      // Twitter
-      if( this.tab.url.startsWith( "https://twitter.com" ) ) {
-        return { is_svg: false, url: "/favicons/twitter.svg" }
-      }
-      // Google
-      if( this.tab.url.startsWith( "https://mail.google.com" ) ) {
-        return { is_svg: false, url: "/favicons/google/mail.ico" }
-      }
-      if( this.tab.url.startsWith( "https://docs.google.com/document" ) ) {
-        return { is_svg: false, url: "/favicons/google/document.ico" }
-      }
-      if( this.tab.url.startsWith( "https://docs.google.com/presentation" ) ) {
-        return { is_svg: false, url: "/favicons/google/presentation.ico" }
-      }
-
-      // Remaining icons
-      return { is_svg: false, url: this.tab.icon_url }
-    },
-  },
-  created() {
-  },
-  methods: {
-    bem,
-    muteTab( event ) {
-      console.info('muteTab', this.tab.id)
-      event.stopPropagation()
-      window.background.muteTab( window.store, window.current_window_id, this.tab.id )
-    },
-    unmuteTab( event ) {
-      console.info('unmuteTab', this.tab.id)
-      event.stopPropagation()
-      window.background.unmuteTab( window.store, window.current_window_id, this.tab.id )
-    },
-    onIconLoadError( event ) {
-      console.info('onIconLoadError', event, this.tab.id, this.tab.icon_url)
-      this.error_url = this.tab.icon_url
-    }
-  }
-}
-</script>
-
-<style lang="scss">
-@import "../styles/photon-colors";
-
-$tab-icon--size: 16px !default;
-$tab-icon__state--size: 12px !default;
-
-%slow-transition {
-  transition-duration: 250ms;
-  transition-timing-function: cubic-bezier(.07,.95,0,1);
-}
-
-@keyframes spinner {
-  0% { opacity: 1; }
-  50% { opacity: 0.25; }
-  100% { opacity: 1; }
-}
-
-.tab-icon {
-  position: relative;
-
-  &__img {
-    width: $tab-icon--size;
-    height: $tab-icon--size;
-
-    &--is-svg#{&}--theme-dark {
-      fill: $grey-30;
-    }
-
-    &--is-svg#{&}--theme-light {
-      fill: $ink-90;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      &--is-svg#{&}--theme-system {
-        fill: $grey-30;
+      @media (prefers-color-scheme: light) {
+        &--theme-system {
+          fill: $ink-90;
+        }
       }
     }
 
-    @media (prefers-color-scheme: light) {
-      &--is-svg#{&}--theme-system {
-        fill: $ink-90;
+    &__spinner {
+      @extend %slow-transition;
+      transition-property: opacity;
+      opacity: 0;
+    }
+
+    &--is-loading &__spinner {
+      opacity: 1;
+    }
+
+    &__spinner-sub {
+      position: absolute;
+      top: 0;
+      width: 4px;
+      height: 6px;
+      border-radius: 2px;
+      background: $grey-50;
+
+      animation-name: spinner;
+      animation-duration: 2s;
+      animation-iteration-count: infinite;
+
+      &--index-0 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 0 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 0 * 2s / 12 );
       }
-    }
-  }
 
-  &__state {
-    position: absolute;
-    top: -2px;
-    right: -8px;
-    height: $tab-icon__state--size;
-    width: $tab-icon__state--size;
-
-    &--theme-dark {
-      fill: rgb(255, 255, 255);
-    }
-
-    &--theme-light {
-      fill: $ink-90;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      &--theme-system {
-        fill: rgb(255, 255, 255);
+      &--index-1 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 1 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 1 * 2s / 12 );
       }
-    }
 
-    @media (prefers-color-scheme: light) {
-      &--theme-system {
-        fill: $ink-90;
+      &--index-2 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 2 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 2 * 2s / 12 );
+      }
+
+      &--index-3 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 3 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 3 * 2s / 12 );
+      }
+
+      &--index-4 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 4 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 4 * 2s / 12 );
+      }
+
+      &--index-5 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 5 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 5 * 2s / 12 );
+      }
+
+      &--index-6 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 6 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 6 * 2s / 12 );
+      }
+
+      &--index-7 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 7 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 7 * 2s / 12 );
+      }
+
+      &--index-8 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 8 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 8 * 2s / 12 );
+      }
+
+      &--index-9 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 9 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 9 * 2s / 12 );
+      }
+
+      &--index-10 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 10 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 10 * 2s / 12 );
+      }
+
+      &--index-11 {
+        transform: translateX(6px) translateY(5px) rotate( calc( 11 * 30deg ) ) translateY(-10px);
+        animation-delay: calc( 11 * 2s / 12 );
       }
     }
   }
-
-  &__spinner {
-    @extend %slow-transition;
-    transition-property: opacity;
-    opacity: 0;
-  }
-
-  &--is-loading &__spinner {
-    opacity: 1;
-  }
-
-  &__spinner-sub {
-    position: absolute;
-    top: 0;
-    width: 4px;
-    height: 6px;
-    border-radius: 2px;
-    background: $grey-50;
-
-    animation-name: spinner;
-    animation-duration: 2s;
-    animation-iteration-count: infinite;
-
-    @for $i from 0 through 11 {
-      &--index-#{$i} {
-        transform: translateX(6px) translateY(5px) rotate($i * 30deg) translateY(-10px);
-        animation-delay: $i * 2s / 12;
-      }
-    }
-  }
-}
 </style>

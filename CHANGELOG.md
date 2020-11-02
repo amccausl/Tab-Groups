@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.0.18] - 2020-11-01
+
+### Changed
+- performance improvements for large tab lists
+
 ## [0.0.17] - 2020-03-22
 
 ### Fixed
@@ -187,6 +192,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - prevent closing last tab group in a window
 
 [Unreleased]: https://github.com/amccausl/tabulate/compare/master...develop
+[0.0.18]: https://github.com/amccausl/tabulate/compare/v0.0.17...v0.0.18
 [0.0.17]: https://github.com/amccausl/tabulate/compare/v0.0.16...v0.0.17
 [0.0.16]: https://github.com/amccausl/tabulate/compare/v0.0.15...v0.0.16
 [0.0.15]: https://github.com/amccausl/tabulate/compare/v0.0.14...v0.0.15

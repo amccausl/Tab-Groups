@@ -16,207 +16,177 @@
 </template>
 
 <script>
-import {
-  getWindow,
-} from "../store/helpers.mjs"
-import {
-  bem,
-  debounce,
-  onStateChange,
-} from "./helpers.mjs"
-
-const PROGRESS_CIRCUMFERENCE = 2 * Math.PI * 10
-
-export default {
-  name: "tab-search",
-  props: [ "theme" ],
-  data() {
-    return {
-      search_text: "",
-      search_resolved: true,
-      progress_dasharray: `0 ${ PROGRESS_CIRCUMFERENCE }`,
-      window_id: window.current_window_id,
-      is_focused: false,
-    }
-  },
-  computed: {
-    __MSG_tab_search_placeholder__() {
-      return window.background.getMessage( "tab_search_placeholder" )
-    }
-  },
-  created() {
-    onStateChange( state => {
-      const state_window = getWindow( state, this.window_id )
-      if( state_window && state_window.search != null ) {
-        console.info('new tab search state', state_window.search.text)
-        if( ! this.is_focused ) {
-          // Only set state if focused to prevent overwriting while typing
-          this.search_text = state_window.search.text
-        }
-        this.search_resolved = state_window.search.resolved
-        if( ! this.search_resolved ) {
-          const progress = 1 - state_window.search.queued_tab_ids.length / state_window.search.total_tabs_count
-          this.progress_dasharray = `${ progress * PROGRESS_CIRCUMFERENCE } ${ PROGRESS_CIRCUMFERENCE }`
-        } else {
-          this.progress_dasharray = `${ PROGRESS_CIRCUMFERENCE }`
-        }
-      } else {
-        this.search_text = ""
-        this.search_resolved = true
-        this.progress_dasharray = `0 ${ this.progress_dasharray }`
-      }
-    })
-  },
-  methods: {
+  import {
+    getWindow,
+  } from "../store/helpers.mjs"
+  import {
     bem,
-    onUpdateSearchText: debounce( function() {
-      console.info('runSearch', this.search_text)
-      window.background.runTabSearch( window.store, this.window_id, this.search_text )
-    }, 250 ),
-    onSearchBlur() {
-      console.info('onSearchBlur')
-      this.is_focused = false
+    debounce,
+    onStateChange,
+  } from "./helpers.mjs"
+
+  const PROGRESS_CIRCUMFERENCE = 2 * Math.PI * 10
+
+  export default {
+    name: "tab-search",
+    props: [ "theme" ],
+    data() {
+      return {
+        search_text: "",
+        search_resolved: true,
+        progress_dasharray: `0 ${ PROGRESS_CIRCUMFERENCE }`,
+        window_id: window.current_window_id,
+        is_focused: false,
+      }
     },
-    onSearchFocus() {
-      console.info('onSearchFocus')
-      this.is_focused = true
+    computed: {
+      __MSG_tab_search_placeholder__() {
+        return window.background.getMessage( "tab_search_placeholder" )
+      }
     },
-    clearSearchText() {
-      console.info('clearSearchText', this.search_text)
-      this.search_text = ""
-      window.background.runTabSearch( window.store, this.window_id, this.search_text )
+    created() {
+      onStateChange( state => {
+        const state_window = getWindow( state, this.window_id )
+        if( state_window && state_window.search != null ) {
+          console.info('new tab search state', state_window.search.text)
+          if( ! this.is_focused ) {
+            // Only set state if focused to prevent overwriting while typing
+            this.search_text = state_window.search.text
+          }
+          this.search_resolved = state_window.search.resolved
+          if( ! this.search_resolved ) {
+            const progress = 1 - state_window.search.queued_tab_ids.length / state_window.search.total_tabs_count
+            this.progress_dasharray = `${ progress * PROGRESS_CIRCUMFERENCE } ${ PROGRESS_CIRCUMFERENCE }`
+          } else {
+            this.progress_dasharray = `${ PROGRESS_CIRCUMFERENCE }`
+          }
+        } else {
+          this.search_text = ""
+          this.search_resolved = true
+          this.progress_dasharray = `0 ${ this.progress_dasharray }`
+        }
+      })
     },
+    methods: {
+      bem,
+      onUpdateSearchText: debounce( function() {
+        console.info('runSearch', this.search_text)
+        window.background.runTabSearch( window.store, this.window_id, this.search_text )
+      }, 250 ),
+      onSearchBlur() {
+        console.info('onSearchBlur')
+        this.is_focused = false
+      },
+      onSearchFocus() {
+        console.info('onSearchFocus')
+        this.is_focused = true
+      },
+      clearSearchText() {
+        console.info('clearSearchText', this.search_text)
+        this.search_text = ""
+        window.background.runTabSearch( window.store, this.window_id, this.search_text )
+      },
+    }
   }
-}
 </script>
 
 <style lang="scss">
-@import "../styles/photon";
+  @import "../styles/photon";
 
-$dark-awesome-bar-background: #474749;
-
-%tab-search__icon {
-  @extend %slow-transition;
-  transition-property: opacity;
-  position: absolute;
-  top: 11px;
-  height: 16px;
-  width: 16px;
-}
-
-$tab-search__theme: (
-  light: (
-    --background-color: $white-100,
-    --color: $grey-90,
-  ),
-  dark: (
-    --background-color: $dark-awesome-bar-background,
-    --color: $white-100,
-  ),
-);
-
-.tab-search {
-  flex: 1;
-  padding: 4px 0 4px 4px;
-  position: relative;
-
-  &__input {
-    @extend %text-body-10;
-    width: 100%;
-    height: 30px;
-    padding-left: 28px;
-    border: 1px solid $grey-90-a30;
-    border-radius: 4px;
-
-    &::-moz-placeholder {
-      @extend %text-body-10;
-    }
-  }
-
-  &__label:hover &__input {
-    border-color: $grey-90-a50;
-  }
-
-  &__icon {
-    @extend %tab-search__icon;
-    left: 11px;
-    opacity: 0.4;
-  }
-
-  &__clear-icon {
-    @extend %tab-search__icon;
-    right: 8px;
-    cursor: pointer;
-    display: none;
-    opacity: 0;
-  }
-
-  &__progress-icon {
+  %tab-search__icon {
     @extend %slow-transition;
-    transition-property: opacity, stroke-dasharray;
+    fill: var( --tab-search__color );
+    transition-property: opacity;
     position: absolute;
-    top: 7px;
-    right: 4px;
-    stroke: $magenta-50;
-    stroke-width: 4px;
-    fill: transparent;
-    opacity: 0;
+    top: 11px;
+    height: 16px;
+    width: 16px;
   }
 
-  &--is-active &__icon,
-  &--is-active &__clear-icon,
-  &--is-active &__progress-icon {
-    display: block;
-    opacity: 1;
-  }
-}
-
-@each $theme, $colors in $tab-search__theme {
   .tab-search {
-    &--theme-#{$theme} &__input {
-      background-color: map-get( $colors, --background-color );
-      color: map-get( $colors, --color );
-      border: 1px solid rgba( map-get( $colors, --color ), 0.3 );
+    flex: 1;
+    padding: 4px;
+    position: relative;
+
+    @media (prefers-color-scheme: dark) {
+      --tab-search__background-color: #474749;
+      --tab-search__color: white;
+      --tab-search__border-color: #919192;
+      --tab-search__border-color--hover: #a3a3a4;
+    }
+
+    @media (prefers-color-scheme: light) {
+      --tab-search__background-color: white;
+      --tab-search__color: #0c0c0d;
+      --tab-search__border-color: #b5b5b5;
+      --tab-search__border-color--hover: #858585;
+    }
+
+    &.tab-search--theme-dark {
+      --tab-search__background-color: #474749;
+      --tab-search__color: white;
+      --tab-search__border-color: #919192;
+      --tab-search__border-color--hover: #a3a3a4;
+    }
+
+    &.tab-search--theme-light {
+      --tab-search__background-color: white;
+      --tab-search__color: #0c0c0d;
+      --tab-search__border-color: #b5b5b5;
+      --tab-search__border-color--hover: #858585;
+    }
+
+    &__input {
+      @extend %text-body-10;
+      width: 100%;
+      height: 30px;
+      padding-left: 28px;
+      border: 1px solid var( --tab-search__border-color );
+      border-radius: 4px;
+      background-color: var( --tab-search__background-color );
+      color: var( --tab-search__color );
 
       &::-moz-placeholder {
-        color: map-get( $colors, --color );
+        @extend %text-body-10;
+        color: var( --tab-search__color );
       }
     }
 
-    &--theme-#{$theme} &__label:hover &__input {
-      border-color: rgba( map-get( $colors, --color ), 0.5 );
+    &__label:hover &__input {
+      border-color: var( --tab-search__border-color--hover );
     }
 
-    &--theme-#{$theme} &__icon {
-      fill: map-get( $colors, --color );
+    &__icon {
+      @extend %tab-search__icon;
+      left: 11px;
+      opacity: 0.4;
     }
 
-    &--theme-#{$theme} &__clear-icon {
-      fill: map-get( $colors, --color );
+    &__clear-icon {
+      @extend %tab-search__icon;
+      right: 8px;
+      cursor: pointer;
+      display: none;
+      opacity: 0;
+    }
+
+    &__progress-icon {
+      @extend %slow-transition;
+      transition-property: opacity, stroke-dasharray;
+      position: absolute;
+      top: 7px;
+      right: 4px;
+      stroke: $magenta-50;
+      stroke-width: 4px;
+      fill: transparent;
+      opacity: 0;
+    }
+
+    &--is-active &__icon,
+    &--is-active &__clear-icon,
+    &--is-active &__progress-icon {
+      display: block;
+      opacity: 1;
     }
   }
-
-  @media (prefers-color-scheme: $theme) {
-    .tab-search {
-      &__input {
-        background-color: map-get( $colors, --background-color );
-        color: map-get( $colors, --color );
-        border: 1px solid rgba( map-get( $colors, --color ), 0.3 );
-
-        &::-moz-placeholder {
-          color: map-get( $colors, --color );
-        }
-      }
-
-      &__label:hover &__input {
-        border-color: rgba( map-get( $colors, --color ), 0.5 );
-      }
-
-      &__icon,
-      &__clear-icon {
-        fill: map-get( $colors, --color );
-      }
-    }
-  }
-}
 </style>
