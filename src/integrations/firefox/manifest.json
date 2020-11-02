@@ -2,11 +2,11 @@
   "manifest_version": 2,
   "name": "__MSG_extension_name__",
   "description": "__MSG_extension_description__",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "browser_specific_settings": {
     "gecko": {
       "id": "{65afae73-8786-42d1-a6e7-95dc884dfb3a}",
-      "strict_min_version": "67.0"
+      "strict_min_version": "73.0"
     }
   },
   "permissions": [
