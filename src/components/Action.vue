@@ -171,8 +171,8 @@
     </header>
 
     <div class="action__content">
-      <div :class="[ bem( 'action__list-item', { 'active': tab_group.id === active_tab_group_id } ) ]" v-for="tab_group in tab_groups" :key="tab_group.id">
-        <div class="text" @click="onTabGroupClick( tab_group )">
+      <div v-for="tab_group in tab_groups" :key="tab_group.id" @click="onTabGroupClick( tab_group )" :class="[ bem( 'action__list-item', { 'active': tab_group.id === active_tab_group_id } ) ]">
+        <div class="text">
           {{ tab_group.title }}
         </div>
         <svg v-if="tab_group.audible" :class="bem( `action__list-item-icon`, { 'audio': true } )" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -181,7 +181,7 @@
             <path d="M13 8a3 3 0 0 0-2.056-2.787.5.5 0 1 0-.343.939A2.008 2.008 0 0 1 12 8a2.008 2.008 0 0 1-1.4 1.848.5.5 0 0 0 .343.939A3 3 0 0 0 13 8z"></path>
           </g>
         </svg>
-        <div @click="onTabGroupClick( tab_group )">
+        <div>
           {{ is_searching ? getCountMessage( 'matched_tabs', tab_group.search_matched_tabs_count ) : getCountMessage( 'tabs', tab_group.tabs_count ) }}
         </div>
       </div>
