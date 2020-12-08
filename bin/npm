@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+docker run -it --rm --user node -e "TERM=xterm-256color" -v $(pwd):/usr/src/app -w /usr/src/app node:15.3.0-slim npm "$@"
