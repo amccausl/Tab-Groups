@@ -15,7 +15,7 @@ import {
   createTestTab
 } from "../helpers.mjs"
 
-tap.test( function toSameWindow( t ) {
+tap.test( async function toSameWindow( t ) {
   const window_id = 1
   const tab_group_id = 3
   const tab_group_index = 1
@@ -47,10 +47,9 @@ tap.test( function toSameWindow( t ) {
   t.equal( state1.windows[ 0 ].active_tab_group_id, tab_group_id, "should not update the active group during move" )
   t.equal( state1.windows[ 0 ].active_tab_id, 5, "should not update the active tab during move" )
 
-  t.end()
 })
 
-tap.test( function toSameWindowDropZone( t ) {
+tap.test( async function toSameWindowDropZone( t ) {
   const window_id = 1
   const tab_group_id = 3
   const state0 = {
@@ -75,10 +74,9 @@ tap.test( function toSameWindowDropZone( t ) {
   t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows[ 0 ].tab_groups[ 2 ].id, tab_group_id )
 
-  t.end()
 })
 
-tap.test( function toDifferentWindow( t ) {
+tap.test( async function toDifferentWindow( t ) {
   const tab_group_id = 3
   const tab_group_index = 1
   const source_data = {
@@ -121,10 +119,9 @@ tap.test( function toDifferentWindow( t ) {
   t.equal( state1.windows[ 1 ].tab_groups.length, 4 )
   t.equal( state1.windows[ 1 ].tab_groups[ tab_group_index ].id, tab_group_id )
 
-  t.end()
 })
 
-tap.test( function activeGroupToDifferentWindow( t ) {
+tap.test( async function activeGroupToDifferentWindow( t ) {
   const tab_group_id = 2
   const tab_group_index = 1
   const source_data = {
@@ -168,10 +165,9 @@ tap.test( function activeGroupToDifferentWindow( t ) {
   t.equal( state1.windows[ 1 ].tab_groups.length, 4 )
   t.equal( state1.windows[ 1 ].tab_groups[ tab_group_index ].id, tab_group_id )
 
-  t.end()
 })
 
-tap.test( function lastGroupToDifferentWindow( t ) {
+tap.test( async function lastGroupToDifferentWindow( t ) {
   const tab_group_index = 1
   const source_data = {
     window_id: 1,
@@ -205,10 +201,9 @@ tap.test( function lastGroupToDifferentWindow( t ) {
   t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows.length, 1, "should remove empty window" )
 
-  t.end()
 })
 
-tap.test( function lastGroupToDifferentWindowWithPinned( t ) {
+tap.test( async function lastGroupToDifferentWindowWithPinned( t ) {
   const tab_group_index = 1
   const source_data = {
     window_id: 1,
@@ -245,10 +240,9 @@ tap.test( function lastGroupToDifferentWindowWithPinned( t ) {
   t.equal( state1.windows.length, 2, "should not remove source window" )
   t.equal( state1.windows[ 0 ].tab_groups.length, 2, "should add a new group" )
 
-  t.end()
 })
 
-tap.test( function lastNonEmptyGroupToDifferentWindow( t ) {
+tap.test( async function lastNonEmptyGroupToDifferentWindow( t ) {
   // Latest firefox doesn't trigger window create first :(
   const tab_group_index = 1
   const source_data = {
@@ -284,10 +278,9 @@ tap.test( function lastNonEmptyGroupToDifferentWindow( t ) {
   t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows.length, 1, "should remove empty window" )
 
-  t.end()
 })
 
-tap.test( function toNewWindow( t ) {
+tap.test( async function toNewWindow( t ) {
   const tab_group_index = 1
   const source_data = {
     window_id: 1,
@@ -318,5 +311,4 @@ tap.test( function toNewWindow( t ) {
   t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows.length, 2, "should add a new window" )
 
-  t.end()
 })

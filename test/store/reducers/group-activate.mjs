@@ -15,7 +15,7 @@ import {
   validateState,
 } from "../../../src/store/validators.mjs"
 
-tap.test( function testNormalActivate( t ) {
+tap.test( async function testNormalActivate( t ) {
   let state0 = {
     config: {},
     windows: [
@@ -43,10 +43,9 @@ tap.test( function testNormalActivate( t ) {
 
   state0 = activateGroup( state0, { window_id: state0.windows[ 0 ].id, tab_group_id: 2 } )
   t.ok( validateState( state0 ), "should pass validation", validateState.errors )
-  t.end()
 })
 
-tap.test( function testActivateMissingGroup(t) {
+tap.test( async function testActivateMissingGroup(t) {
   let state0 = {
     config: {},
     windows: [
@@ -74,5 +73,4 @@ tap.test( function testActivateMissingGroup(t) {
 
   state0 = activateGroup( state0, { window_id: state0.windows[0].id, tab_group_id: 1 } )
   t.ok( validateState( state0 ), "should pass validation", validateState.errors )
-  t.end()
 })

@@ -50,7 +50,7 @@ function createTestContext() {
   ])
 }
 
-tap.test( function testToggleTabSelection( t ) {
+tap.test( async function testToggleTabSelection( t ) {
   const context = createTestContext()
 
   context.selected_tab_ids = []
@@ -71,10 +71,9 @@ tap.test( function testToggleTabSelection( t ) {
 
   // @todo should throw error if not found
 
-  t.end()
 })
 
-tap.test( function testToggleTabBatchSelection( t ) {
+tap.test( async function testToggleTabBatchSelection( t ) {
   const context = createTestContext()
 
   context.selected_tab_ids = []
@@ -93,5 +92,4 @@ tap.test( function testToggleTabBatchSelection( t ) {
   toggleTabBatchSelection.call( context, 4 )
   t.same( context.selected_tab_ids, [ 2, 3, 4, 8 ], "should keep groups separate" )
 
-  t.end()
 })

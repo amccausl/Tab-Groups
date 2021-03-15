@@ -15,7 +15,7 @@ import {
 import { addTab } from "../../../src/store/reducers/tab.mjs"
 import { validateState } from "../../../src/store/validators.mjs"
 
-tap.test( function testSingleWindowAdd( t ) {
+tap.test( async function testSingleWindowAdd( t ) {
   let state = getInitialState()
 
   let tab_group_id = state.windows[ 0 ].tab_groups[ 0 ].id
@@ -30,10 +30,9 @@ tap.test( function testSingleWindowAdd( t ) {
 
   t.equal( state.windows[ 0 ].tab_groups.length, 2 )
   t.equal( state.windows[ 0 ].tab_groups[ 1 ].tabs.length, 3 )
-  t.end()
 })
 
-tap.test( function testMultiWindowAdd( t ) {
+tap.test( async function testMultiWindowAdd( t ) {
   let state = getMultiWindowInitialState()
 
   // let tab_group_id = state.tab_groups[ 1 ].id
@@ -50,10 +49,9 @@ tap.test( function testMultiWindowAdd( t ) {
   t.equal( state.windows[ 0 ].tab_groups[ 1 ].tabs_count, state.windows[ 0 ].tab_groups[ 1 ].tabs.length )
   t.equal( state.windows[ 1 ].tab_groups[ 1 ].tabs.length, 3 )
   t.equal( state.windows[ 1 ].tab_groups[ 1 ].tabs_count, state.windows[ 1 ].tab_groups[ 1 ].tabs.length )
-  t.end()
 })
 
-tap.test( function testAddToNewWindow( t ) {
+tap.test( async function testAddToNewWindow( t ) {
   let state = getInitialState()
 
   let browser_tab = createBrowserTab({
@@ -67,10 +65,9 @@ tap.test( function testAddToNewWindow( t ) {
 
   t.equal( state.windows.length, 2 )
   t.equal( state.windows[ 1 ].tab_groups[ 1 ].tabs[ 0 ].id, 5 )
-  t.end()
 })
 
-tap.test( function testReopenClosedPinnedTab( t ) {
+tap.test( async function testReopenClosedPinnedTab( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -102,10 +99,9 @@ tap.test( function testReopenClosedPinnedTab( t ) {
   t.equal( state1.windows[ 0 ].tab_groups[ 0 ].tabs.length, 2 )
   t.equal( state1.windows[ 0 ].tab_groups[ 0 ].tabs[ 1 ].id, 5 )
 
-  t.end()
 })
 
-tap.test( function testOpenNewTabWithOpenerId( t ) {
+tap.test( async function testOpenNewTabWithOpenerId( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -140,10 +136,9 @@ tap.test( function testOpenNewTabWithOpenerId( t ) {
   t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( state1.windows[ 0 ].tab_groups[ 1 ].tabs_count, 3 )
 
-  t.end()
 })
 
-tap.test( function testOpenNewTabInOtherGroup( t ) {
+tap.test( async function testOpenNewTabInOtherGroup( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -180,10 +175,9 @@ tap.test( function testOpenNewTabInOtherGroup( t ) {
   t.equal( window1.tab_groups[ 2 ].active_tab_id, 9 )
   t.equal( window1.active_tab_id, 9 )
   t.equal( window1.active_tab_group_id, 3 )
-  t.end()
 })
 
-tap.test( function testOpenActiveTabUndefinedGroup( t ) {
+tap.test( async function testOpenActiveTabUndefinedGroup( t ) {
   const state0 = {
     config: {},
     windows: [
@@ -209,5 +203,4 @@ tap.test( function testOpenActiveTabUndefinedGroup( t ) {
   const window1 = state1.windows[ 0 ]
   t.ok( validateState( state1 ), "should pass validation", validateState.errors )
   t.equal( window1.active_tab_id, browser_tab.id )
-  t.end()
 })

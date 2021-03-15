@@ -38,5 +38,4 @@ tap.test( async function validateLocales( t ) {
     t.equal( empty_message_keys.length, 0, `Locale "${ locale_key }" includes empty keys ${ empty_message_keys.map( prop => `"${ prop }"`).join( ", " ) }` )
   }
 
-  t.end()
 })

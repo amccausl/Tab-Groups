@@ -9,7 +9,7 @@ import { createTabGroup } from "../../src/store/helpers.mjs"
 import { activateTab } from "../../src/store/reducers/tab.mjs"
 import { validateState } from "../../src/store/validators.mjs"
 
-tap.test( function testSingleWindowSingleGroupActivateTab( t ) {
+tap.test( async function testSingleWindowSingleGroupActivateTab( t ) {
   const state = getInitialState()
   const window = state.windows[ 0 ]
 
@@ -22,10 +22,9 @@ tap.test( function testSingleWindowSingleGroupActivateTab( t ) {
 
   t.equal( new_window.tab_groups[ 1 ].tabs.length, 2 )
   t.equal( new_window.tab_groups[ 1 ].active_tab_id, tab_id )
-  t.end()
 })
 
-tap.test( function testSingleWindowMultiGroupActivateTab( t ) {
+tap.test( async function testSingleWindowMultiGroupActivateTab( t ) {
   const state = getInitialState()
   const window = state.windows[ 0 ]
 
@@ -49,5 +48,4 @@ tap.test( function testSingleWindowMultiGroupActivateTab( t ) {
 
   t.equal( new_window.tab_groups[ 2 ].tabs.length, 2 )
   t.equal( new_window.tab_groups[ 2 ].active_tab_id, tab_id )
-  t.end()
 })

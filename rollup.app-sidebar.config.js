@@ -18,6 +18,7 @@ const config = {
       output: './dist/css/app-sidebar.css',
     }),
     replace({
+      "preventAssignment": true,
       'process.env.NODE_ENV': JSON.stringify( 'production' ),
     }),
     nodeResolve(),

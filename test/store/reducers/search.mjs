@@ -15,7 +15,7 @@ import {
   createTestTab,
 } from "../helpers.mjs"
 
-tap.test( function testSingleWindowSearch( t ) {
+tap.test( async function testSingleWindowSearch( t ) {
   const window_id = 1
   const state0 = {
     config: {},
@@ -46,10 +46,9 @@ tap.test( function testSingleWindowSearch( t ) {
 
   t.same( state2.windows[ 0 ].search, { text: search_text, resolved: true, total_tabs_count, matched_tab_ids: [ 4, 6, 7, 8 ], queued_tab_ids: [] } )
 
-  t.end()
 })
 
-tap.test( function testSingleWindowSearchUpdate( t ) {
+tap.test( async function testSingleWindowSearchUpdate( t ) {
   const window_id = 1
   const state0 = {
     config: {},
@@ -79,5 +78,4 @@ tap.test( function testSingleWindowSearchUpdate( t ) {
   const state2 = updateWindowSearch( state1, { window_id, search_text, searched_tab_ids, matched_tab_ids } )
   t.same( state2.windows[ 0 ].search, { text: search_text, resolved: false, total_tabs_count, matched_tab_ids: [ 5 ], queued_tab_ids: [ 7, 8 ] } )
 
-  t.end()
 })

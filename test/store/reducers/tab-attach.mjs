@@ -42,7 +42,6 @@ tap.test( "shouldValidateNativeTabDragToNativeTabBar", ( t ) => {
 
   t.equal( state1.windows.length, 1, "should remove empty window" )
 
-  t.end()
 })
 
 tap.test( "shouldValidateDragToNewWindow", ( t ) => {
@@ -82,5 +81,4 @@ tap.test( "shouldValidateDragToNewWindow", ( t ) => {
     ]
   })
 
-  t.end()
 })

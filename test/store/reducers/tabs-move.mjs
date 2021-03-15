@@ -11,7 +11,7 @@ import { validateState } from "../../../src/store/validators.mjs"
 
 import { moveTabs } from "../../../src/store/reducers/tab.mjs"
 
-tap.test( function testSingleWindowMoveOne( t ) {
+tap.test( async function testSingleWindowMoveOne( t ) {
   const initial_state = {
     config: {},
     windows: [
@@ -44,10 +44,9 @@ tap.test( function testSingleWindowMoveOne( t ) {
 
   const state1 = moveTabs( initial_state, tab_move_data )
   t.ok( validateState( state1 ), "should pass validation", validateState.errors )
-  t.end()
 })
 
-tap.test( function testMoveActiveTab( t ) {
+tap.test( async function testMoveActiveTab( t ) {
   const last_active = ( new Date() ).getTime() - 10
   const initial_state = {
     config: {},
@@ -92,10 +91,9 @@ tap.test( function testMoveActiveTab( t ) {
   t.equal( state1.windows[ 0 ].active_tab_group_id, inactive_tab_group.id, "activate new group on move of active tab" )
   t.type( state1.windows[ 0 ].tab_groups[ 2 ].last_active, "number" )
   t.ok( state1.windows[ 0 ].tab_groups[ 2 ].last_active > last_active, `${ state1.windows[ 0 ].tab_groups[ 2 ].last_active } > ${ last_active }` )
-  t.end()
 })
 
-tap.test( function testMoveTabsToNewGroup( t ) {
+tap.test( async function testMoveTabsToNewGroup( t ) {
   const last_active = ( new Date() ).getTime() - 10
   const state0 = {
     config: {},
@@ -141,5 +139,4 @@ tap.test( function testMoveTabsToNewGroup( t ) {
   t.ok( target_tab_group.last_active > last_active, `${ target_tab_group.last_active } > ${ last_active }` )
   t.equal( state1.windows[ 0 ].active_tab_id, 7 )
   t.equal( state1.windows[ 0 ].active_tab_group_id, tab_move_data.target_data.tab_group_id )
-  t.end()
 })

@@ -29,24 +29,24 @@
   },
   "devDependencies": {
     "@brightcove/kacl": "0.1.11",
-    "@rollup/plugin-commonjs": "17.0.0",
-    "@rollup/plugin-node-resolve": "11.0.0",
-    "@rollup/plugin-replace": "2.3.4",
-    "@vue/compiler-sfc": "3.0.2",
+    "@rollup/plugin-commonjs": "17.1.0",
+    "@rollup/plugin-node-resolve": "11.2.0",
+    "@rollup/plugin-replace": "2.4.1",
+    "@vue/compiler-sfc": "3.0.7",
     "ajv": "6.12.6",
     "ajv-cli": "3.3.0",
     "debug": "4.3.1",
-    "eslint": "7.15.0",
+    "eslint": "7.22.0",
     "fira": "git://github.com/mozilla/Fira.git#fd8c8c0a3d353cd99e8ca1662942d165e6961407",
     "node-sass": "^5.0.0",
-    "postcss": "8.2.0",
+    "postcss": "8.2.8",
     "postcss-modules": "4.0.0",
     "postcss-selector-parser": "6.0.4",
-    "rollup": "2.34.2",
+    "rollup": "2.41.2",
     "rollup-plugin-scss": "2.6.1",
     "rollup-plugin-vue": "6.0.0",
     "tap": "14.11.0",
-    "vue": "3.0.2",
-    "web-ext": "5.4.1"
+    "vue": "3.0.7",
+    "web-ext": "6.0.0"
   }
 }

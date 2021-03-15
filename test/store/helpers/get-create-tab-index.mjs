@@ -11,7 +11,7 @@ import {
   createTestTab,
 } from "../helpers.mjs"
 
-tap.test( function testGetCreateTabIndexNewTabEnd( t ) {
+tap.test( async function testGetCreateTabIndexNewTabEnd( t ) {
   const state0 = {
     windows: [
       createWindow( 1, [
@@ -38,10 +38,9 @@ tap.test( function testGetCreateTabIndexNewTabEnd( t ) {
 
   let { index } = getCreateTabTarget( state0, browser_tab )
   t.equal( index, 6 )
-  t.end()
 })
 
-tap.test( function testGetCreateTabIndexNewTabMiddle( t ) {
+tap.test( async function testGetCreateTabIndexNewTabMiddle( t ) {
   const state0 = {
     windows: [
       createWindow( 1, [
@@ -68,10 +67,9 @@ tap.test( function testGetCreateTabIndexNewTabMiddle( t ) {
 
   let { index } = getCreateTabTarget( state0, browser_tab )
   t.equal( index, 4 )
-  t.end()
 })
 
-tap.test( function testGetCreateTabIndexNewFromPinned( t ) {
+tap.test( async function testGetCreateTabIndexNewFromPinned( t ) {
   const state0 = {
     windows: [
       createWindow( 1, [
@@ -98,5 +96,4 @@ tap.test( function testGetCreateTabIndexNewFromPinned( t ) {
 
   let { index } = getCreateTabTarget( state0, browser_tab )
   t.equal( index, 4 )
-  t.end()
 })

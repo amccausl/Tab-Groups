@@ -82,7 +82,6 @@ function draggingLocalTab( t ) {
     target: {}
   })
 
-  t.end()
 }
 
 function getTransferDataFromBookmark( t ) {
@@ -92,7 +91,6 @@ function getTransferDataFromBookmark( t ) {
   const event_data = getTransferData( dataTransfer )
 
   t.same( event_data, { type: "moz-place", links: [ { url: "https://v1.vuejs.org/guide/forms.html", title: "Form Input Bindings - vue.js" } ] } )
-  t.end()
 }
 
 function getTransferDataFromBookmarkFolder( t ) {
@@ -105,20 +103,16 @@ function getTransferDataFromBookmarkFolder( t ) {
     { url: "https://support.mozilla.org/en-US/kb/get-started-firefox-overview-main-features", title: "Get started with Firefox" },
     { url: "https://v1.vuejs.org/guide/forms.html", title: "Form Input Bindings - vue.js" }
   ]})
-  t.end()
 }
 
 function getTransferDataFromLibraryLink( t ) {
-  t.end()
 }
 
 function getTransferDataFromLocationBar( t ) {
-  t.end()
 }
 
 function getTransferDataFromLink( t ) {
   const { dataTransfer } = createTestEvent()
-  t.end()
 }
 
 tap.test( draggingLocalTab )

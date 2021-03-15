@@ -54,8 +54,6 @@ function testGetTabMoveData( t ) {
     tab_group_id: 3,
     tab_group_index: 2
   })
-
-  t.end()
 }
 
 function testGetTabMoveDataMiddle( t ) {
@@ -99,8 +97,6 @@ function testGetTabMoveDataMiddle( t ) {
     tab_group_id: 3,
     tab_group_index: 1
   })
-
-  t.end()
 }
 
 function testGetTabMoveDataReopenPinned( t ) {
@@ -137,7 +133,6 @@ function testGetTabMoveDataReopenPinned( t ) {
     }
   )
 
-  t.end()
 }
 
 function testGetTabMoveDataNewGroup( t ) {
@@ -175,7 +170,6 @@ function testGetTabMoveDataNewGroup( t ) {
     tabs_count: tab_move_data.source_data.tabs.length
   })
 
-  t.end()
 }
 
 // tap.test( testGetTabMoveData )
@@ -183,7 +177,7 @@ function testGetTabMoveDataNewGroup( t ) {
 // tap.test( testGetTabMoveDataNewGroup )
 // tap.test( testGetTabMoveDataReopenPinned )
 
-tap.test( function testMoveFromUrl( t ) {
+tap.test( async function testMoveFromUrl( t ) {
   const state0 = {
     windows: [
       createWindow( 1, [
@@ -224,10 +218,9 @@ tap.test( function testMoveFromUrl( t ) {
   //   tab_group_index: 2
   // })
 
-  t.end()
 })
 
-tap.test( function testNativeDragToStartOfSecondGroup( t ) {
+tap.test( async function testNativeDragToStartOfSecondGroup( t ) {
   const state0 = {
     windows: [
       createWindow( 1, [
@@ -272,10 +265,9 @@ tap.test( function testNativeDragToStartOfSecondGroup( t ) {
     tab_group_index: 0,
   })
 
-  t.end()
 })
 
-tap.test( function testNativeDragPinned( t ) {
+tap.test( async function testNativeDragPinned( t ) {
   const state0 = {
     windows: [
       createWindow(
@@ -331,10 +323,9 @@ tap.test( function testNativeDragPinned( t ) {
     tab_group_index: 0,
   })
 
-  t.end()
 })
 
-tap.test( function testNativeDragMultiple( t ) {
+tap.test( async function testNativeDragMultiple( t ) {
   const state0 = {
     windows: [
       createWindow(
@@ -388,5 +379,4 @@ tap.test( function testNativeDragMultiple( t ) {
     tab_group_index: 0,
   })
 
-  t.end()
 })

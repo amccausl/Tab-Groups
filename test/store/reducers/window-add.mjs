@@ -2,7 +2,7 @@ import tap from 'tap'
 
 import { addWindow } from "../../../src/store/reducers/window.mjs"
 
-tap.test( function testSingleWindowAdd( t ) {
+tap.test( async function testSingleWindowAdd( t ) {
   let state = {
     windows: []
   }
@@ -16,5 +16,4 @@ tap.test( function testSingleWindowAdd( t ) {
 
   t.equal( state.windows.length, 2 )
   t.equal( state.windows[ 1 ].id, 2 )
-  t.end()
 })

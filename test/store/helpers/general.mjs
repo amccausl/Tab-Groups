@@ -35,17 +35,15 @@ function moveToLaterIndex( t ) {
     index: 0,
     tab_group_index: 0
   })
-  t.end()
 }
 
-tap.test( function testFindTab( t ) {
+tap.test( async function testFindTab( t ) {
   let state = getInitialState()
   let tab = findTab( state, state.windows[ 0 ].id, state.windows[ 0 ].tab_groups[ 1 ].tabs[ 0 ].id )
   t.equal( tab, state.windows[ 0 ].tab_groups[ 1 ].tabs[ 0 ] )
-  t.end()
 })
 
-tap.test( function testGetTabMoveData( t ) {
+tap.test( async function testGetTabMoveData( t ) {
   const initial_state = {
     windows: [
       createWindow( 1, [
@@ -85,11 +83,9 @@ tap.test( function testGetTabMoveData( t ) {
     tab_group_id: 3,
     tab_group_index: 2
   })
-
-  t.end()
 })
 
-tap.test( function testGetTabMoveDataMiddle( t ) {
+tap.test( async function testGetTabMoveDataMiddle( t ) {
   const initial_state = {
     windows: [
       createWindow( 1, [
@@ -131,10 +127,9 @@ tap.test( function testGetTabMoveDataMiddle( t ) {
     tab_group_index: 1
   })
 
-  t.end()
 })
 
-tap.test( function testGetTabMoveDataNewGroup( t ) {
+tap.test( async function testGetTabMoveDataNewGroup( t ) {
   const initial_state = {
     windows: [
       createWindow( 1, [
@@ -169,16 +164,13 @@ tap.test( function testGetTabMoveDataNewGroup( t ) {
     tabs_count: tab_move_data.source_data.tabs.length,
     last_active: undefined,
   })
-
-  t.end()
 })
 
-tap.test( function testGetTargetIndex( t ) {
+tap.test( async function testGetTargetIndex( t ) {
   t.test( moveToLaterIndex )
-  t.end()
 })
 
-tap.test( function testPersistence( t ) {
+tap.test( async function testPersistence( t ) {
   let state = getInitialState()
   let tab_groups_state = getTabGroupsPersistState( state.windows[ 0 ] )
 
@@ -191,6 +183,4 @@ tap.test( function testPersistence( t ) {
       tabs_count: 2
     }
   ])
-
-  t.end()
 })

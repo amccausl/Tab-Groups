@@ -7,7 +7,7 @@ import { createBrowserTab } from "../helpers.mjs"
 
 // @todo if one window not included in saved state, ensure IDs not duplicated
 
-tap.test( function freshInitWithSingleWindow( t ) {
+tap.test( async function freshInitWithSingleWindow( t ) {
   const browser_tabs = [
     createBrowserTab({
       id: 1,
@@ -39,10 +39,9 @@ tap.test( function freshInitWithSingleWindow( t ) {
   t.equal( initial_state.windows[ 0 ].tab_groups[ 1 ].tabs.length, 3 )
   t.equal( initial_state.windows.length, 1 )
   t.equal( initial_state.windows[ 0 ].active_tab_group_id, initial_state.windows[ 0 ].tab_groups[ 1 ].id )
-  t.end()
 })
 
-tap.test( function freshInitWithMultipleWindows( t ) {
+tap.test( async function freshInitWithMultipleWindows( t ) {
   const browser_state = {
     browser_tabs: [
       createBrowserTab({
@@ -86,10 +85,9 @@ tap.test( function freshInitWithMultipleWindows( t ) {
   t.equal( state0.windows[ 1 ].tab_groups[ 1 ].title, "Group 2" )
   t.equal( state0.windows[ 1 ].tab_groups[ 1 ].tabs.length, 2 )
   t.equal( state0.windows[ 1 ].active_tab_group_id, state0.windows[ 1 ].tab_groups[ 1 ].id )
-  t.end()
 })
 
-tap.test( function testSingleWindowMultiGroupDetectActive( t ) {
+tap.test( async function testSingleWindowMultiGroupDetectActive( t ) {
   const browser_state = {
     browser_tabs: [
       createBrowserTab({
@@ -140,10 +138,9 @@ tap.test( function testSingleWindowMultiGroupDetectActive( t ) {
   t.ok( validateState( state0 ), "initial should pass validation", validateState.errors )
   t.equal( state0.windows[ 0 ].active_tab_group_id, 2 )
 
-  t.end()
 })
 
-tap.test( function testSingleWindowSessionLoad( t ) {
+tap.test( async function testSingleWindowSessionLoad( t ) {
   const browser_state = {
     browser_tabs: [
       createBrowserTab({
@@ -207,10 +204,9 @@ tap.test( function testSingleWindowSessionLoad( t ) {
   t.equal( state0.windows[ 0 ].tab_groups[ 1 ].tabs_count, 3 )
   t.equal( state0.windows[ 0 ].tab_groups[ 2 ].tabs_count, 1 )
 
-  t.end()
 })
 
-tap.test( function testUnsetActiveTab( t ) {
+tap.test( async function testUnsetActiveTab( t ) {
   const browser_tabs = [
     createBrowserTab({
       id: 1,
@@ -246,5 +242,4 @@ tap.test( function testUnsetActiveTab( t ) {
   t.ok( validateState( initial_state ), "initial should pass validation", validateState.errors )
   // console.info( initial_state.windows[ 0 ] )
 
-  t.end()
 })
